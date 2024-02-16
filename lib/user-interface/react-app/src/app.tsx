@@ -28,7 +28,7 @@ function App() {
         <div style={{ height: "56px", backgroundColor: "#000716" }}>&nbsp;</div>
         <div>
           <Routes>
-            <Route index path="/" element={<Welcome />} />
+            <Route index path="/" element={<Playground />} />
             <Route path="/chatbot" element={<Outlet />}>
               <Route path="playground" element={<Playground />} />
               <Route path="playground/:sessionId" element={<Playground />} />
