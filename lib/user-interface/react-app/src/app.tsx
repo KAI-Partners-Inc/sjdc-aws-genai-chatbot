@@ -7,7 +7,6 @@ import Engines from "./pages/rag/engines/engines";
 import CreateWorkspace from "./pages/rag/create-workspace/create-workspace";
 import Embeddings from "./pages/rag/embeddings/embeddings";
 import CrossEncoders from "./pages/rag/cross-encoders/cross-encoders";
-import Welcome from "./pages/welcome";
 import Playground from "./pages/chatbot/playground/playground";
 import Models from "./pages/chatbot/models/models";
 import WorkspacePane from "./pages/rag/workspace/workspace";
