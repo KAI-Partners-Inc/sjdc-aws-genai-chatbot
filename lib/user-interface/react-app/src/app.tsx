@@ -1,11 +1,18 @@
-import { HashRouter, BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { useContext } from "react";
+import {
+  BrowserRouter,
+  HashRouter,
+  Outlet,
+  Route,
+  Routes,
+} from "react-router-dom";
+import { AppContext } from "./common/app-context";
 import GlobalHeader from "./components/global-header";
-import NotFound from "./pages/not-found";
-import Playground from "./pages/chatbot/playground/playground";
 import Models from "./pages/chatbot/models/models";
-import "./styles/app.scss";
 import MultiChatPlayground from "./pages/chatbot/playground/multi-chat-playground";
-import * as InfraConfig from '../../../../bin/config.json';
+import Playground from "./pages/chatbot/playground/playground";
+import NotFound from "./pages/not-found";
+import "./styles/app.scss";
 import Embedded from "./pages/chatbot/embedded/embedded.tsx";
 import GlobalFooter from "./components/global-footer.tsx";
 
@@ -18,7 +25,7 @@ const subHeaderWrapperStyles = {
   display: 'block'
 }
 const Layout = () => (
-  <div style={{ backgroundColor: "#f9c623" }}>
+  <div style={{ backgroundColor: "#f9c623" }} id="#layout">
     <GlobalHeader />
     <div style={{ height: 56, backgroundColor: "#000716" }} />
     <div>
@@ -38,7 +45,8 @@ const Layout = () => (
 )
 
 function App() {
-  const Router = InfraConfig.privateWebsite ? HashRouter : BrowserRouter;
+  const appContext = useContext(AppContext);
+  const Router = appContext?.config.privateWebsite ? HashRouter : BrowserRouter;
 
   return (
     <div
