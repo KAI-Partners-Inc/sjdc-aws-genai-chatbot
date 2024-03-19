@@ -25,11 +25,11 @@ const subHeaderWrapperStyles = {
   display: 'block'
 }
 const Layout = () => (
-  <div style={{ backgroundColor: "#f9c623" }} id="#layout">
+  <div id="layout" style={{ backgroundColor: "#f9c623" }}>
     <GlobalHeader />
-    <div style={{ height: 56, backgroundColor: "#000716" }} />
+    <div id="header-spacer" style={{ height: 56, backgroundColor: "#000716" }} />
     <div>
-      <div style={subHeaderWrapperStyles}>
+      <div id="subheader-wrapper" style={subHeaderWrapperStyles}>
         <div className="subHeader">
           <a href="https://www.deltacollege.edu/">
             <img alt="San Joaquin Delta College Logo - Home" className="desktop" src="https://www.deltacollege.edu/sites/default/files/images/delta-logo.jpg" style={{ height: 98, maxHeight: '100%'}} />
@@ -37,7 +37,6 @@ const Layout = () => (
           </a>
         </div>
       </div>
-      <div style={{ height: 115, backgroundColor: '#ffffff' }} />
       <Outlet />
       <GlobalFooter />
     </div>

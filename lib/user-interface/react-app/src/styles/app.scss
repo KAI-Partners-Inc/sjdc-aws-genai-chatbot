@@ -36,7 +36,12 @@ header {
     min-height: calc(100vh - 216px) !important;
   }
 }
-.awsui_layout_hyvsj_p48sj_380:not(#\9).awsui_layout_hyvsj_p48sj_380:not(#\9) {
+.awsui_navigation-container_hyvsj_p48sj_711:not(#\9 ),
+.awsui_tools-container_hyvsj_p48sj_989:not(#\9) {
+  top: 171px !important;
+  height: calc(100% - 150px) !important;
+}
+.awsui_navigation-container_hyvsj_p48sj_711:not(#\9) {
   --awsui-footer-height-y98gph: 149px !important;
 }
 
@@ -56,6 +61,7 @@ header {
   position: fixed;
   z-index: 1000;
   display: block;
+  top: 56px;
   left: 0;
   right: 0;
 }
