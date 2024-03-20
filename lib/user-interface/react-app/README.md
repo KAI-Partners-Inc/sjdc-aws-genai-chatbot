@@ -56,7 +56,7 @@ npm run dev
 
 ### Embedding Demo Chat-bot
 
-1. Open the [chat.js](https://d2ins6zcpv691t.cloudfront.net/chat.js) script.
+1. Open the [Chat Script Config](https://d2ins6zcpv691t.cloudfront.net/kai/common-ui/embed-chat.html) page.
 1. Select all and copy the script.
 1. In a new tab open one of the following:
     2. https://kaipartners.com

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embed Chat-bot</title>
+  <link id="prismThemeLink" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css" rel="stylesheet" />
+  <style>
+      :root {
+          --background-color-light: #FFFFFF;
+          --text-color-light: #000000;
+          --background-color-dark: #121212;
+          --text-color-dark: #FFFFFF;
+          ---tools-background-color-dark: #2d2d2d;
+          ---tools-background-color-light: #f5f2f0;
+          ---link-color-dark: #DF7A1D;
+          ---link-color-hover-dark: #ef831f;
+          ---link-color-light: #007BFF;
+          ---link-color-hover-light: #0056b3;
+      }
+      body {
+          font-family: "Open Sans", sans-serif;
+          background-color: var(--background-color-light);
+          color: var(--text-color-light);
+          transition: background-color 0.3s, color 0.3s;
+      }
+      body.dark-mode {
+          background-color: var(--background-color-dark);
+          color: var(--text-color-dark);
+      }
+      header {
+          display: flex;
+          justify-content: flex-end;
+          padding: 5px 10px;
+      }
+      button:not(#KAIChatButton):not(#KAISampleChatButton) {
+          font-size: 1rem;
+          background: #DF7A1D;
+          border: 1px solid #DF7A1D;
+          padding: 7px 20px;
+          font-weight: 700;
+          color: #ffffff;
+          cursor: pointer;
+      }
+      button:not(#KAIChatButton):not(#KAISampleChatButton):active,
+      button:not(#KAIChatButton):not(#KAISampleChatButton):hover,
+      button:not(#KAIChatButton):not(#KAISampleChatButton):focus {
+          background-color: #ef831f;
+      }
+      button:not(#KAIChatButton):not(#KAISampleChatButton):focus {
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(0,123,255,0.5);
+      }
+      button.link {
+          display: inline-block;
+          padding: 2px;
+          margin: 0;
+          font-weight: 600;
+          background-color: transparent;
+          color: var(---link-color-light);
+          text-decoration: none;
+          border-radius: 5px;
+          border: none;
+      }
+      body.dark-mode button.link {
+          color: var(---link-color-dark);
+      }
+      button.link:active,
+      button.link:hover,
+      button.link:focus {
+          color: var(---link-color-hover-light);
+          text-decoration: underline;
+      }
+      body.dark-mode button.link:active,
+      body.dark-mode button.link:hover,
+      body.dark-mode button.link:focus {
+          color: var(---link-color-hover-dark);
+      }
+      button.link:focus {
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(0,123,255,0.5);
+      }
+
+
+      .code-tools {
+          padding: 5px;
+          gap: 10px;
+          background-color: var(---tools-background-color-light);
+          display: flex;
+          justify-content: space-between;
+      }
+      .code-tools > div {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+      .code-tools .configs {
+          display: flex;
+          flex-direction: row;
+          gap: 15px;
+          align-items: flex-start;
+          justify-content: space-between;
+      }
+      .code-tools .configs input[type=color] {
+          margin-top: 7px;
+          height: 30px;
+          width: 30px;
+      }
+      .code-tools .configs input[type=text] {
+          height: 23px;
+          margin: 4px 0;
+      }
+
+      .code-tools .configs > div,
+      .code-tools .configs > label {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+      body.dark-mode .code-tools {
+          background-color: var(---tools-background-color-dark);
+      }
+      .sample {
+          margin: 10px;
+          border: 1px solid #808080;
+          box-shadow: 1px 1px 3px rgba(14, 27, 42, 0.35);
+          padding: 20px;
+          border-radius: 10px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+      }
+  </style>
+</head>
+<body>
+<header>
+  <label>Dark Mode: <input type="checkbox" id="darkModeCheckbox"></label>
+</header>
+<h1>Embedded Chat Script</h1>
+<div>
+  <div class="code-tools">
+    <div class="configs">
+      <label>
+        Text
+        <input id="chatButtonValueInput" type="text">
+      </label>
+      <label>
+        Button Color
+        <input id="chatButtonColorPicker" type="color">
+      </label>
+      <label>
+        Text Color
+        <input id="chatButtonTextColorPicker" type="color">
+      </label>
+      <label>
+        Hover Color
+        <input id="chatButtonHoverColorPicker" type="color">
+      </label>
+      <label>
+        Width
+        <input type="range" min="50" max="300" class="slider" id="chatButtonWidthInput">
+      </label>
+      <label>
+        Height
+        <input type="range" min="20" max="100" class="slider" id="chatButtonHeightInput">
+      </label>
+      <label>
+        Flat
+        <input type="checkbox" id="chatButtonFlatInput">
+      </label>
+      <button class="link" onclick="reset()">Reset</button>
+    </div>
+  </div>
+  <div class="sample">
+    Use the controls above to adjust the chat-bot button styling and then copy the code below into your html file.
+    <button id="KAISampleChatButton">Chat</button>
+  </div>
+  <div class="code-tools">
+    <div></div>
+    <button id="copy-button" onclick="copyText()">Copy</button>
+  </div>
+  <pre><code class="language-javascript" id="chat-js"></code></pre>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+<script>
+  const DefaultStyle = {
+    VALUE: 'Chat',
+    BACKGROUND: '#f9c623',
+    TEXT: '#000000',
+    HOVER: '#9a7d17',
+    HEIGHT: '36',
+    WIDTH: '200',
+    FLAT: true,
+  }
+  let chatButtonValue = localStorage.getItem('chatButtonValue') || DefaultStyle.VALUE
+  let chatButtonBackground = localStorage.getItem('chatButtonBackground') || DefaultStyle.BACKGROUND
+  let chatButtonColor = localStorage.getItem('chatButtonColor') || DefaultStyle.TEXT
+  let chatButtonHoverColor = localStorage.getItem('chatButtonHoverColor') || DefaultStyle.HOVER
+  let chatButtonWidth = localStorage.getItem('chatButtonWidth') || DefaultStyle.WIDTH
+  let chatButtonHeight = localStorage.getItem('chatButtonHeight') || DefaultStyle.HEIGHT
+  let chatButtonFlatString = localStorage.getItem('chatButtonFlat')
+  let chatButtonFlat = !chatButtonFlatString ? DefaultStyle.FLAT : chatButtonFlatString === 'true'
+  const prismThemeLink = document.getElementById('prismThemeLink')
+  const darkCss = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-tomorrow.min.css'
+  const lightCss = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css'
+  const KAISampleChatButton = document.getElementById('KAISampleChatButton')
+  const chatButtonValueInput = document.getElementById('chatButtonValueInput')
+  const chatButtonTextColorPicker = document.getElementById('chatButtonTextColorPicker')
+  const chatButtonColorPicker = document.getElementById('chatButtonColorPicker')
+  const chatButtonWidthInput = document.getElementById('chatButtonWidthInput')
+  const chatButtonHeightInput = document.getElementById('chatButtonHeightInput')
+  const chatButtonFlatInput = document.getElementById('chatButtonFlatInput')
+  const chatButtonHoverColorPicker = document.getElementById('chatButtonHoverColorPicker')
+  const ss =   document.getElementsByTagName('style')[0]
+  const {protocol, hostname, port} = window.location
+  const iframeSrc = `${protocol}//${hostname}${port && `:${port}`}/embedded`;
+  const buttonStyle = position => `{
+  align-items: center !important;
+  background: ${chatButtonBackground} !important;
+  border: none !important;
+  border-radius: ${!chatButtonFlat ? '5px' : '0'} !important;
+  color: ${chatButtonColor} !important;
+  display: flex !important;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 700 !important;
+  height: ${chatButtonHeight}px !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  width: ${chatButtonWidth}px !important;
+  ${position && `bottom: 0 !important;
+  position: fixed !important;
+  right: 10px !important;
+  z-index: 2147483640 !important;`}
+}`
+  const setChatJsTextContent = () => {
+    const chatJsEl = document.getElementById('chat-js')
+    chatJsEl.textContent = `const kaiChatStyleEl = document.createElement('style')
+document.head.appendChild(kaiChatStyleEl)
+kaiChatStyleEl.sheet.insertRule(\`#KAIChatButton ${buttonStyle(true)}\`, kaiChatStyleEl.sheet.cssRules.length)
+kaiChatStyleEl.sheet.insertRule(\`#KAIChatButton.close {
+  bottom: 600px !important;
+  right: 10px !important;
+  top: auto !important;
+}\`, kaiChatStyleEl.sheet.cssRules.length)
+kaiChatStyleEl.sheet.insertRule(\` #KAIChatButton:active { color: ${chatButtonHoverColor} !important; }\`, kaiChatStyleEl.sheet.cssRules.length)
+kaiChatStyleEl.sheet.insertRule(\` #KAIChatButton:focus { color: ${chatButtonHoverColor} !important; }\`, kaiChatStyleEl.sheet.cssRules.length)
+kaiChatStyleEl.sheet.insertRule(\` #KAIChatButton:hover { color: ${chatButtonHoverColor} !important; }\`, kaiChatStyleEl.sheet.cssRules.length)
+
+const iframe = document.createElement('iframe')
+iframe.setAttribute('title', 'Chat Window')
+iframe.setAttribute('src', '${iframeSrc}')
+iframe.setAttribute('allow', 'fullscreen')
+iframe.setAttribute('name', 'chat')
+iframe.setAttribute('style', \`
+  background: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  bottom: 0 !important;
+  display: none;
+  height: 600px !important;
+  position: fixed !important;
+  right: 10px !important;
+  width: 500px !important;
+  z-index: 10000 !important;
+\`)
+document.body.appendChild(iframe)
+
+const chatButton = document.createElement('button')
+chatButton.setAttribute('id', 'KAIChatButton')
+chatButton.innerHTML = '${chatButtonValue}'
+chatButton.addEventListener("click", () => {
+  if (iframe.style.display === "none") {
+    iframe.style.display = "block"
+    iframe.focus()
+    chatButton.classList.add('close')
+    chatButton.innerHTML = "Close"
+  } else {
+    iframe.style.display = "none"
+    chatButton.classList.remove('close')
+    chatButton.innerHTML = '${chatButtonValue}'
+  }
+})
+document.body.appendChild(chatButton)
+document.getElementById('chat-widget-container').style.display = 'none'`
+    Prism.highlightElement(chatJsEl)
+  }
+  const applyChatButtonStyles = () => {
+    chatButtonValueInput.value = chatButtonValue
+    chatButtonTextColorPicker.value = chatButtonColor
+    chatButtonColorPicker.value = chatButtonBackground
+    chatButtonHoverColorPicker.value = chatButtonHoverColor
+    chatButtonWidthInput.value = chatButtonWidth
+    chatButtonHeightInput.value = chatButtonHeight
+    chatButtonFlatInput.checked = chatButtonFlat
+    KAISampleChatButton.innerHTML = chatButtonValue
+    ss.sheet.insertRule(`#KAISampleChatButton ${buttonStyle()}`, ss.sheet.cssRules.length)
+    ss.sheet.insertRule(` #KAISampleChatButton:active { color: ${chatButtonHoverColor}; }`, ss.sheet.cssRules.length)
+    ss.sheet.insertRule(` #KAISampleChatButton:focus { color: ${chatButtonHoverColor}; }`, ss.sheet.cssRules.length)
+    ss.sheet.insertRule(` #KAISampleChatButton:hover { color: ${chatButtonHoverColor}; }`, ss.sheet.cssRules.length)
+  }
+  applyChatButtonStyles()
+  chatButtonTextColorPicker.addEventListener('input', event => {
+    chatButtonColor = event.target.value
+    localStorage.setItem('chatButtonColor', chatButtonColor)
+    setChatJsTextContent()
+    applyChatButtonStyles()
+  });
+  chatButtonValueInput.addEventListener('input', event => {
+    chatButtonValue = event.target.value
+    localStorage.setItem('chatButtonValue', chatButtonValue)
+    setChatJsTextContent()
+    applyChatButtonStyles()
+  });
+  chatButtonColorPicker.addEventListener('input', event => {
+    chatButtonBackground = event.target.value
+    localStorage.setItem('chatButtonBackground', chatButtonBackground)
+    setChatJsTextContent()
+    applyChatButtonStyles()
+  });
+  chatButtonHoverColorPicker.addEventListener('input', event => {
+    chatButtonHoverColor = event.target.value
+    localStorage.setItem('chatButtonHoverColor', chatButtonHoverColor)
+    setChatJsTextContent()
+    applyChatButtonStyles()
+  });
+  chatButtonWidthInput.addEventListener('input', event => {
+    chatButtonWidth = event.target.value
+    localStorage.setItem('chatButtonWidth', chatButtonWidth)
+    setChatJsTextContent()
+    applyChatButtonStyles()
+  });
+  chatButtonHeightInput.addEventListener('input', event => {
+    chatButtonHeight = event.target.value
+    localStorage.setItem('chatButtonHeight', chatButtonHeight)
+    setChatJsTextContent()
+    applyChatButtonStyles()
+  });
+  chatButtonFlatInput.addEventListener('input', event => {
+    chatButtonFlat = event.target.checked
+    localStorage.setItem('chatButtonFlat', chatButtonFlat)
+    setChatJsTextContent()
+    applyChatButtonStyles()
+  });
+  const reset = () => {
+    localStorage.removeItem('chatButtonValue')
+    chatButtonValue = DefaultStyle.VALUE
+    localStorage.removeItem('chatButtonBackground')
+    chatButtonBackground = DefaultStyle.BACKGROUND
+    localStorage.removeItem('chatButtonColor')
+    chatButtonColor = DefaultStyle.TEXT
+    localStorage.removeItem('chatButtonHoverColor')
+    chatButtonHoverColor = DefaultStyle.HOVER
+    localStorage.removeItem('chatButtonWidth')
+    chatButtonWidth = DefaultStyle.WIDTH
+    localStorage.removeItem('chatButtonHeight')
+    chatButtonHeight = DefaultStyle.HEIGHT
+    localStorage.removeItem('chatButtonFlat')
+    chatButtonFlat = DefaultStyle.FLAT
+    setChatJsTextContent()
+    applyChatButtonStyles()
+  };
+  setChatJsTextContent()
+  const copyText = async () => {
+    try {
+      const codeText = document.getElementById("chat-js").innerText
+      await navigator.clipboard.writeText(codeText)
+      document.getElementById('copy-button').innerText = 'Copied!'
+      setTimeout(() => {
+        document.getElementById('copy-button').innerText = 'Copy'
+      }, 2000)
+    } catch (err) {
+      console.error('Failed to copy: ', err)
+    }
+  }
+  const toggleDarkMode = () => {
+    const isDarkMode = document.body.classList.toggle('dark-mode')
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light')
+    prismThemeLink.setAttribute('href', isDarkMode ? darkCss : lightCss)
+  }
+  const applyTheme = theme => {
+    if (theme === 'dark') {
+      document.body.classList.toggle('dark-mode')
+      document.getElementById('darkModeCheckbox').checked = true
+      prismThemeLink.setAttribute('href', darkCss)
+    }
+  }
+  document.getElementById('darkModeCheckbox').addEventListener('click', toggleDarkMode);
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = savedTheme || (prefersDarkMode ? 'dark' : 'light');
+  applyTheme(theme);
+</script>
+</body>
+</html>
