@@ -33,21 +33,21 @@
           justify-content: flex-end;
           padding: 5px 10px;
       }
-      button:not(#KAIChatButton):not(#KAISampleChatButton) {
+      button:not(#KAIChatButton, #KAISampleChatButton, .link) {
           font-size: 1rem;
-          background: #DF7A1D;
+          background-color: #DF7A1D;
           border: 1px solid #DF7A1D;
           padding: 7px 20px;
           font-weight: 700;
           color: #ffffff;
           cursor: pointer;
       }
-      button:not(#KAIChatButton):not(#KAISampleChatButton):active,
-      button:not(#KAIChatButton):not(#KAISampleChatButton):hover,
-      button:not(#KAIChatButton):not(#KAISampleChatButton):focus {
+      button:not(#KAIChatButton, #KAISampleChatButton, .link):active,
+      button:not(#KAIChatButton, #KAISampleChatButton, .link):hover,
+      button:not(#KAIChatButton, #KAISampleChatButton, .link):focus {
           background-color: #ef831f;
       }
-      button:not(#KAIChatButton):not(#KAISampleChatButton):focus {
+      button:not(#KAIChatButton, #KAISampleChatButton, .link):focus {
           outline: none;
           box-shadow: 0 0 0 2px rgba(0,123,255,0.5);
       }
@@ -83,11 +83,12 @@
 
 
       .code-tools {
-          padding: 5px;
+          padding: 10px;
           gap: 10px;
           background-color: var(---tools-background-color-light);
           display: flex;
           justify-content: space-between;
+          align-items: center;
       }
       .code-tools > div {
           display: flex;
@@ -97,7 +98,7 @@
       .code-tools .configs {
           display: flex;
           flex-direction: row;
-          gap: 15px;
+          gap: 25px;
           align-items: flex-start;
           justify-content: space-between;
       }
@@ -168,8 +169,8 @@
         Flat
         <input type="checkbox" id="chatButtonFlatInput">
       </label>
-      <button class="link" onclick="reset()">Reset</button>
     </div>
+    <button onclick="reset()">Reset</button>
   </div>
   <div class="sample">
     Use the controls above to adjust the chat-bot button styling and then copy the code below into your html file.
