@@ -295,9 +295,9 @@ document.getElementById('chat-widget-container').style.display = 'none'`
     chatButtonFlatInput.checked = chatButtonFlat
     KAISampleChatButton.innerHTML = chatButtonValue
     ss.sheet.insertRule(`#KAISampleChatButton ${buttonStyle()}`, ss.sheet.cssRules.length)
-    ss.sheet.insertRule(` #KAISampleChatButton:active { color: ${chatButtonHoverColor}; }`, ss.sheet.cssRules.length)
-    ss.sheet.insertRule(` #KAISampleChatButton:focus { color: ${chatButtonHoverColor}; }`, ss.sheet.cssRules.length)
-    ss.sheet.insertRule(` #KAISampleChatButton:hover { color: ${chatButtonHoverColor}; }`, ss.sheet.cssRules.length)
+    ss.sheet.insertRule(` #KAISampleChatButton:active { color: ${chatButtonHoverColor} !important; }`, ss.sheet.cssRules.length)
+    ss.sheet.insertRule(` #KAISampleChatButton:focus { color: ${chatButtonHoverColor} !important; }`, ss.sheet.cssRules.length)
+    ss.sheet.insertRule(` #KAISampleChatButton:hover { color: ${chatButtonHoverColor} !important; }`, ss.sheet.cssRules.length)
   }
   applyChatButtonStyles()
   chatButtonTextColorPicker.addEventListener('input', event => {
