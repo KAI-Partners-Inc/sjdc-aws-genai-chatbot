@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Willowbrook Community College</title>
+  <style>
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          margin: 0;
+          padding: 0;
+          color: #333;
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+          justify-content: space-between;
+      }
+      .header {
+          background: linear-gradient(
+                  to bottom,
+                  #C1DEE4,
+                  #A7CBD3 30.5%,
+                  #3A653C 30.5%,
+                  #214C36,
+                  #184030 72.3%,
+                  #61969F 72.3%,
+                  #6BA5B6
+          );
+          color: #ffffff;
+          padding: 0 40px 0 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+      }
+      .header img {
+          height: 200px;
+          mask-image: linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 90%, transparent 100%);
+      }
+      .header h1 {
+          margin: 0;
+          font-size: 24px;
+          font-weight: normal;
+      }
+      .header nav ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          gap: 15px;
+      }
+      .header a {
+          color: white;
+          text-decoration: none;
+          font-size: 1.1rem;
+          font-weight: 600;
+      }
+      .header a:hover {
+          text-decoration: underline;
+      }
+      .banner {
+          height: 300px;
+          background-position-y: -310px;
+          background-image: url("banner.webp");
+      }
+      .content {
+          padding: 40px;
+          flex-grow: 1;
+      }
+      .content h2 {
+          color: #204D74;
+      }
+      .content p {
+          line-height: 1.6;
+      }
+      .footer {
+          background-color: #F4F4F4;
+          text-align: center;
+          padding: 20px;
+          margin-top: 20px;
+      }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <img src="wcc-logo.webp" alt="Willowbrook Community College Logo">
+  <nav>
+    <ul>
+      <li><a href="/">Student Login</a></li>
+      <li><a href="/">Apply</a></li>
+      <li><a href="/">Employees</a></li>
+    </ul>
+  </nav>
+</header>
+<div class="banner" aria-hidden="true"></div>
+<main class="content">
+  <h1>Willowbrook Community College</h1>
+  <h2>Welcome to Willowbrook Community College</h2>
+  <p>Welcome to Willowbrook Community College, a leading institution for higher education that empowers students through innovative teaching and learning. Explore our diverse range of programs designed to inspire and prepare you for a successful future.</p>
+  <p>Our campus is nestled in a vibrant and supportive community, featuring state-of-the-art facilities, cutting-edge technology, and a wide array of resources aimed at enhancing your educational journey.</p>
+  <h3>Explore Our Programs</h3>
+  <ul>
+    <li>Associate of Arts in Liberal Arts</li>
+    <li>Associate of Science in Information Technology</li>
+    <li>Certificate Programs in Business Administration</li>
+    <li>Continuing Education and Professional Development</li>
+  </ul>
+</main>
+
+<div class="footer">
+  <p>© 2024 Willowbrook Community College. All rights reserved.</p>
+</div>
+<script>
+  const kaiChatStyleEl = document.createElement('style')
+  document.head.appendChild(kaiChatStyleEl)
+  kaiChatStyleEl.sheet.insertRule(`#KAIChatButton {
+  align-items: center !important;
+  background: #f9c623 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  color: #000000 !important;
+  display: flex !important;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 700 !important;
+  height: 36px !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  width: 200px !important;
+  bottom: 0 !important;
+  position: fixed !important;
+  right: 10px !important;
+  z-index: 2147483640 !important;
+}`, kaiChatStyleEl.sheet.cssRules.length)
+  kaiChatStyleEl.sheet.insertRule(`#KAIChatButton.close {
+  bottom: 605px !important;
+  right: 30px !important;
+  top: auto !important;
+  width: 100px !important;
+}`, kaiChatStyleEl.sheet.cssRules.length)
+  kaiChatStyleEl.sheet.insertRule(` #KAIChatButton:active { color: #9a7d17 !important; }`, kaiChatStyleEl.sheet.cssRules.length)
+  kaiChatStyleEl.sheet.insertRule(` #KAIChatButton:focus { color: #9a7d17 !important; }`, kaiChatStyleEl.sheet.cssRules.length)
+  kaiChatStyleEl.sheet.insertRule(` #KAIChatButton:hover { color: #9a7d17 !important; }`, kaiChatStyleEl.sheet.cssRules.length)
+
+  const iframe = document.createElement('iframe')
+  iframe.setAttribute('title', 'Chat Window')
+  iframe.setAttribute('src', 'https://d2ins6zcpv691t.cloudfront.net/embedded')
+  iframe.setAttribute('allow', 'fullscreen')
+  iframe.setAttribute('name', 'chat')
+  iframe.setAttribute('style', `
+  background: white !important;
+  border: 1px solid gray !important;
+  border-radius: 10px !important;
+  bottom: 0 !important;
+  display: none;
+  height: 600px !important;
+  position: fixed !important;
+  right: 10px !important;
+  width: 500px !important;
+  z-index: 10000 !important;
+`)
+  document.body.appendChild(iframe)
+
+  const chatButton = document.createElement('button')
+  chatButton.setAttribute('id', 'KAIChatButton')
+  chatButton.innerHTML = 'Chat'
+  chatButton.addEventListener("click", () => {
+    if (iframe.style.display === "none") {
+      iframe.style.display = "block"
+      iframe.focus()
+      chatButton.classList.add('close')
+      chatButton.innerHTML = "Close"
+    } else {
+      iframe.style.display = "none"
+      chatButton.classList.remove('close')
+      chatButton.innerHTML = 'Chat'
+    }
+  })
+  document.body.appendChild(chatButton)
+  document.getElementById('chat-widget-container').style.display = 'none'
+</script>
+<script>
+
+</script>
+</body>
+</html>

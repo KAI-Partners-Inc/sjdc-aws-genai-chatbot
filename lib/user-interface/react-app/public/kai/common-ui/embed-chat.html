@@ -239,9 +239,10 @@
 document.head.appendChild(kaiChatStyleEl)
 kaiChatStyleEl.sheet.insertRule(\`#KAIChatButton ${buttonStyle(true)}\`, kaiChatStyleEl.sheet.cssRules.length)
 kaiChatStyleEl.sheet.insertRule(\`#KAIChatButton.close {
-  bottom: 600px !important;
-  right: 10px !important;
+  bottom: 605px !important;
+  right: 30px !important;
   top: auto !important;
+  width: 100px !important;
 }\`, kaiChatStyleEl.sheet.cssRules.length)
 kaiChatStyleEl.sheet.insertRule(\` #KAIChatButton:active { color: ${chatButtonHoverColor} !important; }\`, kaiChatStyleEl.sheet.cssRules.length)
 kaiChatStyleEl.sheet.insertRule(\` #KAIChatButton:focus { color: ${chatButtonHoverColor} !important; }\`, kaiChatStyleEl.sheet.cssRules.length)
@@ -254,14 +255,14 @@ iframe.setAttribute('allow', 'fullscreen')
 iframe.setAttribute('name', 'chat')
 iframe.setAttribute('style', \`
   background: white !important;
-  border: none !important;
+  border: 1px solid gray !important;
   border-radius: 10px !important;
   bottom: 0 !important;
   display: none;
   height: 600px !important;
   position: fixed !important;
   right: 10px !important;
-  width: 500px !important;
+  width: 620px !important;
   z-index: 10000 !important;
 \`)
 document.body.appendChild(iframe)

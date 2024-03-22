@@ -21,6 +21,9 @@ npm install -g typescript
 ```
 
 ### :rocket: Building Project
+>[!Note]
+> Please verify this is the correct domain and change accordingly. At the writing of this the demo chat-bot domain is:
+> - https://d2ins6zcpv691t.cloudfront.net
 1. :vertical_traffic_light: Run the following commands in the root folder:
 ```shell
 npm install
@@ -56,44 +59,29 @@ npm run dev
 
 ### Embedding Demo Chat-bot
 
-1. Open the [Chat Script Config](https://d2ins6zcpv691t.cloudfront.net/kai/common-ui/embed-chat.html) page.
-1. Select all and copy the script.
+>[!Note]
+> Please verify this is the correct domain and change accordingly. At the writing of this the demo chat-bot domain is:
+> - https://d2ins6zcpv691t.cloudfront.net
+> 
+> The embedded chat config and example pages are located here:
+> - [Chat-bot script config page](https://d2ins6zcpv691t.cloudfront.net/kai/common-ui/embed-chat.html)
+> - [Chat-bot script embedded into a host page](https://d2ins6zcpv691t.cloudfront.net/kai/common-ui/embed-chat-host.html)
+
+1. In the browser open [/kai/common-ui/embed-chat.html](https://d2ins6zcpv691t.cloudfront.net/kai/common-ui/embed-chat.html).
+1. Make the appropriate configurations
+1. Click the Copy button.
 1. In a new tab open one of the following:
-    2. https://kaipartners.com
-    3. https://www.deltacollege.edu
-1. Open the developer tools in the web browser.
-2. Make sure the Developer Tools **Console** is open.
-3. Past the `chat.js` script into the developer console.
 
-### Embedding Local Chat-bot
+   1. https://kaipartners.com
+   1. https://www.deltacollege.edu
 
-The local standalone chat-bot can be accessed at http://localhost:3000/embedded
+>[!Note]
+> You can add a new domain by adding it to the list of `Content-Security-Policy` `frame-ancestors` in the `vite.config.ts` located at:
+> - `/lib/user-interface/react-app/vite.config.ts` file.
 
-Here is the JavaScript embed chat script http://localhost:3000/chat.js
-
-To test out embedding the local chat-bot follow these steps:
-
-1. Open ./lib/user-interface/react-app/public/chat.js
-1. Change these two lines:
-```javascript
-iframe.setAttribute('src', 'https://d2ins6zcpv691t.cloudfront.net/embedded')
-// iframe.setAttribute('src', 'http://localhost:3000/embedded')
-```
-to
-```javascript
-// iframe.setAttribute('src', 'https://d2ins6zcpv691t.cloudfront.net/embedded')
-iframe.setAttribute('src', 'http://localhost:3000/embedded')
-```
-3. Start your local user-interface server.
-1. Open the [chat.js](http://localhost:3000/chat.js) script.
-1. Select all and copy the script.
-1. In a new tab open one of the following:
-    1. http://127.0.0.1:5173
-    2. https://kaipartners.com
-    3. https://www.deltacollege.edu
-1. Open the developer tools in the web browser.
-2. Make sure the Developer Tools **Console** is open.
-3. Past the `chat.js` script into the developer console.
+5. Open the developer tools in the web browser.
+1. Make sure the Developer Tools **Console** is open.
+1. Past the copied script into the developer console.
 
 ---
 
