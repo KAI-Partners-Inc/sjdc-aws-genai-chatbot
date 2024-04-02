@@ -15,6 +15,8 @@ import NotFound from "./pages/not-found";
 import "./styles/app.scss";
 import Embedded from "./pages/chatbot/embedded/embedded.tsx";
 import GlobalFooter from "./components/global-footer.tsx";
+import TestPage from "./pages/test-page.tsx";
+import WelcomeTest from "./pages/welcome_test.tsx";
 
 
 const subHeaderWrapperStyles = {
@@ -57,6 +59,8 @@ function App() {
     >
       <Router>
           <Routes>
+            <Route path = "/test" element={<TestPage/>} />
+            <Route path = "/welcome-test" element={<WelcomeTest />} />
             <Route path="/embedded" element={<Embedded />} /> 
             <Route path="/" element={<Layout />}>
               <Route index element={<Playground />} />
