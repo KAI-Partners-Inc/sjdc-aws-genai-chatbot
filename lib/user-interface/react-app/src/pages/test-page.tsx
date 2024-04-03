@@ -34,7 +34,7 @@ function TestPage() {
             return;
         }
         if (!collegeLogo) return; // Handle case where no file is selected
-
+        localStorage.setItem('collegeName', collegeName);
         const reader = new FileReader();
         reader.onload = () => {
           var imageData = reader.result;
