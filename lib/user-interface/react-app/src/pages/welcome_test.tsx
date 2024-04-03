@@ -19,6 +19,10 @@ interface contentInterface {
   collegeName: string,
   district: string
 }
+
+interface footerInterface {
+  collegeName: string
+}
 function Header({imgurl, imgAlt}: headerInterface) {
   return (
     <header className="header">
@@ -59,10 +63,10 @@ function Content({collegeName, district}: contentInterface) {
   );
 }
 
-function Footer() {
+function Footer({collegeName}:footerInterface) {
   return (
     <div className="footer">
-      <p>© 2024 Willowbrook Community College. All rights reserved.</p>
+      <p>© 2024 {collegeName}. All rights reserved.</p>
     </div>
   );
 }
@@ -171,7 +175,7 @@ const WelcomePage = () => {
       <Header imgurl={logoUrl} imgAlt={imgAlt}/>
       <Banner />
       <Content district={district} collegeName={collegeName}/>
-      <Footer />
+      <Footer collegeName={collegeName}/>
     </div>
   );
 };
