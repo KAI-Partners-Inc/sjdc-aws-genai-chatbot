@@ -106,4 +106,4 @@ export abstract class Labels {
   }
 }
 
-export const CHATBOT_NAME = sessionStorage.getItem("college_name");
+export const CHATBOT_NAME = sessionStorage.getItem("college_name") || "KAIP GenAI Chatbot" ;

@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Navigate } from "react-router-dom";
 import '../styles/welcome.scss';
-import headerimg from '../assets/images/ecc.jpg';
 
 function setTextColor(bgcolor: string) {
   const darkcolors = ['navy', 'blue', 'green', 'red', 'orange', 'purple']
