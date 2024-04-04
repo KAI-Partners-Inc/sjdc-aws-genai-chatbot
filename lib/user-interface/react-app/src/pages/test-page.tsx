@@ -33,19 +33,26 @@ function TestPage() {
             alert('College Name and District must have at least 4 characters.');
             return;
         }
-        if (!collegeLogo) return; // Handle case where no file is selected
         localStorage.setItem('collegeName', collegeName);
-        const reader = new FileReader();
-        reader.onload = () => {
-          var imageData = reader.result;
-          if(imageData== null){
-            imageData= ""
-          }
-          localStorage.setItem('uploadedImage', imageData.toString()); // Store image data in local storage
+        console.log(localStorage.getItem('collegeName'))
+        if (collegeLogo) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            var imageData = reader.result;
+            if(imageData== null){
+              imageData= ""
+            }
+            localStorage.setItem('uploadedImage', imageData.toString()); // Store image data in local storage
+            
+            history('/welcome-test',
+              {state: { collegeName, district, language, color, chatcolor, chatbotLabel }});
+          };
+          reader.readAsDataURL(collegeLogo);
+        }
+        else{
           history('/welcome-test',
-            {state: { collegeName, district, language, color, chatcolor, chatbotLabel }});
-        };
-        reader.readAsDataURL(collegeLogo);
+              {state: { collegeName, district, language, color, chatcolor, chatbotLabel }});
+        }
     };
       
    return (
@@ -102,7 +109,7 @@ function TestPage() {
             </div>
             <div className='form-group'>
               <label htmlFor="collegeLogo">Upload your college logo:</label>
-              <input type="file" onChange={handleLogoChange} />
+              <input type="file" onChange={handleLogoChange} accept='image/*' />
             </div>
             <div className="form-group">
               <label htmlFor="color">Select Header Color:</label>

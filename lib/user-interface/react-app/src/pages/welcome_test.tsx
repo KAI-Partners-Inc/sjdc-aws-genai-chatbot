@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Navigate } from "react-router-dom";
 import '../styles/welcome.scss';
+import defaultLogo from '../assets/images/defaultLogo.png'
 
 function setTextColor(bgcolor: string) {
   const darkcolors = ['navy', 'blue', 'green', 'red', 'orange', 'purple']
@@ -77,7 +78,7 @@ const WelcomePage = () => {
     if (!collegeName || !district){
         <Navigate to="/test"/>
     }
-    const logoUrl = localStorage.getItem('uploadedImage') || '';
+    const logoUrl = localStorage.getItem('uploadedImage') || defaultLogo;
     // localStorage.removeItem("uploadedImage")
     const chatTextColor = setTextColor(chatcolor)
     const headTextColor = setTextColor(color)
