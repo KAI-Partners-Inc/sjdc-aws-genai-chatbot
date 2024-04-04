@@ -27,22 +27,15 @@ function Header({imgurl, imgAlt}: headerInterface) {
   return (
     <header className="header">
       <img src={imgurl} alt={imgAlt}/>
-      <nav>
-        <ul >
-          <li><a href="/" >Student Login</a></li>
-          <li><a href="/" >Apply</a></li>
-          <li><a href="/" >Employees</a></li>
-        </ul>
-      </nav>
     </header>
   );
 }
 
-function Banner() {
-  return (
-    <div className="banner" aria-hidden="true" ></div>
-  );
-}
+// function Banner() {
+//   return (
+//     <div className="banner" aria-hidden="true" ></div>
+//   );
+// }
 
 function Content({collegeName, district}: contentInterface) {
   return (
@@ -52,13 +45,6 @@ function Content({collegeName, district}: contentInterface) {
       <h2> District of {district} </h2>
       <p >Welcome to {collegeName}, where we seek higher education.</p>
       <p >If you have any questions, please use the chatbot accessible via the button in the lower right hand corner!</p>
-      <h3>Explore Our Programs</h3>
-      <ul>
-        <li>Associate of Arts in Liberal Arts</li>
-        <li>Associate of Science in Information Technology</li>
-        <li>Certificate Programs in Business Administration</li>
-        <li>Continuing Education and Professional Development</li>
-      </ul>
     </main>
   );
 }
@@ -173,7 +159,6 @@ const WelcomePage = () => {
   return (
     <div className="welcome-container" >
       <Header imgurl={logoUrl} imgAlt={imgAlt}/>
-      <Banner />
       <Content district={district} collegeName={collegeName}/>
       <Footer collegeName={collegeName}/>
     </div>
