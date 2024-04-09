@@ -26,24 +26,24 @@ const subHeaderWrapperStyles = {
   backgroundColor: '#FFFFFF',
   display: 'block'
 }
-const Layout = () => (
-  <div id="layout" style={{ backgroundColor: "#f9c623" }}>
-    <GlobalHeader />
-    <div id="header-spacer" style={{ height: 56, backgroundColor: "#000716" }} />
-    <div>
-      <div id="subheader-wrapper" style={subHeaderWrapperStyles}>
-        <div className="subHeader">
-          <a href="https://www.deltacollege.edu/">
-            <img alt="San Joaquin Delta College Logo - Home" className="desktop" src="https://www.deltacollege.edu/sites/default/files/images/delta-logo.jpg" style={{ height: 98, maxHeight: '100%'}} />
-            <img alt="San Joaquin Delta College Logo - Home" className="mobile" src="https://www.deltacollege.edu/sites/default/files/images/header-mobile-logo.jpg" style={{ height: 70, maxHeight: '100%'}} />
-          </a>
-        </div>
-      </div>
-      <Outlet />
-      <GlobalFooter />
-    </div>
-  </div>
-)
+// const Layout = () => (
+//   <div id="layout" style={{ backgroundColor: "#f9c623" }}>
+//     <GlobalHeader />
+//     <div id="header-spacer" style={{ height: 56, backgroundColor: "#000716" }} />
+//     <div>
+//       <div id="subheader-wrapper" style={subHeaderWrapperStyles}>
+//         <div className="subHeader">
+//           <a href="https://www.deltacollege.edu/">
+//             <img alt="San Joaquin Delta College Logo - Home" className="desktop" src="https://www.deltacollege.edu/sites/default/files/images/delta-logo.jpg" style={{ height: 98, maxHeight: '100%'}} />
+//             <img alt="San Joaquin Delta College Logo - Home" className="mobile" src="https://www.deltacollege.edu/sites/default/files/images/header-mobile-logo.jpg" style={{ height: 70, maxHeight: '100%'}} />
+//           </a>
+//         </div>
+//       </div>
+//       <Outlet />
+//       <GlobalFooter />
+//     </div>
+//   </div>
+// )
 
 function App() {
   const appContext = useContext(AppContext);
