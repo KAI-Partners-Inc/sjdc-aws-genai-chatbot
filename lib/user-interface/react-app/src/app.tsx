@@ -7,25 +7,23 @@ import {
   Routes,
 } from "react-router-dom";
 import { AppContext } from "./common/app-context";
-import GlobalHeader from "./components/global-header";
 import Models from "./pages/chatbot/models/models";
 import MultiChatPlayground from "./pages/chatbot/playground/multi-chat-playground";
 import Playground from "./pages/chatbot/playground/playground";
 import NotFound from "./pages/not-found";
 import "./styles/app.scss";
 import Embedded from "./pages/chatbot/embedded/embedded.tsx";
-import GlobalFooter from "./components/global-footer.tsx";
 import TestPage from "./pages/test-page.tsx";
 import WelcomeTest from "./pages/welcome_test.tsx";
 
 
-const subHeaderWrapperStyles = {
-  fontSize: '1.6rem',
-  lineHeight: '1.95em',
-  color: '#666666',
-  backgroundColor: '#FFFFFF',
-  display: 'block'
-}
+// const subHeaderWrapperStyles = {
+//   fontSize: '1.6rem',
+//   lineHeight: '1.95em',
+//   color: '#666666',
+//   backgroundColor: '#FFFFFF',
+//   display: 'block'
+// }
 // const Layout = () => (
 //   <div id="layout" style={{ backgroundColor: "#f9c623" }}>
 //     <GlobalHeader />
