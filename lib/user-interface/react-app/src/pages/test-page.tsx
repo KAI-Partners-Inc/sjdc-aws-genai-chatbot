@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/testpage.scss';
+import kaipLogo from '../assets/images/kaip_logo.png';
   
 function TestPage() {  
     const [collegeName, setCollegeName] = useState('');
@@ -59,8 +60,8 @@ function TestPage() {
     <div className="page-container">
       <div className="left-section">
         <div className="form-header">
-          <h1>KAI College Chatbot Form</h1>
-          <p>To continue to the chatbot, please fill in the details about your college:</p>
+          <h1 className="left-h1"> <img className="kaip-logo" src={kaipLogo}></img>KAI Partners Chatbot</h1>
+          <p className="left-description">To view an example, please fill in the following details:</p>
         </div>
       </div>
       <div className="right-section">

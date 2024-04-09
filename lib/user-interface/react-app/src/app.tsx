@@ -62,7 +62,7 @@ function App() {
             <Route path = "/test" element={<TestPage/>} />
             <Route path = "/welcome-test" element={<WelcomeTest />} />
             <Route path="/embedded" element={<Embedded />} /> 
-            <Route path="/" element={<Layout />}>
+            <Route path="/" element={<TestPage />}>
               <Route index element={<Playground />} />
               <Route path="/chatbot" element={<Outlet />}>
                 <Route path="playground" element={<Playground />} />
