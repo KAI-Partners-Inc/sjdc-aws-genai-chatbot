@@ -15,6 +15,8 @@ import "./styles/app.scss";
 import Embedded from "./pages/chatbot/embedded/embedded.tsx";
 import TestPage from "./pages/test-page.tsx";
 import WelcomeTest from "./pages/welcome_test.tsx";
+// import GlobalFooter from "./components/global-footer.tsx";
+// import GlobalHeader from "./components/global-header.tsx";
 
 
 // const subHeaderWrapperStyles = {
@@ -60,8 +62,8 @@ function App() {
             <Route path = "/test" element={<TestPage/>} />
             <Route path = "/welcome-test" element={<WelcomeTest />} />
             <Route path="/embedded" element={<Embedded />} /> 
-            <Route path="/" element={<TestPage />}>
-              <Route index element={<Playground />} />
+            <Route path="/" >
+              <Route index element={<TestPage />} />
               <Route path="/chatbot" element={<Outlet />}>
                 <Route path="playground" element={<Playground />} />
                 <Route path="playground/:sessionId" element={<Playground />} />

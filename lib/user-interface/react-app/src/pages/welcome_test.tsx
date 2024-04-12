@@ -3,6 +3,10 @@ import { useLocation } from 'react-router-dom';
 import { Navigate } from "react-router-dom";
 import '../styles/welcome.scss';
 import defaultLogo from '../assets/images/defaultLogo.png'
+import bannerImg from "../assets/images/ccc_background.png";
+import contentImg1 from "../assets/images/content_img1.jpg";
+import contentImg2 from "../assets/images/content_img2.webp";
+import contentImg3 from "../assets/images/content_img3.webp";
 
 function setTextColor(bgcolor: string) {
   const darkcolors = ['navy', 'blue', 'green', 'red', 'orange', 'purple']
@@ -13,7 +17,8 @@ function setTextColor(bgcolor: string) {
 }
 interface headerInterface {
   imgurl: string,
-  imgAlt: string
+  imgAlt: string,
+  collegeName: string
 }
 interface contentInterface {
   collegeName: string,
@@ -23,28 +28,52 @@ interface contentInterface {
 interface footerInterface {
   collegeName: string
 }
-function Header({imgurl, imgAlt}: headerInterface) {
+interface bannerInterface {
+  collegeName: string
+}
+function Header({imgurl, imgAlt, collegeName}: headerInterface) {
   return (
     <header className="header">
       <img src={imgurl} alt={imgAlt}/>
+      <h1>{collegeName}</h1>
     </header>
   );
 }
 
-// function Banner() {
-//   return (
-//     <div className="banner" aria-hidden="true" ></div>
-//   );
-// }
+function Banner({collegeName}: bannerInterface) {
+  return (
+    <div className="banner" aria-hidden="true" >
+      <img className="bannerImg" src={bannerImg}></img>
+      <h1 className="bannerImageText"> Welcome to {collegeName}</h1>
+    </div>
+  );
+}
 
 function Content({collegeName, district}: contentInterface) {
   return (
     <main className="content" >
-      <h1>{collegeName} Chatbot</h1>
-      <h2 >Welcome to {collegeName}.</h2>
-      <h2> District of {district} </h2>
-      <p >Welcome to {collegeName}, where we seek higher education.</p>
-      <p >If you have any questions, please use the chatbot accessible via the button in the lower right hand corner!</p>
+      <h2 className="contentIntro">Welcome to {collegeName}, where opportunities for academic growth and personal development are within reach for every student. Located in the {district} district, our college serves as a vibrant hub for diverse learners seeking quality education and pathways to success.</h2>
+      <div className="contentContainer">
+        <div className="text-column">
+          <h2 className="contentHeads">About us</h2>
+          <p className="contentP">At {collegeName}, we believe in accessible, affordable, and high-quality education. Whether you're a recent high school graduate, a working professional looking to advance your career, or someone returning to academia after a hiatus, we offer a supportive environment where you can thrive.</p>
+          <h2 className="contentHeads">Values</h2>
+          <p  className="contentP">Our dedicated faculty members are committed to fostering a culture of learning excellence. With small class sizes and personalized attention, students have the opportunity to engage deeply with course material and receive individualized support when needed.</p>
+          <h2 className="contentHeads">What we have to offer</h2>
+          <p  className="contentP">We take pride in our comprehensive range of academic programs, designed to meet the evolving needs of our community and the workforce. From transfer programs that seamlessly transition to four-year institutions to career and technical education pathways that lead directly to the workforce, we offer diverse options to suit your goals and interests.</p>
+          <h2 className="contentHeads">Resources</h2>
+          <p  className="contentP">Beyond the classroom, {collegeName} provides a rich array of extracurricular activities, clubs, and organizations to enhance your college experience. Whether you're interested in student government, cultural clubs, or academic societies, you'll find ample opportunities to connect with peers, develop leadership skills, and make lasting friendships.</p>
+          <h2 className="contentHeads">Community</h2>
+          <p  className="contentP">As an institution deeply rooted in our community, we are proud to offer resources and support services that empower students to succeed. From tutoring and academic advising to career counseling and wellness programs, we are here to help you navigate your educational journey and achieve your aspirations.</p>
+
+          <p className="contentP">Discover your potential and embark on a transformative educational experience at {collegeName}. Explore our website to learn more about our programs, services, and how you can become part of our vibrant learning community. We look forward to welcoming you to our campus and helping you reach your academic and professional goals.</p>
+        </div>
+        <div className="img-column">
+          <img src= {contentImg1}></img>
+          <img src= {contentImg2}></img>
+          <img src= {contentImg3}></img>
+        </div>
+      </div>
     </main>
   );
 }
@@ -158,7 +187,8 @@ const WelcomePage = () => {
   const imgAlt = `${collegeName} Logo`
   return (
     <div className="welcome-container" >
-      <Header imgurl={logoUrl} imgAlt={imgAlt}/>
+      <Header imgurl={logoUrl} imgAlt={imgAlt} collegeName={collegeName}/>
+      <Banner collegeName={collegeName}/>
       <Content district={district} collegeName={collegeName}/>
       <Footer collegeName={collegeName}/>
     </div>
