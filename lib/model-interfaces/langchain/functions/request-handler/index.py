@@ -83,7 +83,7 @@ def handle_run(record):
         agent_id = "Replace with provided AWS Bedrock Agent ID"
         ### RUN MESSAGE THROUGH AGENT TO GET TO RESPONSE
         ### 3 
-        client = boto3.client('bedrock-agent-runtime')
+        client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
         invoke_res = client.invoke_agent(
             agentAliasId='F8BN0AJC6X',
             agentId='JKRMSXAZXE',
