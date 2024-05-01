@@ -87,7 +87,7 @@ def handle_run(record):
         invoke_res = client.invoke_agent(
             agentAliasId='F8BN0AJC6X',
             agentId='JKRMSXAZXE',
-            endSession= false,
+            endSession= False,
             inputText=prompt,
             sessionId=session_id
         )
