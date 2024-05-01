@@ -35,20 +35,15 @@ def list_models():
 
 ### 1
 def get_custom_bedrock_agent():
-    return {
-                "name": "CustomModelID",
-                "provider": "bedrock",
-                "interface": "langchain",
-                "ragSupported": True,
-                "inputModalities": [
-                    "TEXT"
-                ],
-                "outputModalities": [
-                    "TEXT"
-                ],
-                "streaming": True,
-                "__typename": "Model"
-            }
+    return [{
+            "provider": Provider.OPENAI.value,
+            "name": "CustomModelID",
+            "streaming": True,
+            "inputModalities": [Modality.TEXT.value],
+            "outputModalities": [Modality.TEXT.value],
+            "interface": ModelInterface.LANGCHIAN.value,
+            "ragSupported": True,
+        }]
 
 
 def list_openai_models():
