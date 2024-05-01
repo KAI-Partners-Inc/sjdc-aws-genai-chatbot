@@ -39,14 +39,14 @@ def get_custom_bedrock_agent():
                 "name": "CustomModelID",
                 "provider": "bedrock",
                 "interface": "langchain",
-                "ragSupported": true,
+                "ragSupported": True,
                 "inputModalities": [
                     "TEXT"
                 ],
                 "outputModalities": [
                     "TEXT"
                 ],
-                "streaming": true,
+                "streaming": True,
                 "__typename": "Model"
             }
 
