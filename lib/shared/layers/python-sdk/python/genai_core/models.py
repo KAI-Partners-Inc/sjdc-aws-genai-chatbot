@@ -26,9 +26,29 @@ def list_models():
 
     azure_openai_models = list_azure_openai_models()
     if azure_openai_models:
-        models.extend(azure_openai_models)
+        models.extend(azure_openai_models)  
+
+    test = get_custom_bedrock_agent()
+    models.extend(test)
 
     return models
+
+### 1
+def get_custom_bedrock_agent():
+    return {
+                "name": "CustomModelID",
+                "provider": "bedrock",
+                "interface": "langchain",
+                "ragSupported": true,
+                "inputModalities": [
+                    "TEXT"
+                ],
+                "outputModalities": [
+                    "TEXT"
+                ],
+                "streaming": true,
+                "__typename": "Model"
+            }
 
 
 def list_openai_models():

@@ -93,6 +93,8 @@ class ModelAdapter:
     def get_qa_prompt(self):
         return QA_PROMPT
 
+
+    ### 6
     def run_with_chain(self, user_prompt, workspace_id=None):
         if not self.llm:
             raise ValueError("llm must be set")
@@ -170,6 +172,8 @@ class ModelAdapter:
             "metadata": metadata,
         }
 
+
+    ### 5
     def run(self, prompt, workspace_id=None, *args, **kwargs):
         logger.debug(f"run with {kwargs}")
         logger.debug(f"workspace_id {workspace_id}")

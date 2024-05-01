@@ -6,7 +6,7 @@ from ..types import Direction
 
 sns = boto3.client("sns")
 
-
+### 7 
 def send_to_client(detail, topic_arn=None):
     if not "direction" in detail:
         detail["direction"] = Direction.OUT.value

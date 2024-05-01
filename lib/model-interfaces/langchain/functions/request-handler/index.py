@@ -9,7 +9,7 @@ from aws_lambda_powertools.utilities.batch import BatchProcessor, EventType
 from aws_lambda_powertools.utilities.batch.exceptions import BatchProcessingError
 from aws_lambda_powertools.utilities.data_classes.sqs_event import SQSRecord
 from aws_lambda_powertools.utilities.typing import LambdaContext
-
+import boto3
 import adapters
 from genai_core.utils.websocket import send_to_client
 from genai_core.types import ChatbotAction
@@ -65,7 +65,7 @@ def handle_heartbeat(record):
         }
     )
 
-
+### 2
 def handle_run(record):
     user_id = record["userId"]
     data = record["data"]
@@ -79,36 +79,86 @@ def handle_run(record):
     if not session_id:
         session_id = str(uuid.uuid4())
 
-    adapter = registry.get_adapter(f"{provider}.{model_id}")
+    if model_id == "CustomModelID":
+        agent_id = "Replace with provided AWS Bedrock Agent ID"
+        ### RUN MESSAGE THROUGH AGENT TO GET TO RESPONSE
+        ### 3 
+        client = boto3.client('bedrock-agent-runtime')
+        invoke_res = client.invoke_agent(
+            agentAliasId='F8BN0AJC6X',
+            agentId='JKRMSXAZXE',
+            endSession= false,
+            inputText=prompt,
+            sessionId=session_id
+        )
+        ### response["completion"] is type EventStream - figure out how to parse
+        ### https://botocore.amazonaws.com/v1/documentation/api/latest/reference/eventstream.html
+        response_full = invoke_res["completion"]
+        text_response = ""
+        for event in response_full:
+            if "trace" in event:
+                text_response = response_full["trace"]["trace"]["orchestrationTrace"]["observation"]["finalResponse"]
+        
+        # metadata = {
+        #     "modelId": self.model_id,
+        #     "modelKwargs": self.model_kwargs,
+        #     "mode": self._mode,
+        #     "sessionId": self.session_id,
+        #     "userId": self.user_id,
+        #     "documents": [],
+        #     "prompts": self.callback_handler.prompts,
+        # }
 
-    adapter.on_llm_new_token = lambda *args, **kwargs: on_llm_new_token(
-        user_id, session_id, *args, **kwargs
-    )
-
-    model = adapter(
-        model_id=model_id,
-        mode=mode,
-        session_id=session_id,
-        user_id=user_id,
-        model_kwargs=data.get("modelKwargs", {}),
-    )
-
-    response = model.run(
-        prompt=prompt,
-        workspace_id=workspace_id,
-    )
-
-    logger.info(response)
-
-    send_to_client(
-        {
+        ### need to add metadata
+        response = {
+            "sessionId": session_id,
             "type": "text",
-            "action": ChatbotAction.FINAL_RESPONSE.value,
-            "timestamp": str(int(round(datetime.now().timestamp()))),
-            "userId": user_id,
-            "data": response,
+            "content": text_response
         }
-    )
+
+        send_to_client(
+            {
+                "type": "text",
+                "action": ChatbotAction.FINAL_RESPONSE.value,
+                "timestamp": str(int(round(datetime.now().timestamp()))),
+                "userId": user_id,
+                "data": response,
+            }
+        )
+    else:
+        adapter = registry.get_adapter(f"{provider}.{model_id}")
+        
+
+        ### 4
+        ### EVERYTHING BELOW in this handle_run function IS STEP 4
+        adapter.on_llm_new_token = lambda *args, **kwargs: on_llm_new_token(
+            user_id, session_id, *args, **kwargs
+        )
+
+        model = adapter(
+            model_id=model_id,
+            mode=mode,
+            session_id=session_id,
+            user_id=user_id,
+            model_kwargs=data.get("modelKwargs", {}),
+        )
+
+        response = model.run(
+            prompt=prompt,
+            workspace_id=workspace_id,
+        )
+
+        logger.info(response)
+
+        send_to_client(
+            {
+                "type": "text",
+                "action": ChatbotAction.FINAL_RESPONSE.value,
+                "timestamp": str(int(round(datetime.now().timestamp()))),
+                "userId": user_id,
+                "data": response,
+            }
+        )
 
 
 @tracer.capture_method
