@@ -101,22 +101,23 @@ def handle_run(record):
                 if "trace" in event:
                     text_response = response_full["trace"]["trace"]["orchestrationTrace"]["observation"]["finalResponse"]
             
-            # metadata = {
-            #     "modelId": self.model_id,
-            #     "modelKwargs": self.model_kwargs,
-            #     "mode": self._mode,
-            #     "sessionId": self.session_id,
-            #     "userId": self.user_id,
-            #     "documents": [],
-            #     "prompts": self.callback_handler.prompts,
-            # }
+            metadata = {
+                "modelId": = model_id,
+                "modelKwargs": data.get("modelKwargs", {}),
+                "mode": mode,
+                "sessionId": session_id,
+                "userId": user_id,
+                "documents": [],
+                "prompts": [],
+            }
         except Exception as error:
             text_response = error
         ### need to add metadata
         response = {
             "sessionId": session_id,
             "type": "text",
-            "content": text_response
+            "content": text_response,
+            "metadata": metadata
         }
         logger.info(response)
         send_to_client(
