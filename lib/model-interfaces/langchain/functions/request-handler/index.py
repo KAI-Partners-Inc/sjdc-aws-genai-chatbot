@@ -65,6 +65,7 @@ def handle_heartbeat(record):
         }
     )
 
+
 ### 2
 def handle_run(record):
     user_id = record["userId"]
@@ -83,39 +84,41 @@ def handle_run(record):
         agent_id = "Replace with provided AWS Bedrock Agent ID"
         ### RUN MESSAGE THROUGH AGENT TO GET TO RESPONSE
         ### 3 
-        client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
-        invoke_res = client.invoke_agent(
-            agentAliasId='F8BN0AJC6X',
-            agentId='JKRMSXAZXE',
-            endSession= False,
-            inputText=prompt,
-            sessionId=session_id
-        )
-        ### response["completion"] is type EventStream - figure out how to parse
-        ### https://botocore.amazonaws.com/v1/documentation/api/latest/reference/eventstream.html
-        response_full = invoke_res["completion"]
-        text_response = ""
-        for event in response_full:
-            if "trace" in event:
-                text_response = response_full["trace"]["trace"]["orchestrationTrace"]["observation"]["finalResponse"]
-        
-        # metadata = {
-        #     "modelId": self.model_id,
-        #     "modelKwargs": self.model_kwargs,
-        #     "mode": self._mode,
-        #     "sessionId": self.session_id,
-        #     "userId": self.user_id,
-        #     "documents": [],
-        #     "prompts": self.callback_handler.prompts,
-        # }
-
+        try:
+            client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
+            invoke_res = client.invoke_agent(
+                agentAliasId='F8BN0AJC6X',
+                agentId='JKRMSXAZXE',
+                endSession= False,
+                inputText=prompt,
+                sessionId=session_id
+            )
+            ### response["completion"] is type EventStream - figure out how to parse
+            ### https://botocore.amazonaws.com/v1/documentation/api/latest/reference/eventstream.html
+            response_full = invoke_res["completion"]
+            text_response = ""
+            for event in response_full:
+                if "trace" in event:
+                    text_response = response_full["trace"]["trace"]["orchestrationTrace"]["observation"]["finalResponse"]
+            
+            # metadata = {
+            #     "modelId": self.model_id,
+            #     "modelKwargs": self.model_kwargs,
+            #     "mode": self._mode,
+            #     "sessionId": self.session_id,
+            #     "userId": self.user_id,
+            #     "documents": [],
+            #     "prompts": self.callback_handler.prompts,
+            # }
+        except Exception as error:
+            text_response = error
         ### need to add metadata
         response = {
             "sessionId": session_id,
             "type": "text",
             "content": text_response
         }
-
+        logger.info(response)
         send_to_client(
             {
                 "type": "text",
@@ -222,3 +225,7 @@ def handler(event, context: LambdaContext):
     )
 
     return processor.response()
+
+
+# if __name__ == "__main__":
+#     testing()
