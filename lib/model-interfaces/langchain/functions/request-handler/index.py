@@ -100,7 +100,8 @@ def handle_run(record):
             for event in response_full:
                 if "trace" in event:
                     text_response = response_full["trace"]["trace"]["orchestrationTrace"]["observation"]["finalResponse"]
-            
+                else:
+                    text_response = "no trace in event"
             metadata = {
                 "modelId": = model_id,
                 "modelKwargs": data.get("modelKwargs", {}),
