@@ -5,8 +5,8 @@
     "aws-genai-llm-chatbot": "bin/aws-genai-llm-chatbot.js"
   },
   "scripts": {
-    "build": "npx @aws-amplify/cli codegen && tsc",
-    "watch": "tsc -w",
+    "build": "npx @aws-amplify/cli codegen && npx tsc",
+    "watch": "npx tsc -w",
     "cdk": "cdk",
     "gen": "npx @aws-amplify/cli codegen",
     "create": "node ./cli/magic.js config",
@@ -43,7 +43,7 @@
     "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.114.1-alpha.0",
     "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.114.1-alpha.0",
     "@aws-cdk/aws-cognito-identitypool-alpha": "^2.114.1-alpha.0",
-    "@cdklabs/generative-ai-cdk-constructs": "^0.1.50",
+    "@cdklabs/generative-ai-cdk-constructs": "^0.1.122",
     "aws-cdk-lib": "2.126.0",
     "cdk-nag": "2.27.170",
     "commander": "^11.0.0",

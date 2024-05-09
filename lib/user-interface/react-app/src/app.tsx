@@ -25,6 +25,7 @@ import SemanticSearch from "./pages/rag/semantic-search/semantic-search.tsx";
 import RssFeed from "./pages/rag/workspace/rss-feed.tsx";
 import WorkspacePane from "./pages/rag/workspace/workspace.tsx";
 import Workspaces from "./pages/rag/workspaces/workspaces.tsx";
+import SessionPage from "./pages/chatbot/sessions/sessions.tsx";
 // import GlobalFooter from "./components/global-footer.tsx";
 // import GlobalHeader from "./components/global-header.tsx";
 
@@ -76,6 +77,7 @@ function App() {
             <Route path="/chatbot" element={<Outlet />}>
               <Route path="playground" element={<Playground />} />
               <Route path="playground/:sessionId" element={<Playground />} />
+              <Route path="sessions" element={<SessionPage />} />
               <Route path="multichat" element={<MultiChatPlayground />} />
               <Route path="models" element={<Models />} />
             </Route>
