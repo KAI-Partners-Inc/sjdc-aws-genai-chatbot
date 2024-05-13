@@ -114,8 +114,31 @@ def handle_run(record):
         if model_id == "CustomModelID":
             retrieve_generate_response = retrieve_and_generate(prompt, session_id, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
-            logger.info(output)
-
+            metadata = {
+                    "modelId": = model_id,
+                    "modelKwargs": data.get("modelKwargs", {}),
+                    "mode": mode,
+                    "sessionId": session_id,
+                    "userId": user_id,
+                    "documents": [],
+                    "prompts": [],
+                }
+            response = {
+                    "sessionId": session_id,
+                    "type": "text",
+                    "content": text_response,
+                    "metadata": metadata
+                }
+            logger.info(response)
+            send_to_client(
+                {
+                    "type": "text",
+                    "action": ChatbotAction.FINAL_RESPONSE.value,
+                    "timestamp": str(int(round(datetime.now().timestamp()))),
+                    "userId": user_id,
+                    "data": response,
+                }
+            )
         else:
             adapter = registry.get_adapter(f"{provider}.{model_id}")
     
