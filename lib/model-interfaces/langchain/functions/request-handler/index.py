@@ -66,6 +66,37 @@ def handle_heartbeat(record):
     )
 
 
+def retrieveAndGenerate(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
+    model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
+    kbId = "APQWAWBG21"
+    if sessionId:
+        return bedrock_agent_client.retrieve_and_generate(
+            input={
+                'text': input
+            },
+            retrieveAndGenerateConfiguration={
+                'type': 'KNOWLEDGE_BASE',
+                'knowledgeBaseConfiguration': {
+                    'knowledgeBaseId': kbId,
+                    'modelArn': model_arn
+                }
+            },
+            sessionId=sessionId
+        )
+    else:
+        return bedrock_agent_client.retrieve_and_generate(
+            input={
+                'text': input
+            },
+            retrieveAndGenerateConfiguration={
+                'type': 'KNOWLEDGE_BASE',
+                'knowledgeBaseConfiguration': {
+                    'knowledgeBaseId': kbId,
+                    'modelArn': model_arn
+                }
+            }
+        )
+
 ### 2
 def handle_run(record):
     user_id = record["userId"]
@@ -79,123 +110,80 @@ def handle_run(record):
 
     if not session_id:
         session_id = str(uuid.uuid4())
-    # try:
-    #     if model_id == "CustomModelID":
-    #         ### RUN MESSAGE THROUGH AGENT TO GET TO RESPONSE
-    #         ### 3 
-    #         try:
-    #             client = boto3.client('bedrock-agent-runtime')
-    #             invoke_res = client.invoke_agent(
-    #                 agentAliasId='F8BN0AJC6X',
-    #                 agentId='JKRMSXAZXE',
-    #                 endSession= False,
-    #                 inputText=prompt,
-    #                 sessionId=session_id
-    #             )
-    #             ### invoke_res["completion"] is type EventStream - figure out how to parse
-    #             ### https://botocore.amazonaws.com/v1/documentation/api/latest/reference/eventstream.htm
-    #             text_response = ""
-    #             for event in invoke_res.get("completion"):
-    #                 chunk = event["chunk"]
-    #                 text_response += chunk["bytes"].decode()
-                
-    #         except Exception as error:
-    #             text_response = error
-        
-    #         ### metadata
-    #         metadata = {
-    #                 "modelId": = model_id,
-    #                 "modelKwargs": data.get("modelKwargs", {}),
-    #                 "mode": mode,
-    #                 "sessionId": session_id,
-    #                 "userId": user_id,
-    #                 "documents": [],
-    #                 "prompts": [],
-    #             }
+    try:
+        if model_id == "CustomModelID":
+            retrieve_generate_response = retrieve_and_generate(prompt, session_id, "anthropic.claude-3-sonnet-20240229-v1:0")
+            output = retrieve_generate_response["output"]["text"]
+            logger.info(output)
             
-    #         response = {
-    #             "sessionId": session_id,
-    #             "type": "text",
-    #             "content": text_response,
-    #             "metadata": metadata
-    #         }
-    #         logger.info(response)
-    #         send_to_client(
-    #             {
-    #                 "type": "text",
-    #                 "action": ChatbotAction.FINAL_RESPONSE.value,
-    #                 "timestamp": str(int(round(datetime.now().timestamp()))),
-    #                 "userId": user_id,
-    #                 "data": response,
-    #             }
-    #         )
-    #     else:
-    #         adapter = registry.get_adapter(f"{provider}.{model_id}")
+        else:
+            adapter = registry.get_adapter(f"{provider}.{model_id}")
     
 
-    #         ### 4
-    #         ### EVERYTHING BELOW in this handle_run function IS STEP 4
-    #         adapter.on_llm_new_token = lambda *args, **kwargs: on_llm_new_token(
-    #             user_id, session_id, *args, **kwargs
-    #         )
+            ### 4
+            ### EVERYTHING BELOW in this handle_run function IS STEP 4
+            adapter.on_llm_new_token = lambda *args, **kwargs: on_llm_new_token(
+                user_id, session_id, *args, **kwargs
+            )
 
-    #         model = adapter(
-    #             model_id=model_id,
-    #             mode=mode,
-    #             session_id=session_id,
-    #             user_id=user_id,
-    #             model_kwargs=data.get("modelKwargs", {}),
-    #         )
+            model = adapter(
+                model_id=model_id,
+                mode=mode,
+                session_id=session_id,
+                user_id=user_id,
+                model_kwargs=data.get("modelKwargs", {}),
+            )
 
-    #         response = model.run(
-    #             prompt=prompt,
-    #             workspace_id=workspace_id,
-    #         )
+            response = model.run(
+                prompt=prompt,
+                workspace_id=workspace_id,
+            )
 
-    #         logger.info(response)
+            logger.info(response)
 
-    #         send_to_client(
-    #             {
-    #                 "type": "text",
-    #                 "action": ChatbotAction.FINAL_RESPONSE.value,
-    #                 "timestamp": str(int(round(datetime.now().timestamp()))),
-    #                 "userId": user_id,
-    #                 "data": response,
-    #             }
-    #         )
-    # except:
-    adapter = registry.get_adapter(f"{provider}.{model_id}")
+            send_to_client(
+                {
+                    "type": "text",
+                    "action": ChatbotAction.FINAL_RESPONSE.value,
+                    "timestamp": str(int(round(datetime.now().timestamp()))),
+                    "userId": user_id,
+                    "data": response,
+                }
+            )
+    except Exception as error:
+        logger.inf
+    # adapter = registry.get_adapter(f"{provider}.{model_id}")
 
-    ### 4
-    ### EVERYTHING BELOW in this handle_run function IS STEP 4
-    adapter.on_llm_new_token = lambda *args, **kwargs: on_llm_new_token(
-        user_id, session_id, *args, **kwargs
-    )
+    # ### 4
+    # ### EVERYTHING BELOW in this handle_run function IS STEP 4
+    # adapter.on_llm_new_token = lambda *args, **kwargs: on_llm_new_token(
+    #     user_id, session_id, *args, **kwargs
+    # )
 
-    model = adapter(
-        model_id=model_id,
-        mode=mode,
-        session_id=session_id,
-        user_id=user_id,
-        model_kwargs=data.get("modelKwargs", {}),
-    )
+    # model = adapter(
+    #     model_id=model_id,
+    #     mode=mode,
+    #     session_id=session_id,
+    #     user_id=user_id,
+    #     model_kwargs=data.get("modelKwargs", {}),
+    # )
 
-    response = model.run(
-        prompt=prompt,
-        workspace_id=workspace_id,
-    )
+    # response = model.run(
+    #     prompt=prompt,
+    #     workspace_id=workspace_id,
+    # )
 
-    logger.info(response)
+    # logger.info(response)
 
-    send_to_client(
-        {
-            "type": "text",
-            "action": ChatbotAction.FINAL_RESPONSE.value,
-            "timestamp": str(int(round(datetime.now().timestamp()))),
-            "userId": user_id,
-            "data": response,
-        }
-    )
+    # send_to_client(
+    #     {
+    #         "type": "text",
+    #         "action": ChatbotAction.FINAL_RESPONSE.value,
+    #         "timestamp": str(int(round(datetime.now().timestamp()))),
+    #         "userId": user_id,
+    #         "data": response,
+    #     }
+    # )
 
 
 @tracer.capture_method
