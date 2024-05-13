@@ -111,7 +111,7 @@ export class Models extends Construct {
             ),
           },
           container:
-            DeepLearningContainerImage.HUGGINGFACE_PYTORCH_TGI_INFERENCE_2_1_1_TGI2_0_0_GPU_PY310_CU121_UBUNTU22_04,
+            DeepLearningContainerImage.HUGGINGFACE_PYTORCH_TGI_INFERENCE_2_1_1_TGI1_2_0_GPU_PY310_CU121_UBUNTU20_0,
           instanceType: SageMakerInstanceType.ML_G5_2XLARGE,
           startupHealthCheckTimeoutInSeconds: 300,
           endpointName: MISTRAL_7B_ENDPOINT_NAME,
@@ -158,7 +158,7 @@ export class Models extends Construct {
               (subnet) => subnet.subnetId
             ),
           },
-          container: DeepLearningContainerImage.HUGGINGFACE_PYTORCH_TGI_INFERENCE_2_1_1_TGI2_0_0_GPU_PY310_CU121_UBUNTU22_04,
+          container: DeepLearningContainerImage.HUGGINGFACE_PYTORCH_TGI_INFERENCE_2_1_1_TGI1_2_0_GPU_PY310_CU121_UBUNTU20_0,
           instanceType: SageMakerInstanceType.ML_G5_2XLARGE,
           startupHealthCheckTimeoutInSeconds: 300,
           endpointName: MISTRAL_7B_INSTRUCT2_ENDPOINT_NAME,
@@ -209,7 +209,7 @@ export class Models extends Construct {
               (subnet) => subnet.subnetId
             ),
           },
-          container: DeepLearningContainerImage.HUGGINGFACE_PYTORCH_TGI_INFERENCE_2_1_1_TGI2_0_0_GPU_PY310_CU121_UBUNTU22_04,
+          container: DeepLearningContainerImage.HUGGINGFACE_PYTORCH_TGI_INFERENCE_2_1_1_TGI1_2_0_GPU_PY310_CU121_UBUNTU20_0,
           instanceType: SageMakerInstanceType.ML_G5_48XLARGE,
           startupHealthCheckTimeoutInSeconds: 300,
           endpointName: MISTRAL_8x7B_INSTRUCT2_ENDPOINT_NAME,
