@@ -115,7 +115,7 @@ def handle_run(record):
             retrieve_generate_response = retrieve_and_generate(prompt, session_id, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
             logger.info(output)
-            
+
         else:
             adapter = registry.get_adapter(f"{provider}.{model_id}")
     
@@ -151,7 +151,7 @@ def handle_run(record):
                 }
             )
     except Exception as error:
-        logger.inf
+        logger.info(error)
     # adapter = registry.get_adapter(f"{provider}.{model_id}")
 
     # ### 4
