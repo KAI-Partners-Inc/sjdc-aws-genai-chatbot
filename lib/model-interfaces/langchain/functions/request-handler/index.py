@@ -112,7 +112,7 @@ def handle_run(record):
         session_id = str(uuid.uuid4())
     try:
         if model_id == "CustomModelID":
-            retrieve_generate_response = retrieve_and_generate(prompt, session_id, "anthropic.claude-3-sonnet-20240229-v1:0")
+            retrieve_generate_response = retrieveAndGenerate(prompt, session_id, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
             logger.info(ouput)
             metadata = {
