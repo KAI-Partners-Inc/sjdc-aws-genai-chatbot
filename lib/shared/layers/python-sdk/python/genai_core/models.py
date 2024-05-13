@@ -36,7 +36,7 @@ def list_models():
 ### 1
 def get_custom_bedrock_agent():
     return [{
-            "provider": Provider.OPENAI.value,
+            "provider": Provider.BEDROCK.value,
             "name": "CustomModelID",
             "streaming": True,
             "inputModalities": [Modality.TEXT.value],
