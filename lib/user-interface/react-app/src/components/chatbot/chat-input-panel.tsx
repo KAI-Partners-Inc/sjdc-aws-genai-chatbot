@@ -130,20 +130,31 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
           if (data !== undefined && data !== null) {
             const response: ChatBotMessageResponse = JSON.parse(data);
             console.log("message data", response.data);
-            if (response.data.metadata.modelId == "CustomModelID"){
-              sessionStorage.setItem("customSessionId", response.data.sessionId)
+            if ('modelId' in response.data.metadata){
+              if (response.data.metadata.modelId == "CustomModelID"){
+                sessionStorage.setItem("customSessionId", response.data.sessionId)
+              }
             }
 
             if (response.action === ChatBotAction.Heartbeat) {
               console.log("Heartbeat pong!");
               return;
             }
-            if (response.data.metadata.modelId == "CustomModelID"){
-              updateMessageHistoryRef(
-                response.data.sessionId,
-                messageHistoryRef.current,
-                response
-              );
+            if ('modelId' in response.data.metadata){
+              if (response.data.metadata.modelId == "CustomModelID"){
+                updateMessageHistoryRef(
+                  response.data.sessionId,
+                  messageHistoryRef.current,
+                  response
+                );
+              }
+              else{
+                updateMessageHistoryRef(
+                  props.session.id,
+                  messageHistoryRef.current,
+                  response
+                );
+              }
             }
             else{
               updateMessageHistoryRef(
