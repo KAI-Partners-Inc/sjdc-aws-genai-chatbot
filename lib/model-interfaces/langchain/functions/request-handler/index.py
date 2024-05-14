@@ -108,14 +108,12 @@ def handle_run(record):
     prompt = data["text"]
     workspace_id = data.get("workspaceId", None)
     session_id = data.get("sessionId")
+    if not session_id:
+        session_id = str(uuid.uuid4())
     try:
         if model_id == "CustomModelID":
-            if session_id:
-                retrieve_generate_response = retrieveAndGenerate(prompt, session_id, "anthropic.claude-3-sonnet-20240229-v1:0")
-            else:
-                retrieve_generate_response = retrieveAndGenerate(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
+            retrieve_generate_response = retrieveAndGenerate(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
-            session_id = retrieve_generate_response["sessionId"]
             logger.info(output)
             metadata = {
                     "modelId": model_id,
@@ -143,8 +141,6 @@ def handle_run(record):
                 }
             )
         else:
-            if not session_id:
-                session_id = str(uuid.uuid4())
             adapter = registry.get_adapter(f"{provider}.{model_id}")
 
             ### 4
