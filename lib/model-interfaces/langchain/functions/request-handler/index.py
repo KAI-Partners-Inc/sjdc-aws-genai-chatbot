@@ -116,7 +116,7 @@ def handle_run(record):
                 retrieve_generate_response = retrieveAndGenerate(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
             session_id = retrieve_generate_response["sessionId"]
-            logger.info(ouput)
+            logger.info(output)
             metadata = {
                     "modelId": model_id,
                     "modelKwargs": data.get("modelKwargs", {}),
