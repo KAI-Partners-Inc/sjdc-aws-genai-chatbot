@@ -127,7 +127,7 @@ def handle_run(record):
             response = {
                     "sessionId": session_id,
                     "type": "text",
-                    "content": text_response,
+                    "content": output
                     "metadata": metadata
                 }
             logger.info(response)
