@@ -130,15 +130,28 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
           if (data !== undefined && data !== null) {
             const response: ChatBotMessageResponse = JSON.parse(data);
             console.log("message data", response.data);
+            if (response.data.metadata.modelId == "CustomModelID"){
+              sessionStorage.setItem("customSessionId", response.data.sessionId)
+            }
+
             if (response.action === ChatBotAction.Heartbeat) {
               console.log("Heartbeat pong!");
               return;
             }
-            updateMessageHistoryRef(
-              props.session.id,
-              messageHistoryRef.current,
-              response
-            );
+            if (response.data.metadata.modelId == "CustomModelID"){
+              updateMessageHistoryRef(
+                response.data.sessionId,
+                messageHistoryRef.current,
+                response
+              );
+            }
+            else{
+              updateMessageHistoryRef(
+                props.session.id,
+                messageHistoryRef.current,
+                response
+              );
+            }
 
             if (
               response.action === ChatBotAction.FinalResponse ||
@@ -338,6 +351,16 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
     );
 
     const value = state.value.trim();
+    let sessionIdVar = ""
+    if (name == "CustomModelID"){
+      let customsession = sessionStorage.getItem("customSessionId")
+      if (customsession){
+        sessionIdVar = customsession;
+      }
+    }
+    else{
+      sessionIdVar =props.session.id
+    }
     const request: ChatBotRunRequest = {
       action: ChatBotAction.Run,
       modelInterface:
@@ -354,7 +377,7 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
         files: props.configuration.files ?? [],
         modelName: name,
         provider: provider,
-        sessionId: props.session.id,
+        sessionId: sessionIdVar,
         workspaceId: state.selectedWorkspace?.value,
         modelKwargs: {
           streaming: props.configuration.streaming,
@@ -364,6 +387,7 @@ export default function ChatInputPanel(props: ChatInputPanelProps) {
         },
       },
     };
+    
     console.log(request);
     setState((state) => ({
       ...state,
