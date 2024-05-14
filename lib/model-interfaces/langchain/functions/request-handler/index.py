@@ -20,6 +20,7 @@ logger = Logger()
 
 AWS_REGION = os.environ["AWS_REGION"]
 API_KEYS_SECRETS_ARN = os.environ["API_KEYS_SECRETS_ARN"]
+bedrock_agent_client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
 
 sequence_number = 0
 
@@ -69,7 +70,6 @@ def handle_heartbeat(record):
 def retrieveAndGenerate(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
     kbId = "APQWAWBG21"
-    bedrock_agent_client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
     if sessionId:
         return bedrock_agent_client.retrieve_and_generate(
             input={
