@@ -11,7 +11,7 @@ export default function GlobalFooter() {
 
   return (
     <footer style={footerStyles} id="footer">
-      Copyright © 2024&nbsp;San Joaquin Delta College
+      Copyright © 2024&nbsp;KAI Partners
       <a href="https://www.deltacollege.edu/campus-offices/marketing-and-communications/privacy-cookie-statement">Privacy and Cookie Statement</a>
       <strong>
         <a href="https://www.deltacollege.edu/campus-offices/marketing-and-communications/web-help-form">Report a Website Issue</a>

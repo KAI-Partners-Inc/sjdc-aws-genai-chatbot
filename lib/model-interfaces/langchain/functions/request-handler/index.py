@@ -13,6 +13,8 @@ import boto3
 import adapters
 from genai_core.utils.websocket import send_to_client
 from genai_core.types import ChatbotAction
+from genai_core.langchain import DynamoDBChatMessageHistory
+
 
 processor = BatchProcessor(event_type=EventType.SQS)
 tracer = Tracer()
@@ -124,6 +126,16 @@ def handle_run(record):
                     "documents": [],
                     "prompts": [],
                 }
+            try:
+
+                db_chat_history = DynamoDBChatMessageHistory(
+                table_name=os.environ["SESSIONS_TABLE_NAME"],
+                session_id=session_id,
+                user_id=user_id,
+                )
+                db_chat_history.add_metadata(metadata)
+            except:
+                pass
             response = {
                     "sessionId": session_id,
                     "type": "text",
