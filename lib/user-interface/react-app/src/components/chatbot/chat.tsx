@@ -106,7 +106,7 @@ export default function Chat(props: { sessionId?: string }) {
     const apiClient = new ApiClient(appContext);
     await apiClient.userFeedback.addUserFeedback({feedbackData});
   };
-  const collegeName = localStorage.getItem("collegeName") || "California Community College"
+  const collegeName = localStorage.getItem("collegeName") || "KAI Partners GenAI Chatbot"
   return (
     <div className={styles.chat_container}>
       <SpaceBetween direction="vertical" size="m">
