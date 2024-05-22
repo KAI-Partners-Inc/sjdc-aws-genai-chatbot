@@ -70,8 +70,8 @@ function App() {
     >
       <Router>
           <Routes>
-            <Route index path="/" element={<TestPage />} />
-            <Route path = "/test" element={<TestPage/>} />
+            <Route index path="/" element={<Playground />} />
+            <Route path = "/client-admin" element={<TestPage/>} />
             <Route path = "/welcome-test" element={<WelcomeTest />} />
             <Route path="/embedded" element={<Embedded />} /> 
             <Route path="/chatbot" element={<Outlet />}>

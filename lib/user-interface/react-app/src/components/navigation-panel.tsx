@@ -39,6 +39,11 @@ export default function NavigationPanel() {
             text: "Models",
             href: "/chatbot/models",
           },
+          {
+            type: "link",
+            text: "Client Admin",
+            href: "/client-admin",
+          }
         ],
       },
     ];
