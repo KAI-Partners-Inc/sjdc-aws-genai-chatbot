@@ -18,7 +18,7 @@ import { useForm } from "../../../common/hooks/use-form";
 import { ApiClient } from "../../../common/api-client/api-client";
 import { Utils } from "../../../common/utils";
 import { AppContext } from "../../../common/app-context";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { AddDataData } from "./types";
 import AddText from "./add-text";
 import AddQnA from "./add-qna";
@@ -27,8 +27,12 @@ import DataFileUpload from "./data-file-upload";
 import { CHATBOT_NAME } from "../../../common/constants";
 import AddRssSubscription from "./add-rss-subscription";
 import { Workspace } from "../../../API";
+import BaseAppLayoutv from "../../../components/v2-base-app-layout";
 
 export default function AddData() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const versionPath = pathname.split('/')
   const onFollow = useOnFollow();
   const appContext = useContext(AppContext);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -98,162 +102,324 @@ export default function AddData() {
   const disabledTabs =
     workspace?.engine === "kendra" ? ["qna", "website", "rssfeed"] : [];
 
-  return (
-    <BaseAppLayout
-      contentType="cards"
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: CHATBOT_NAME,
-              href: "/",
-            },
-            {
-              text: "RAG",
-              href: "/rag",
-            },
-            {
-              text: "Workspaces",
-              href: "/rag/workspaces",
-            },
-            ...(data.workspace?.label
-              ? [
-                  {
-                    text: data.workspace?.label,
-                    href: `/rag/workspaces/${data.workspace?.value}`,
-                  },
-                ]
-              : []),
-            {
-              text: "Add Data",
-              href: "/rag/workspaces/add-data",
-            },
-          ]}
-        />
-      }
-      content={
-        <ContentLayout header={<Header variant="h1">Add Data</Header>}>
-          <SpaceBetween size="l">
-            <Container>
+  if (versionPath[1] == 'v2'){
+    return (
+      <BaseAppLayoutv
+        contentType="cards"
+          breadcrumbs={
+            <BreadcrumbGroup
+              onFollow={onFollow}
+              items={[
+                {
+                  text: CHATBOT_NAME,
+                  href: "/",
+                },
+                {
+                  text: "RAG",
+                  href: "/rag",
+                },
+                {
+                  text: "Workspaces",
+                  href: "/rag/workspaces",
+                },
+                ...(data.workspace?.label
+                  ? [
+                      {
+                        text: data.workspace?.label,
+                        href: `/rag/workspaces/${data.workspace?.value}`,
+                      },
+                    ]
+                  : []),
+                {
+                  text: "Add Data",
+                  href: "/rag/workspaces/add-data",
+                },
+              ]}
+            />
+          }
+          content={
+            <ContentLayout header={<Header variant="h1">Add Data</Header>}>
               <SpaceBetween size="l">
-                <FormField label="Workspace" errorText={errors.workspace}>
-                  <Select
-                    loadingText="Loading workspaces (might take few seconds)..."
-                    statusType={workspacesLoadingStatus}
-                    placeholder="Select a workspace"
-                    filteringType="auto"
-                    selectedOption={data.workspace}
-                    options={workspaceOptions}
-                    onChange={({ detail: { selectedOption } }) => {
-                      onChange({ workspace: selectedOption });
+                <Container>
+                  <SpaceBetween size="l">
+                    <FormField label="Workspace" errorText={errors.workspace}>
+                      <Select
+                        loadingText="Loading workspaces (might take few seconds)..."
+                        statusType={workspacesLoadingStatus}
+                        placeholder="Select a workspace"
+                        filteringType="auto"
+                        selectedOption={data.workspace}
+                        options={workspaceOptions}
+                        onChange={({ detail: { selectedOption } }) => {
+                          onChange({ workspace: selectedOption });
+                          setSearchParams((current) => ({
+                            ...Utils.urlSearchParamsToRecord(current),
+                            workspaceId: selectedOption.value ?? "",
+                          }));
+                        }}
+                        empty={"No Workspaces available"}
+                      />
+                    </FormField>
+                  </SpaceBetween>
+                </Container>
+                {workspace?.kendraIndexExternal && (
+                  <Flashbar
+                    items={[
+                      {
+                        type: "info",
+                        content: (
+                          <>
+                            Data upload is not available for external Kendra indexes
+                          </>
+                        ),
+                      },
+                    ]}
+                  />
+                )}
+                {showTabs && (
+                  <Tabs
+                    tabs={[
+                      {
+                        label: "Upload Files",
+                        id: "file",
+                        content: (
+                          <DataFileUpload
+                            data={data}
+                            validate={validate}
+                            selectedWorkspace={selectedWorkspace}
+                          />
+                        ),
+                      },
+                      {
+                        label: "Add Text",
+                        id: "text",
+                        content: (
+                          <AddText
+                            data={data}
+                            validate={validate}
+                            submitting={submitting}
+                            setSubmitting={setSubmitting}
+                            selectedWorkspace={selectedWorkspace}
+                          />
+                        ),
+                      },
+                      {
+                        label: "Add Q&A",
+                        id: "qna",
+                        disabled: disabledTabs.includes("qna"),
+                        content: (
+                          <AddQnA
+                            data={data}
+                            validate={validate}
+                            submitting={submitting}
+                            setSubmitting={setSubmitting}
+                            selectedWorkspace={selectedWorkspace}
+                          />
+                        ),
+                      },
+                      {
+                        label: "Crawl Website",
+                        id: "website",
+                        disabled: disabledTabs.includes("website"),
+                        content: (
+                          <CrawlWebsite
+                            data={data}
+                            validate={validate}
+                            submitting={submitting}
+                            setSubmitting={setSubmitting}
+                            selectedWorkspace={selectedWorkspace}
+                          />
+                        ),
+                      },
+                      {
+                        label: "RSS Feeds",
+                        id: "rssfeed",
+                        disabled: disabledTabs.includes("rssfeed"),
+                        content: (
+                          <AddRssSubscription
+                            data={data}
+                            validate={validate}
+                            submitting={submitting}
+                            setSubmitting={setSubmitting}
+                            selectedWorkspace={selectedWorkspace}
+                          />
+                        ),
+                      },
+                    ]}
+                    activeTabId={activeTab}
+                    onChange={({ detail: { activeTabId } }) => {
+                      setActiveTab(activeTabId);
                       setSearchParams((current) => ({
                         ...Utils.urlSearchParamsToRecord(current),
-                        workspaceId: selectedOption.value ?? "",
+                        tab: activeTabId,
                       }));
                     }}
-                    empty={"No Workspaces available"}
                   />
-                </FormField>
+                )}
               </SpaceBetween>
-            </Container>
-            {workspace?.kendraIndexExternal && (
-              <Flashbar
-                items={[
-                  {
-                    type: "info",
-                    content: (
-                      <>
-                        Data upload is not available for external Kendra indexes
-                      </>
-                    ),
-                  },
-                ]}
-              />
-            )}
-            {showTabs && (
-              <Tabs
-                tabs={[
-                  {
-                    label: "Upload Files",
-                    id: "file",
-                    content: (
-                      <DataFileUpload
-                        data={data}
-                        validate={validate}
-                        selectedWorkspace={selectedWorkspace}
-                      />
-                    ),
-                  },
-                  {
-                    label: "Add Text",
-                    id: "text",
-                    content: (
-                      <AddText
-                        data={data}
-                        validate={validate}
-                        submitting={submitting}
-                        setSubmitting={setSubmitting}
-                        selectedWorkspace={selectedWorkspace}
-                      />
-                    ),
-                  },
-                  {
-                    label: "Add Q&A",
-                    id: "qna",
-                    disabled: disabledTabs.includes("qna"),
-                    content: (
-                      <AddQnA
-                        data={data}
-                        validate={validate}
-                        submitting={submitting}
-                        setSubmitting={setSubmitting}
-                        selectedWorkspace={selectedWorkspace}
-                      />
-                    ),
-                  },
-                  {
-                    label: "Crawl Website",
-                    id: "website",
-                    disabled: disabledTabs.includes("website"),
-                    content: (
-                      <CrawlWebsite
-                        data={data}
-                        validate={validate}
-                        submitting={submitting}
-                        setSubmitting={setSubmitting}
-                        selectedWorkspace={selectedWorkspace}
-                      />
-                    ),
-                  },
-                  {
-                    label: "RSS Feeds",
-                    id: "rssfeed",
-                    disabled: disabledTabs.includes("rssfeed"),
-                    content: (
-                      <AddRssSubscription
-                        data={data}
-                        validate={validate}
-                        submitting={submitting}
-                        setSubmitting={setSubmitting}
-                        selectedWorkspace={selectedWorkspace}
-                      />
-                    ),
-                  },
-                ]}
-                activeTabId={activeTab}
-                onChange={({ detail: { activeTabId } }) => {
-                  setActiveTab(activeTabId);
-                  setSearchParams((current) => ({
-                    ...Utils.urlSearchParamsToRecord(current),
-                    tab: activeTabId,
-                  }));
-                }}
-              />
-            )}
-          </SpaceBetween>
-        </ContentLayout>
-      }
-    />
-  );
+            </ContentLayout>
+          }
+      />
+    );
+  }
+  else{
+    return (
+      <BaseAppLayout
+        contentType="cards"
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Workspaces",
+                href: "/rag/workspaces",
+              },
+              ...(data.workspace?.label
+                ? [
+                    {
+                      text: data.workspace?.label,
+                      href: `/rag/workspaces/${data.workspace?.value}`,
+                    },
+                  ]
+                : []),
+              {
+                text: "Add Data",
+                href: "/rag/workspaces/add-data",
+              },
+            ]}
+          />
+        }
+        content={
+          <ContentLayout header={<Header variant="h1">Add Data</Header>}>
+            <SpaceBetween size="l">
+              <Container>
+                <SpaceBetween size="l">
+                  <FormField label="Workspace" errorText={errors.workspace}>
+                    <Select
+                      loadingText="Loading workspaces (might take few seconds)..."
+                      statusType={workspacesLoadingStatus}
+                      placeholder="Select a workspace"
+                      filteringType="auto"
+                      selectedOption={data.workspace}
+                      options={workspaceOptions}
+                      onChange={({ detail: { selectedOption } }) => {
+                        onChange({ workspace: selectedOption });
+                        setSearchParams((current) => ({
+                          ...Utils.urlSearchParamsToRecord(current),
+                          workspaceId: selectedOption.value ?? "",
+                        }));
+                      }}
+                      empty={"No Workspaces available"}
+                    />
+                  </FormField>
+                </SpaceBetween>
+              </Container>
+              {workspace?.kendraIndexExternal && (
+                <Flashbar
+                  items={[
+                    {
+                      type: "info",
+                      content: (
+                        <>
+                          Data upload is not available for external Kendra indexes
+                        </>
+                      ),
+                    },
+                  ]}
+                />
+              )}
+              {showTabs && (
+                <Tabs
+                  tabs={[
+                    {
+                      label: "Upload Files",
+                      id: "file",
+                      content: (
+                        <DataFileUpload
+                          data={data}
+                          validate={validate}
+                          selectedWorkspace={selectedWorkspace}
+                        />
+                      ),
+                    },
+                    {
+                      label: "Add Text",
+                      id: "text",
+                      content: (
+                        <AddText
+                          data={data}
+                          validate={validate}
+                          submitting={submitting}
+                          setSubmitting={setSubmitting}
+                          selectedWorkspace={selectedWorkspace}
+                        />
+                      ),
+                    },
+                    {
+                      label: "Add Q&A",
+                      id: "qna",
+                      disabled: disabledTabs.includes("qna"),
+                      content: (
+                        <AddQnA
+                          data={data}
+                          validate={validate}
+                          submitting={submitting}
+                          setSubmitting={setSubmitting}
+                          selectedWorkspace={selectedWorkspace}
+                        />
+                      ),
+                    },
+                    {
+                      label: "Crawl Website",
+                      id: "website",
+                      disabled: disabledTabs.includes("website"),
+                      content: (
+                        <CrawlWebsite
+                          data={data}
+                          validate={validate}
+                          submitting={submitting}
+                          setSubmitting={setSubmitting}
+                          selectedWorkspace={selectedWorkspace}
+                        />
+                      ),
+                    },
+                    {
+                      label: "RSS Feeds",
+                      id: "rssfeed",
+                      disabled: disabledTabs.includes("rssfeed"),
+                      content: (
+                        <AddRssSubscription
+                          data={data}
+                          validate={validate}
+                          submitting={submitting}
+                          setSubmitting={setSubmitting}
+                          selectedWorkspace={selectedWorkspace}
+                        />
+                      ),
+                    },
+                  ]}
+                  activeTabId={activeTab}
+                  onChange={({ detail: { activeTabId } }) => {
+                    setActiveTab(activeTabId);
+                    setSearchParams((current) => ({
+                      ...Utils.urlSearchParamsToRecord(current),
+                      tab: activeTabId,
+                    }));
+                  }}
+                />
+              )}
+            </SpaceBetween>
+          </ContentLayout>
+        }
+      />
+    );
+  }
 }

@@ -16,8 +16,13 @@ import CreateWorkspaceKendra from "./create-workspace-kendra";
 import SelectEnginePanel from "./select-engine-panel";
 import { CHATBOT_NAME } from "../../../common/constants";
 import { Utils } from "../../../common/utils";
+import { useLocation } from "react-router-dom";
+import BaseAppLayoutv from "../../../components/v2-base-app-layout";
 
 export default function CreateWorkspace() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const versionPath = pathname.split('/')
   const onFollow = useOnFollow();
   const appContext = useContext(AppContext);
   const [engine, setEngine] = useState("");
@@ -56,51 +61,100 @@ export default function CreateWorkspace() {
       setLoading(false);
     })();
   }, [appContext]);
-
-  return (
-    <BaseAppLayout
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: CHATBOT_NAME,
-              href: "/",
-            },
-            {
-              text: "RAG",
-              href: "/rag",
-            },
-            {
-              text: "Workspaces",
-              href: "/rag/workspaces",
-            },
-            {
-              text: "Create Workspace",
-              href: "/rag/workspaces/create",
-            },
-          ]}
-          expandAriaLabel="Show path"
-          ariaLabel="Breadcrumbs"
-        />
-      }
-      content={
-        <ContentLayout header={<CreateWorkspaceHeader />}>
-          <SpaceBetween size="l">
-            <SelectEnginePanel
-              engines={engines}
-              engine={engine}
-              setEngine={setEngine}
-            />
-            {loading && (
-              <StatusIndicator type="loading">Loading</StatusIndicator>
-            )}
-            {engine === "aurora" && <CreateWorkspaceAurora />}
-            {engine === "opensearch" && <CreateWorkspaceOpenSearch />}
-            {engine === "kendra" && <CreateWorkspaceKendra />}
-          </SpaceBetween>
-        </ContentLayout>
-      }
-    />
-  );
+  if (versionPath[1] == 'v2'){
+    return (
+      <BaseAppLayoutv
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Workspaces",
+                href: "/rag/workspaces",
+              },
+              {
+                text: "Create Workspace",
+                href: "/rag/workspaces/create",
+              },
+            ]}
+            expandAriaLabel="Show path"
+            ariaLabel="Breadcrumbs"
+          />
+        }
+        content={
+          <ContentLayout header={<CreateWorkspaceHeader />}>
+            <SpaceBetween size="l">
+              <SelectEnginePanel
+                engines={engines}
+                engine={engine}
+                setEngine={setEngine}
+              />
+              {loading && (
+                <StatusIndicator type="loading">Loading</StatusIndicator>
+              )}
+              {engine === "aurora" && <CreateWorkspaceAurora />}
+              {engine === "opensearch" && <CreateWorkspaceOpenSearch />}
+              {engine === "kendra" && <CreateWorkspaceKendra />}
+            </SpaceBetween>
+          </ContentLayout>
+        }
+      />
+    );
+  }
+  else{
+    return (
+      <BaseAppLayout
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Workspaces",
+                href: "/rag/workspaces",
+              },
+              {
+                text: "Create Workspace",
+                href: "/rag/workspaces/create",
+              },
+            ]}
+            expandAriaLabel="Show path"
+            ariaLabel="Breadcrumbs"
+          />
+        }
+        content={
+          <ContentLayout header={<CreateWorkspaceHeader />}>
+            <SpaceBetween size="l">
+              <SelectEnginePanel
+                engines={engines}
+                engine={engine}
+                setEngine={setEngine}
+              />
+              {loading && (
+                <StatusIndicator type="loading">Loading</StatusIndicator>
+              )}
+              {engine === "aurora" && <CreateWorkspaceAurora />}
+              {engine === "opensearch" && <CreateWorkspaceOpenSearch />}
+              {engine === "kendra" && <CreateWorkspaceKendra />}
+            </SpaceBetween>
+          </ContentLayout>
+        }
+      />
+    );
+  }
 }

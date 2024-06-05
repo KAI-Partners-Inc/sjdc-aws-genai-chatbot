@@ -23,12 +23,13 @@ import { AppContext } from "../../../common/app-context";
 import { LoadingStatus } from "../../../common/types";
 import { OptionsHelper } from "../../../common/helpers/options-helper";
 import { ApiClient } from "../../../common/api-client/api-client";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { Utils } from "../../../common/utils";
 import SemanticSearchDetails from "./semantic-search-details";
 import ResultItems from "./result-items";
 import { CHATBOT_NAME } from "../../../common/constants";
 import { SemanticSearchResult, Workspace } from "../../../API";
+import BaseAppLayoutv from "../../../components/v2-base-app-layout";
 
 interface SemanticSearchData {
   workspace: SelectProps.Option | null;
@@ -36,6 +37,9 @@ interface SemanticSearchData {
 }
 
 export default function SemanticSearch() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const versionPath = pathname.split('/')
   const onFollow = useOnFollow();
   const appContext = useContext(AppContext);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -174,121 +178,242 @@ export default function SemanticSearch() {
     }
   }
 
-  return (
-    <BaseAppLayout
-      contentType="cards"
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: CHATBOT_NAME,
-              href: "/",
-            },
-            {
-              text: "RAG",
-              href: "/rag",
-            },
-            {
-              text: "Workspaces",
-              href: "/rag/workspaces/",
-            },
-            ...(data.workspace?.label
-              ? [
-                  {
-                    text: data.workspace?.label,
-                    href: `/rag/workspaces/${data.workspace?.value}`,
-                  },
-                ]
-              : []),
-            {
-              text: "Semantic Search",
-              href: "/rag/semantic-search",
-            },
-          ]}
-        />
-      }
-      content={
-        <ContentLayout header={<Header variant="h1">Semantic Search</Header>}>
-          <SpaceBetween size="l">
-            <Form
-              actions={
-                <SpaceBetween
-                  direction="horizontal"
-                  size="l"
-                  alignItems="center"
-                >
-                  {submitting && (
-                    <StatusIndicator type="loading">Loading</StatusIndicator>
-                  )}
-                  <Button variant="primary" onClick={onSearch}>
-                    Search
-                  </Button>
-                </SpaceBetween>
-              }
-              errorText={globalError}
-            >
-              <SpaceBetween size="l">
-                <Container
-                  footer={
-                    searchResult && (
-                      <SemanticSearchDetails
-                        searchResults={searchResult}
-                        detailsExpanded={detailsExpanded}
-                        setDetailsExpanded={setDetailsExpanded}
-                      />
-                    )
-                  }
-                >
-                  <SpaceBetween size="l">
-                    <FormField label="Workspace" errorText={errors.workspace}>
-                      <Select
-                        loadingText="Loading workspaces (might take few seconds)..."
-                        statusType={workspacesLoadingStatus}
-                        placeholder="Select a workspace"
-                        filteringType="auto"
-                        selectedOption={data.workspace}
-                        options={workspaceOptions}
-                        onChange={({ detail: { selectedOption } }) => {
-                          onChange({ workspace: selectedOption });
-                          setSearchParams((current) => ({
-                            ...Utils.urlSearchParamsToRecord(current),
-                            workspaceId: selectedOption.value ?? "",
-                          }));
-                        }}
-                        empty={"No Workspaces available"}
-                      />
-                    </FormField>
-                    <FormField label="Search Query" errorText={errors.query}>
-                      <Textarea
-                        value={data.query}
-                        onChange={({ detail: { value } }) =>
-                          onChange({ query: value })
-                        }
-                      />
-                    </FormField>
+  if (versionPath[1] == 'v2'){
+    return (
+      <BaseAppLayoutv
+        contentType="cards"
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Workspaces",
+                href: "/rag/workspaces/",
+              },
+              ...(data.workspace?.label
+                ? [
+                    {
+                      text: data.workspace?.label,
+                      href: `/rag/workspaces/${data.workspace?.value}`,
+                    },
+                  ]
+                : []),
+              {
+                text: "Semantic Search",
+                href: "/rag/semantic-search",
+              },
+            ]}
+          />
+        }
+        content={
+          <ContentLayout header={<Header variant="h1">Semantic Search</Header>}>
+            <SpaceBetween size="l">
+              <Form
+                actions={
+                  <SpaceBetween
+                    direction="horizontal"
+                    size="l"
+                    alignItems="center"
+                  >
+                    {submitting && (
+                      <StatusIndicator type="loading">Loading</StatusIndicator>
+                    )}
+                    <Button variant="primary" onClick={onSearch}>
+                      Search
+                    </Button>
                   </SpaceBetween>
-                </Container>
-              </SpaceBetween>
-            </Form>
-            {searchResult && searchResult.items && (
-              <>
-                {searchResult.items.length === 0 && (
-                  <Container>
-                    <Header variant="h3">No results found</Header>
+                }
+                errorText={globalError}
+              >
+                <SpaceBetween size="l">
+                  <Container
+                    footer={
+                      searchResult && (
+                        <SemanticSearchDetails
+                          searchResults={searchResult}
+                          detailsExpanded={detailsExpanded}
+                          setDetailsExpanded={setDetailsExpanded}
+                        />
+                      )
+                    }
+                  >
+                    <SpaceBetween size="l">
+                      <FormField label="Workspace" errorText={errors.workspace}>
+                        <Select
+                          loadingText="Loading workspaces (might take few seconds)..."
+                          statusType={workspacesLoadingStatus}
+                          placeholder="Select a workspace"
+                          filteringType="auto"
+                          selectedOption={data.workspace}
+                          options={workspaceOptions}
+                          onChange={({ detail: { selectedOption } }) => {
+                            onChange({ workspace: selectedOption });
+                            setSearchParams((current) => ({
+                              ...Utils.urlSearchParamsToRecord(current),
+                              workspaceId: selectedOption.value ?? "",
+                            }));
+                          }}
+                          empty={"No Workspaces available"}
+                        />
+                      </FormField>
+                      <FormField label="Search Query" errorText={errors.query}>
+                        <Textarea
+                          value={data.query}
+                          onChange={({ detail: { value } }) =>
+                            onChange({ query: value })
+                          }
+                        />
+                      </FormField>
+                    </SpaceBetween>
                   </Container>
-                )}
-                {searchResult.items.length > 0 && <Tabs tabs={tabs} />}
-              </>
-            )}
-          </SpaceBetween>
-        </ContentLayout>
-      }
-      info={
-        <HelpPanel header={<Header variant="h3">Semantic search</Header>}>
-          <p>Search in the workspace for the given query.</p>
-        </HelpPanel>
-      }
-    />
-  );
+                </SpaceBetween>
+              </Form>
+              {searchResult && searchResult.items && (
+                <>
+                  {searchResult.items.length === 0 && (
+                    <Container>
+                      <Header variant="h3">No results found</Header>
+                    </Container>
+                  )}
+                  {searchResult.items.length > 0 && <Tabs tabs={tabs} />}
+                </>
+              )}
+            </SpaceBetween>
+          </ContentLayout>
+        }
+        info={
+          <HelpPanel header={<Header variant="h3">Semantic search</Header>}>
+            <p>Search in the workspace for the given query.</p>
+          </HelpPanel>
+        }
+      />
+    );
+  }
+  else{
+    return (
+      <BaseAppLayout
+        contentType="cards"
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Workspaces",
+                href: "/rag/workspaces/",
+              },
+              ...(data.workspace?.label
+                ? [
+                    {
+                      text: data.workspace?.label,
+                      href: `/rag/workspaces/${data.workspace?.value}`,
+                    },
+                  ]
+                : []),
+              {
+                text: "Semantic Search",
+                href: "/rag/semantic-search",
+              },
+            ]}
+          />
+        }
+        content={
+          <ContentLayout header={<Header variant="h1">Semantic Search</Header>}>
+            <SpaceBetween size="l">
+              <Form
+                actions={
+                  <SpaceBetween
+                    direction="horizontal"
+                    size="l"
+                    alignItems="center"
+                  >
+                    {submitting && (
+                      <StatusIndicator type="loading">Loading</StatusIndicator>
+                    )}
+                    <Button variant="primary" onClick={onSearch}>
+                      Search
+                    </Button>
+                  </SpaceBetween>
+                }
+                errorText={globalError}
+              >
+                <SpaceBetween size="l">
+                  <Container
+                    footer={
+                      searchResult && (
+                        <SemanticSearchDetails
+                          searchResults={searchResult}
+                          detailsExpanded={detailsExpanded}
+                          setDetailsExpanded={setDetailsExpanded}
+                        />
+                      )
+                    }
+                  >
+                    <SpaceBetween size="l">
+                      <FormField label="Workspace" errorText={errors.workspace}>
+                        <Select
+                          loadingText="Loading workspaces (might take few seconds)..."
+                          statusType={workspacesLoadingStatus}
+                          placeholder="Select a workspace"
+                          filteringType="auto"
+                          selectedOption={data.workspace}
+                          options={workspaceOptions}
+                          onChange={({ detail: { selectedOption } }) => {
+                            onChange({ workspace: selectedOption });
+                            setSearchParams((current) => ({
+                              ...Utils.urlSearchParamsToRecord(current),
+                              workspaceId: selectedOption.value ?? "",
+                            }));
+                          }}
+                          empty={"No Workspaces available"}
+                        />
+                      </FormField>
+                      <FormField label="Search Query" errorText={errors.query}>
+                        <Textarea
+                          value={data.query}
+                          onChange={({ detail: { value } }) =>
+                            onChange({ query: value })
+                          }
+                        />
+                      </FormField>
+                    </SpaceBetween>
+                  </Container>
+                </SpaceBetween>
+              </Form>
+              {searchResult && searchResult.items && (
+                <>
+                  {searchResult.items.length === 0 && (
+                    <Container>
+                      <Header variant="h3">No results found</Header>
+                    </Container>
+                  )}
+                  {searchResult.items.length > 0 && <Tabs tabs={tabs} />}
+                </>
+              )}
+            </SpaceBetween>
+          </ContentLayout>
+        }
+        info={
+          <HelpPanel header={<Header variant="h3">Semantic search</Header>}>
+            <p>Search in the workspace for the given query.</p>
+          </HelpPanel>
+        }
+      />
+    );
+  }
 }

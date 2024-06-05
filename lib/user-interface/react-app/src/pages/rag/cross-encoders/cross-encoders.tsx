@@ -25,8 +25,13 @@ import { OptionsHelper } from "../../../common/helpers/options-helper";
 import { Utils } from "../../../common/utils";
 import { CHATBOT_NAME } from "../../../common/constants";
 import { CrossEncoderData } from "../../../API";
+import { useLocation } from "react-router-dom";
+import BaseAppLayoutv from "../../../components/v2-base-app-layout";
 
 export default function CrossEncoders() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const versionPath = pathname.split('/')
   const onFollow = useOnFollow();
   const appContext = useContext(AppContext);
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
@@ -182,183 +187,364 @@ export default function CrossEncoders() {
   if (Utils.isDevelopment()) {
     console.log("re-render");
   }
-
-  return (
-    <BaseAppLayout
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: CHATBOT_NAME,
-              href: "/",
-            },
-            {
-              text: "RAG",
-              href: "/rag",
-            },
-            {
-              text: "Cross-Encoders",
-              href: "/rag/cross-encoders",
-            },
-          ]}
-        />
-      }
-      content={
-        <ContentLayout
-          header={
-            <Header
-              variant="h1"
-              description="Cross-Encoder models employ a classification approach for data pairs rather than generating vector embeddings for the data."
-            >
-              Cross-Encoders (Re-ranking)
-            </Header>
-          }
-        >
-          <SpaceBetween size="l">
-            <Form
-              actions={
-                <SpaceBetween
-                  direction="horizontal"
-                  size="l"
-                  alignItems="center"
-                >
-                  {submitting && (
-                    <StatusIndicator type="loading">Loading</StatusIndicator>
-                  )}
-                  <Button
-                    data-testid="create"
-                    disabled={submitting}
-                    variant="primary"
-                    onClick={submitForm}
+  if (versionPath[1] == 'v2'){
+    return (
+      <BaseAppLayoutv
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Cross-Encoders",
+                href: "/rag/cross-encoders",
+              },
+            ]}
+          />
+        }
+        content={
+          <ContentLayout
+            header={
+              <Header
+                variant="h1"
+                description="Cross-Encoder models employ a classification approach for data pairs rather than generating vector embeddings for the data."
+              >
+                Cross-Encoders (Re-ranking)
+              </Header>
+            }
+          >
+            <SpaceBetween size="l">
+              <Form
+                actions={
+                  <SpaceBetween
+                    direction="horizontal"
+                    size="l"
+                    alignItems="center"
                   >
-                    Rank passages
-                  </Button>
-                </SpaceBetween>
-              }
-              errorText={globalError}
-            >
-              <SpaceBetween size="l">
-                <Container header={<Header variant="h1">Model</Header>}>
-                  <SpaceBetween size="l">
-                    <FormField
-                      label="Cross-Encoder Model"
-                      errorText={errors.crossEncoderModel}
+                    {submitting && (
+                      <StatusIndicator type="loading">Loading</StatusIndicator>
+                    )}
+                    <Button
+                      data-testid="create"
+                      disabled={submitting}
+                      variant="primary"
+                      onClick={submitForm}
                     >
-                      <Select
-                        disabled={submitting}
-                        selectedAriaLabel="Selected"
-                        placeholder="Choose a cross-encoder model"
-                        statusType={crossEncoderModelsStatus}
-                        loadingText="Loading cross-encoder models (might take few seconds)..."
-                        selectedOption={data.crossEncoderModel}
-                        options={crossEncoderModelOptions}
-                        onChange={({ detail: { selectedOption } }) =>
-                          onChange({ crossEncoderModel: selectedOption })
-                        }
-                        empty={<div>No cross-encoder models found</div>}
-                      />
-                    </FormField>
+                      Rank passages
+                    </Button>
                   </SpaceBetween>
-                </Container>
-                <Container header={<Header variant="h1">Input</Header>}>
-                  <SpaceBetween size="l">
-                    <FormField
-                      label="Query text"
-                      errorText={errors.input}
-                      info={
-                        <Link onFollow={onLoadSampleData}>
-                          load sample data
-                        </Link>
-                      }
-                    >
-                      <Textarea
-                        disabled={submitting}
-                        value={data.input}
-                        onChange={({ detail }) => {
-                          onChange({ input: detail.value });
-                        }}
-                      />
-                    </FormField>
-                  </SpaceBetween>
-                </Container>
-                <Container header={<Header variant="h1">Passages</Header>}>
-                  <SpaceBetween size="l">
-                    {data.passages.map((passage, index) => (
+                }
+                errorText={globalError}
+              >
+                <SpaceBetween size="l">
+                  <Container header={<Header variant="h1">Model</Header>}>
+                    <SpaceBetween size="l">
                       <FormField
-                        key={index}
-                        label={`Passage ${index + 1}`}
-                        errorText={errors.passages?.[index]}
-                        secondaryControl={
-                          <Button
-                            disabled={submitting || index === 0}
-                            onClick={() => removePassage(index)}
-                          >
-                            Remove
-                          </Button>
+                        label="Cross-Encoder Model"
+                        errorText={errors.crossEncoderModel}
+                      >
+                        <Select
+                          disabled={submitting}
+                          selectedAriaLabel="Selected"
+                          placeholder="Choose a cross-encoder model"
+                          statusType={crossEncoderModelsStatus}
+                          loadingText="Loading cross-encoder models (might take few seconds)..."
+                          selectedOption={data.crossEncoderModel}
+                          options={crossEncoderModelOptions}
+                          onChange={({ detail: { selectedOption } }) =>
+                            onChange({ crossEncoderModel: selectedOption })
+                          }
+                          empty={<div>No cross-encoder models found</div>}
+                        />
+                      </FormField>
+                    </SpaceBetween>
+                  </Container>
+                  <Container header={<Header variant="h1">Input</Header>}>
+                    <SpaceBetween size="l">
+                      <FormField
+                        label="Query text"
+                        errorText={errors.input}
+                        info={
+                          <Link onFollow={onLoadSampleData}>
+                            load sample data
+                          </Link>
                         }
                       >
                         <Textarea
                           disabled={submitting}
-                          value={passage}
+                          value={data.input}
                           onChange={({ detail }) => {
-                            const newPassages = [...data.passages];
-                            newPassages[index] = detail.value;
-                            onChange({ passages: newPassages });
+                            onChange({ input: detail.value });
                           }}
                         />
                       </FormField>
+                    </SpaceBetween>
+                  </Container>
+                  <Container header={<Header variant="h1">Passages</Header>}>
+                    <SpaceBetween size="l">
+                      {data.passages.map((passage, index) => (
+                        <FormField
+                          key={index}
+                          label={`Passage ${index + 1}`}
+                          errorText={errors.passages?.[index]}
+                          secondaryControl={
+                            <Button
+                              disabled={submitting || index === 0}
+                              onClick={() => removePassage(index)}
+                            >
+                              Remove
+                            </Button>
+                          }
+                        >
+                          <Textarea
+                            disabled={submitting}
+                            value={passage}
+                            onChange={({ detail }) => {
+                              const newPassages = [...data.passages];
+                              newPassages[index] = detail.value;
+                              onChange({ passages: newPassages });
+                            }}
+                          />
+                        </FormField>
+                      ))}
+                      <Button
+                        disabled={submitting || data.passages.length >= 5}
+                        onClick={addPassage}
+                      >
+                        Add new passage
+                      </Button>
+                    </SpaceBetween>
+                  </Container>
+                </SpaceBetween>
+              </Form>
+              {ranking && (
+                <Container
+                  header={
+                    <Header variant="h1">
+                      Results&nbsp;(
+                      {ranking.map((val, index) => (
+                        <React.Fragment key={index}>
+                          {index < ranking.length - 1 ? (
+                            <>{val.index + 1},&nbsp;</>
+                          ) : (
+                            <>{val.index + 1}</>
+                          )}
+                        </React.Fragment>
+                      ))}
+                      )
+                    </Header>
+                  }
+                >
+                  <SpaceBetween size="l">
+                    {ranking.map((item) => (
+                      <FormField
+                        key={item.index}
+                        label={`Passage ${
+                          item.index + 1
+                        } (score: ${item.score.toFixed(4)})`}
+                      >
+                        <Textarea rows={5} value={item.passage} readOnly={true} />
+                      </FormField>
                     ))}
-                    <Button
-                      disabled={submitting || data.passages.length >= 5}
-                      onClick={addPassage}
-                    >
-                      Add new passage
-                    </Button>
                   </SpaceBetween>
                 </Container>
-              </SpaceBetween>
-            </Form>
-            {ranking && (
-              <Container
-                header={
-                  <Header variant="h1">
-                    Results&nbsp;(
-                    {ranking.map((val, index) => (
-                      <React.Fragment key={index}>
-                        {index < ranking.length - 1 ? (
-                          <>{val.index + 1},&nbsp;</>
-                        ) : (
-                          <>{val.index + 1}</>
-                        )}
-                      </React.Fragment>
-                    ))}
-                    )
-                  </Header>
+              )}
+            </SpaceBetween>
+          </ContentLayout>
+        }
+        info={
+          <HelpPanel header={<Header variant="h3">Cross-Encoders</Header>}>
+            <p>Cross-encoders are ...</p>
+          </HelpPanel>
+        }
+      />
+    );
+  }
+  else{
+    return (
+      <BaseAppLayout
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Cross-Encoders",
+                href: "/rag/cross-encoders",
+              },
+            ]}
+          />
+        }
+        content={
+          <ContentLayout
+            header={
+              <Header
+                variant="h1"
+                description="Cross-Encoder models employ a classification approach for data pairs rather than generating vector embeddings for the data."
+              >
+                Cross-Encoders (Re-ranking)
+              </Header>
+            }
+          >
+            <SpaceBetween size="l">
+              <Form
+                actions={
+                  <SpaceBetween
+                    direction="horizontal"
+                    size="l"
+                    alignItems="center"
+                  >
+                    {submitting && (
+                      <StatusIndicator type="loading">Loading</StatusIndicator>
+                    )}
+                    <Button
+                      data-testid="create"
+                      disabled={submitting}
+                      variant="primary"
+                      onClick={submitForm}
+                    >
+                      Rank passages
+                    </Button>
+                  </SpaceBetween>
                 }
+                errorText={globalError}
               >
                 <SpaceBetween size="l">
-                  {ranking.map((item) => (
-                    <FormField
-                      key={item.index}
-                      label={`Passage ${
-                        item.index + 1
-                      } (score: ${item.score.toFixed(4)})`}
-                    >
-                      <Textarea rows={5} value={item.passage} readOnly={true} />
-                    </FormField>
-                  ))}
+                  <Container header={<Header variant="h1">Model</Header>}>
+                    <SpaceBetween size="l">
+                      <FormField
+                        label="Cross-Encoder Model"
+                        errorText={errors.crossEncoderModel}
+                      >
+                        <Select
+                          disabled={submitting}
+                          selectedAriaLabel="Selected"
+                          placeholder="Choose a cross-encoder model"
+                          statusType={crossEncoderModelsStatus}
+                          loadingText="Loading cross-encoder models (might take few seconds)..."
+                          selectedOption={data.crossEncoderModel}
+                          options={crossEncoderModelOptions}
+                          onChange={({ detail: { selectedOption } }) =>
+                            onChange({ crossEncoderModel: selectedOption })
+                          }
+                          empty={<div>No cross-encoder models found</div>}
+                        />
+                      </FormField>
+                    </SpaceBetween>
+                  </Container>
+                  <Container header={<Header variant="h1">Input</Header>}>
+                    <SpaceBetween size="l">
+                      <FormField
+                        label="Query text"
+                        errorText={errors.input}
+                        info={
+                          <Link onFollow={onLoadSampleData}>
+                            load sample data
+                          </Link>
+                        }
+                      >
+                        <Textarea
+                          disabled={submitting}
+                          value={data.input}
+                          onChange={({ detail }) => {
+                            onChange({ input: detail.value });
+                          }}
+                        />
+                      </FormField>
+                    </SpaceBetween>
+                  </Container>
+                  <Container header={<Header variant="h1">Passages</Header>}>
+                    <SpaceBetween size="l">
+                      {data.passages.map((passage, index) => (
+                        <FormField
+                          key={index}
+                          label={`Passage ${index + 1}`}
+                          errorText={errors.passages?.[index]}
+                          secondaryControl={
+                            <Button
+                              disabled={submitting || index === 0}
+                              onClick={() => removePassage(index)}
+                            >
+                              Remove
+                            </Button>
+                          }
+                        >
+                          <Textarea
+                            disabled={submitting}
+                            value={passage}
+                            onChange={({ detail }) => {
+                              const newPassages = [...data.passages];
+                              newPassages[index] = detail.value;
+                              onChange({ passages: newPassages });
+                            }}
+                          />
+                        </FormField>
+                      ))}
+                      <Button
+                        disabled={submitting || data.passages.length >= 5}
+                        onClick={addPassage}
+                      >
+                        Add new passage
+                      </Button>
+                    </SpaceBetween>
+                  </Container>
                 </SpaceBetween>
-              </Container>
-            )}
-          </SpaceBetween>
-        </ContentLayout>
-      }
-      info={
-        <HelpPanel header={<Header variant="h3">Cross-Encoders</Header>}>
-          <p>Cross-encoders are ...</p>
-        </HelpPanel>
-      }
-    />
-  );
+              </Form>
+              {ranking && (
+                <Container
+                  header={
+                    <Header variant="h1">
+                      Results&nbsp;(
+                      {ranking.map((val, index) => (
+                        <React.Fragment key={index}>
+                          {index < ranking.length - 1 ? (
+                            <>{val.index + 1},&nbsp;</>
+                          ) : (
+                            <>{val.index + 1}</>
+                          )}
+                        </React.Fragment>
+                      ))}
+                      )
+                    </Header>
+                  }
+                >
+                  <SpaceBetween size="l">
+                    {ranking.map((item) => (
+                      <FormField
+                        key={item.index}
+                        label={`Passage ${
+                          item.index + 1
+                        } (score: ${item.score.toFixed(4)})`}
+                      >
+                        <Textarea rows={5} value={item.passage} readOnly={true} />
+                      </FormField>
+                    ))}
+                  </SpaceBetween>
+                </Container>
+              )}
+            </SpaceBetween>
+          </ContentLayout>
+        }
+        info={
+          <HelpPanel header={<Header variant="h3">Cross-Encoders</Header>}>
+            <p>Cross-encoders are ...</p>
+          </HelpPanel>
+        }
+      />
+    );
+  }
 }

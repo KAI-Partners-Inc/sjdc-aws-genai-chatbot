@@ -10,8 +10,13 @@ import BaseAppLayout from "../../../components/base-app-layout";
 import GeneralConfig, { WorkspacesStatistics } from "./general-config";
 import { CHATBOT_NAME } from "../../../common/constants";
 import { Workspace } from "../../../API";
+import { useLocation } from "react-router-dom";
+import BaseAppLayoutv from "../../../components/v2-base-app-layout";
 
 export default function Dashboard() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const versionPath = pathname.split('/')
   const onFollow = useOnFollow();
   const appContext = useContext(AppContext);
   const [loading, setLoading] = useState(true);
@@ -46,33 +51,66 @@ export default function Dashboard() {
     })();
   }, [appContext]);
 
-  return (
-    <BaseAppLayout
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: CHATBOT_NAME,
-              href: "/",
-            },
-            {
-              text: "RAG",
-              href: "/rag",
-            },
-          ]}
-          expandAriaLabel="Show path"
-          ariaLabel="Breadcrumbs"
-        />
-      }
-      content={
-        <ContentLayout header={<DashboardHeader />}>
-          <SpaceBetween size="l">
-            <GeneralConfig statistics={statistics} />
-            <WorkspacesTable loading={loading} workspaces={workspaces} />
-          </SpaceBetween>
-        </ContentLayout>
-      }
-    />
-  );
+  if (versionPath[1] == 'v2'){
+    return (
+      <BaseAppLayoutv
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+            ]}
+            expandAriaLabel="Show path"
+            ariaLabel="Breadcrumbs"
+          />
+        }
+        content={
+          <ContentLayout header={<DashboardHeader />}>
+            <SpaceBetween size="l">
+              <GeneralConfig statistics={statistics} />
+              <WorkspacesTable loading={loading} workspaces={workspaces} />
+            </SpaceBetween>
+          </ContentLayout>
+        }
+      />
+    );
+  }
+  else{
+    return (
+      <BaseAppLayout
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+            ]}
+            expandAriaLabel="Show path"
+            ariaLabel="Breadcrumbs"
+          />
+        }
+        content={
+          <ContentLayout header={<DashboardHeader />}>
+            <SpaceBetween size="l">
+              <GeneralConfig statistics={statistics} />
+              <WorkspacesTable loading={loading} workspaces={workspaces} />
+            </SpaceBetween>
+          </ContentLayout>
+        }
+      />
+    );
+  }
 }

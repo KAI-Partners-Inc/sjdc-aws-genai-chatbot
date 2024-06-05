@@ -20,7 +20,7 @@ import {
 } from "@cloudscape-design/components";
 import useOnFollow from "../../../common/hooks/use-on-follow";
 import BaseAppLayout from "../../../components/base-app-layout";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { DocumentSubscriptionStatus } from "../../../common/types";
 import { AppContext } from "../../../common/app-context";
@@ -31,8 +31,12 @@ import { DateTime } from "luxon";
 import { Utils } from "../../../common/utils";
 import { useForm } from "../../../common/hooks/use-form";
 import { Workspace, Document, DocumentsResult } from "../../../API";
+import BaseAppLayoutv from "../../../components/v2-base-app-layout";
 
 export default function RssFeed() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const versionPath = pathname.split('/')
   const appContext = useContext(AppContext);
   const navigate = useNavigate();
   const onFollow = useOnFollow();
@@ -220,314 +224,624 @@ export default function RssFeed() {
       await getRssSubscriptionPosts({ lastDocumentId });
     }
   };
-
-  return (
-    <BaseAppLayout
-      contentType="cards"
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: CHATBOT_NAME,
-              href: "/",
-            },
-            {
-              text: "RAG",
-              href: "/rag",
-            },
-            {
-              text: "Workspaces",
-              href: "/rag/workspaces",
-            },
-            {
-              text: workspace?.name || "",
-              href: `/rag/workspaces/${workspace?.id}`,
-            },
-            {
-              text: rssSubscription?.title || "",
-              href: `/rag/workspaces/${workspace?.id}/rss/${rssSubscription?.id}`,
-            },
-          ]}
-        />
-      }
-      content={
-        <ContentLayout
-          header={
-            <Header
-              variant="h1"
-              actions={
-                <SpaceBetween size="m" direction="horizontal">
-                  <Button
-                    onClick={() =>
-                      toggleRssSubscription(
-                        rssSubscriptionStatus ==
-                          DocumentSubscriptionStatus.ENABLED
-                          ? "disable"
-                          : "enable"
-                      )
-                    }
-                  >
-                    {rssSubscriptionStatus == DocumentSubscriptionStatus.ENABLED
-                      ? "Disable RSS Feed Subscription"
-                      : "Enable RSS Feed Subscription"}
-                  </Button>
-                  <Button
-                    onClick={() => setIsEditingCrawlerSettings(true)}
-                    disabled={
-                      isEditingCrawlerSettings ||
-                      rssSubscriptionStatus ==
-                        DocumentSubscriptionStatus.DISABLED
-                    }
-                  >
-                    Edit Website Crawler Configuration
-                  </Button>
-                </SpaceBetween>
-              }
-            >
-              {loading ? (
-                <StatusIndicator type="loading">Loading...</StatusIndicator>
-              ) : (
-                workspace?.name
-              )}
-            </Header>
-          }
-        >
-          <SpaceBetween size="l">
-            <Container
-              header={
-                <Header variant="h2">RSS Feed Subscription Details</Header>
-              }
-            >
-              <SpaceBetween direction="vertical" size="s">
-                {rssSubscriptionStatus ==
-                DocumentSubscriptionStatus.DISABLED ? (
-                  <Alert type="warning" header="RSS Feed Subscription Disabled">
-                    This RSS Subscription is currently disabled and won't check
-                    for any new posts from the RSS feed. To enable it, please
-                    click the <b>"Enable RSS Feed Subscription"</b> button.
-                    <br />
-                    <i>
-                      Any Posts from RSS Feed listed as "Pending" in the table
-                      below will still be sent for crawling, even if
-                      subscription is disabled.
-                    </i>
-                  </Alert>
-                ) : (
-                  <></>
-                )}
-                <ColumnLayout columns={3} variant="text-grid">
-                  <SpaceBetween size="l">
-                    <div>
-                      <Box variant="awsui-key-label">RSS Subscription ID</Box>
-                      <div>{rssSubscription?.id}</div>
-                    </div>
-                    <div>
-                      <Box variant="awsui-key-label">RSS Feed Title</Box>
-                      <div>{rssSubscription?.title}</div>
-                    </div>
-                    <div>
-                      <Box variant="awsui-key-label">RSS Feed URL</Box>
-                      <div>{rssSubscription?.path}</div>
-                    </div>
-                  </SpaceBetween>
-                  <SpaceBetween size="l">
-                    <div>
-                      <Box variant="awsui-key-label">
-                        RSS Subscription Status
-                      </Box>
-                      <div>
-                        <StatusIndicator
-                          type={Labels.statusTypeMap[rssSubscriptionStatus]}
-                          colorOverride={
-                            rssSubscriptionStatus ==
+  if (versionPath[1] == 'v2'){
+    return (
+      <BaseAppLayoutv
+        contentType="cards"
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Workspaces",
+                href: "/rag/workspaces",
+              },
+              {
+                text: workspace?.name || "",
+                href: `/rag/workspaces/${workspace?.id}`,
+              },
+              {
+                text: rssSubscription?.title || "",
+                href: `/rag/workspaces/${workspace?.id}/rss/${rssSubscription?.id}`,
+              },
+            ]}
+          />
+        }
+        content={
+          <ContentLayout
+            header={
+              <Header
+                variant="h1"
+                actions={
+                  <SpaceBetween size="m" direction="horizontal">
+                    <Button
+                      onClick={() =>
+                        toggleRssSubscription(
+                          rssSubscriptionStatus ==
                             DocumentSubscriptionStatus.ENABLED
-                              ? "green"
-                              : "red"
-                          }
-                        >
-                          {Labels.statusMap[rssSubscriptionStatus]}
-                        </StatusIndicator>
-                        {}
-                      </div>
-                    </div>
-                    <div>
-                      <Box variant="awsui-key-label">
-                        RSS Subscription Created
-                      </Box>
-                      <div>
-                        {rssSubscription?.createdAt
-                          ? DateTime.fromISO(
-                              new Date(rssSubscription?.createdAt).toISOString()
-                            ).toLocaleString(DateTime.DATETIME_SHORT)
-                          : ""}
-                      </div>
-                    </div>
-                    <div>
-                      <Box variant="awsui-key-label">
-                        RSS Subscription Last Checked
-                      </Box>
-                      <div>
-                        {rssSubscription?.rssLastCheckedAt
-                          ? DateTime.fromISO(
-                              new Date(
-                                rssSubscription?.rssLastCheckedAt
-                              ).toISOString()
-                            ).toLocaleString(DateTime.DATETIME_SHORT)
-                          : ""}
-                      </div>
-                    </div>
+                            ? "disable"
+                            : "enable"
+                        )
+                      }
+                    >
+                      {rssSubscriptionStatus == DocumentSubscriptionStatus.ENABLED
+                        ? "Disable RSS Feed Subscription"
+                        : "Enable RSS Feed Subscription"}
+                    </Button>
+                    <Button
+                      onClick={() => setIsEditingCrawlerSettings(true)}
+                      disabled={
+                        isEditingCrawlerSettings ||
+                        rssSubscriptionStatus ==
+                          DocumentSubscriptionStatus.DISABLED
+                      }
+                    >
+                      Edit Website Crawler Configuration
+                    </Button>
                   </SpaceBetween>
-                  {isEditingCrawlerSettings &&
-                  rssSubscriptionStatus ==
-                    DocumentSubscriptionStatus.ENABLED ? (
-                    <RssFeedCrawlerForm
-                      data={{
-                        followLinks: rssCrawlerFollowLinks,
-                        limit: rssCrawlerLimit,
-                      }}
-                      documentId={rssSubscription?.id ?? ""}
-                      workspaceId={workspace?.id ?? ""}
-                      setCanceled={cancelEdit}
-                      setSubmitting={setSubmitting}
-                      submitting={submitting}
-                    />
+                }
+              >
+                {loading ? (
+                  <StatusIndicator type="loading">Loading...</StatusIndicator>
+                ) : (
+                  workspace?.name
+                )}
+              </Header>
+            }
+          >
+            <SpaceBetween size="l">
+              <Container
+                header={
+                  <Header variant="h2">RSS Feed Subscription Details</Header>
+                }
+              >
+                <SpaceBetween direction="vertical" size="s">
+                  {rssSubscriptionStatus ==
+                  DocumentSubscriptionStatus.DISABLED ? (
+                    <Alert type="warning" header="RSS Feed Subscription Disabled">
+                      This RSS Subscription is currently disabled and won't check
+                      for any new posts from the RSS feed. To enable it, please
+                      click the <b>"Enable RSS Feed Subscription"</b> button.
+                      <br />
+                      <i>
+                        Any Posts from RSS Feed listed as "Pending" in the table
+                        below will still be sent for crawling, even if
+                        subscription is disabled.
+                      </i>
+                    </Alert>
                   ) : (
+                    <></>
+                  )}
+                  <ColumnLayout columns={3} variant="text-grid">
                     <SpaceBetween size="l">
                       <div>
-                        <Box variant="h4">
-                          RSS Post Website Crawler Configuration
-                        </Box>
+                        <Box variant="awsui-key-label">RSS Subscription ID</Box>
+                        <div>{rssSubscription?.id}</div>
                       </div>
                       <div>
-                        <Box variant="awsui-key-label">Follow Links</Box>
+                        <Box variant="awsui-key-label">RSS Feed Title</Box>
+                        <div>{rssSubscription?.title}</div>
+                      </div>
+                      <div>
+                        <Box variant="awsui-key-label">RSS Feed URL</Box>
+                        <div>{rssSubscription?.path}</div>
+                      </div>
+                    </SpaceBetween>
+                    <SpaceBetween size="l">
+                      <div>
+                        <Box variant="awsui-key-label">
+                          RSS Subscription Status
+                        </Box>
                         <div>
                           <StatusIndicator
-                            type={rssCrawlerFollowLinks ? "success" : "info"}
+                            type={Labels.statusTypeMap[rssSubscriptionStatus]}
                             colorOverride={
                               rssSubscriptionStatus ==
                               DocumentSubscriptionStatus.ENABLED
-                                ? rssCrawlerFollowLinks
-                                  ? "green"
-                                  : "grey"
-                                : "grey"
+                                ? "green"
+                                : "red"
                             }
                           >
-                            {rssCrawlerFollowLinks ? "Yes" : "No"}
+                            {Labels.statusMap[rssSubscriptionStatus]}
                           </StatusIndicator>
+                          {}
                         </div>
                       </div>
                       <div>
                         <Box variant="awsui-key-label">
-                          Maximum Number of Links to Follow
+                          RSS Subscription Created
                         </Box>
                         <div>
-                          <Badge
-                            color={
-                              rssCrawlerFollowLinks &&
-                              rssSubscriptionStatus ==
-                                DocumentSubscriptionStatus.ENABLED
-                                ? "blue"
-                                : "grey"
-                            }
-                          >
-                            {rssCrawlerFollowLinks ? rssCrawlerLimit : "N/A"}
-                          </Badge>
+                          {rssSubscription?.createdAt
+                            ? DateTime.fromISO(
+                                new Date(rssSubscription?.createdAt).toISOString()
+                              ).toLocaleString(DateTime.DATETIME_SHORT)
+                            : ""}
+                        </div>
+                      </div>
+                      <div>
+                        <Box variant="awsui-key-label">
+                          RSS Subscription Last Checked
+                        </Box>
+                        <div>
+                          {rssSubscription?.rssLastCheckedAt
+                            ? DateTime.fromISO(
+                                new Date(
+                                  rssSubscription?.rssLastCheckedAt
+                                ).toISOString()
+                              ).toLocaleString(DateTime.DATETIME_SHORT)
+                            : ""}
                         </div>
                       </div>
                     </SpaceBetween>
-                  )}
-                </ColumnLayout>
-              </SpaceBetween>
-            </Container>
-            <Table
-              loading={postsLoading}
-              loadingText={`Loading RSS Subscription Posts`}
-              columnDefinitions={[
-                {
-                  id: "title",
-                  header: "Title",
-                  cell: (item: Document) => (
-                    <>{Utils.textEllipsis(item.title ?? "", 100)}</>
-                  ),
-                  isRowHeader: true,
-                },
-                {
-                  id: "url",
-                  header: "URL",
-                  cell: (item: Document) => (
-                    <RssFeedPostUrlPopover item={item} />
-                  ),
-                  isRowHeader: true,
-                },
-                {
-                  id: "status",
-                  header: "Status",
-                  cell: (item: Document) => (
-                    <StatusIndicator type={Labels.statusTypeMap[item.status!]}>
-                      {Labels.statusMap[item.status!]}
-                    </StatusIndicator>
-                  ),
-                },
-                {
-                  id: "createdAt",
-                  header: "RSS Post Detected",
-                  cell: (item: Document) =>
-                    item.createdAt
-                      ? DateTime.fromISO(
-                          new Date(item.createdAt).toISOString()
-                        ).toLocaleString(DateTime.DATETIME_SHORT)
-                      : "",
-                },
-              ]}
-              items={
-                pages[Math.min(pages.length - 1, currentPageIndex - 1)]?.items!
-              }
-              empty={
-                <TableEmptyState
-                  resourceName="RSS Subscription Post"
-                  createText="Subcribe to a new RSS Feed"
-                  createHref={`/rag/workspaces/add-data?workspaceId=${rssSubscription?.workspaceId}&tab=rssfeed`}
-                />
-              }
-              pagination={
-                pages.length === 0 ? null : (
-                  <Pagination
-                    openEnd={true}
-                    pagesCount={0}
-                    currentPageIndex={currentPageIndex}
-                    onNextPageClick={onNextPageClick}
-                    onPreviousPageClick={onPreviousPageClick}
+                    {isEditingCrawlerSettings &&
+                    rssSubscriptionStatus ==
+                      DocumentSubscriptionStatus.ENABLED ? (
+                      <RssFeedCrawlerForm
+                        data={{
+                          followLinks: rssCrawlerFollowLinks,
+                          limit: rssCrawlerLimit,
+                        }}
+                        documentId={rssSubscription?.id ?? ""}
+                        workspaceId={workspace?.id ?? ""}
+                        setCanceled={cancelEdit}
+                        setSubmitting={setSubmitting}
+                        submitting={submitting}
+                      />
+                    ) : (
+                      <SpaceBetween size="l">
+                        <div>
+                          <Box variant="h4">
+                            RSS Post Website Crawler Configuration
+                          </Box>
+                        </div>
+                        <div>
+                          <Box variant="awsui-key-label">Follow Links</Box>
+                          <div>
+                            <StatusIndicator
+                              type={rssCrawlerFollowLinks ? "success" : "info"}
+                              colorOverride={
+                                rssSubscriptionStatus ==
+                                DocumentSubscriptionStatus.ENABLED
+                                  ? rssCrawlerFollowLinks
+                                    ? "green"
+                                    : "grey"
+                                  : "grey"
+                              }
+                            >
+                              {rssCrawlerFollowLinks ? "Yes" : "No"}
+                            </StatusIndicator>
+                          </div>
+                        </div>
+                        <div>
+                          <Box variant="awsui-key-label">
+                            Maximum Number of Links to Follow
+                          </Box>
+                          <div>
+                            <Badge
+                              color={
+                                rssCrawlerFollowLinks &&
+                                rssSubscriptionStatus ==
+                                  DocumentSubscriptionStatus.ENABLED
+                                  ? "blue"
+                                  : "grey"
+                              }
+                            >
+                              {rssCrawlerFollowLinks ? rssCrawlerLimit : "N/A"}
+                            </Badge>
+                          </div>
+                        </div>
+                      </SpaceBetween>
+                    )}
+                  </ColumnLayout>
+                </SpaceBetween>
+              </Container>
+              <Table
+                loading={postsLoading}
+                loadingText={`Loading RSS Subscription Posts`}
+                columnDefinitions={[
+                  {
+                    id: "title",
+                    header: "Title",
+                    cell: (item: Document) => (
+                      <>{Utils.textEllipsis(item.title ?? "", 100)}</>
+                    ),
+                    isRowHeader: true,
+                  },
+                  {
+                    id: "url",
+                    header: "URL",
+                    cell: (item: Document) => (
+                      <RssFeedPostUrlPopover item={item} />
+                    ),
+                    isRowHeader: true,
+                  },
+                  {
+                    id: "status",
+                    header: "Status",
+                    cell: (item: Document) => (
+                      <StatusIndicator type={Labels.statusTypeMap[item.status!]}>
+                        {Labels.statusMap[item.status!]}
+                      </StatusIndicator>
+                    ),
+                  },
+                  {
+                    id: "createdAt",
+                    header: "RSS Post Detected",
+                    cell: (item: Document) =>
+                      item.createdAt
+                        ? DateTime.fromISO(
+                            new Date(item.createdAt).toISOString()
+                          ).toLocaleString(DateTime.DATETIME_SHORT)
+                        : "",
+                  },
+                ]}
+                items={
+                  pages[Math.min(pages.length - 1, currentPageIndex - 1)]?.items!
+                }
+                empty={
+                  <TableEmptyState
+                    resourceName="RSS Subscription Post"
+                    createText="Subcribe to a new RSS Feed"
+                    createHref={`/rag/workspaces/add-data?workspaceId=${rssSubscription?.workspaceId}&tab=rssfeed`}
                   />
-                )
-              }
-              header={
-                <Header
-                  actions={[
-                    <SpaceBetween
-                      direction="horizontal"
-                      size="xs"
-                      key="table-header-buttons"
-                    >
-                      <Button
-                        href={`/rag/workspaces/${workspaceId}?tab=website`}
+                }
+                pagination={
+                  pages.length === 0 ? null : (
+                    <Pagination
+                      openEnd={true}
+                      pagesCount={0}
+                      currentPageIndex={currentPageIndex}
+                      onNextPageClick={onNextPageClick}
+                      onPreviousPageClick={onPreviousPageClick}
+                    />
+                  )
+                }
+                header={
+                  <Header
+                    actions={[
+                      <SpaceBetween
+                        direction="horizontal"
+                        size="xs"
+                        key="table-header-buttons"
                       >
-                        View Crawled Websites
-                      </Button>
-                      <Button iconName="refresh" onClick={refreshPage} />
-                    </SpaceBetween>,
-                  ]}
-                  description="RSS Feed Subscriptions check for new posts daily and queues new posts for Website Crawling. Visit the Websites tab in the workspace to see the websites that have been crawled."
-                >
-                  Posts from RSS Feed
-                </Header>
-              }
-            />
-          </SpaceBetween>
-        </ContentLayout>
-      }
-    />
-  );
+                        <Button
+                          href={`/rag/workspaces/${workspaceId}?tab=website`}
+                        >
+                          View Crawled Websites
+                        </Button>
+                        <Button iconName="refresh" onClick={refreshPage} />
+                      </SpaceBetween>,
+                    ]}
+                    description="RSS Feed Subscriptions check for new posts daily and queues new posts for Website Crawling. Visit the Websites tab in the workspace to see the websites that have been crawled."
+                  >
+                    Posts from RSS Feed
+                  </Header>
+                }
+              />
+            </SpaceBetween>
+          </ContentLayout>
+        }
+      />
+    );
+  }
+  else{
+    return (
+      <BaseAppLayout
+        contentType="cards"
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Workspaces",
+                href: "/rag/workspaces",
+              },
+              {
+                text: workspace?.name || "",
+                href: `/rag/workspaces/${workspace?.id}`,
+              },
+              {
+                text: rssSubscription?.title || "",
+                href: `/rag/workspaces/${workspace?.id}/rss/${rssSubscription?.id}`,
+              },
+            ]}
+          />
+        }
+        content={
+          <ContentLayout
+            header={
+              <Header
+                variant="h1"
+                actions={
+                  <SpaceBetween size="m" direction="horizontal">
+                    <Button
+                      onClick={() =>
+                        toggleRssSubscription(
+                          rssSubscriptionStatus ==
+                            DocumentSubscriptionStatus.ENABLED
+                            ? "disable"
+                            : "enable"
+                        )
+                      }
+                    >
+                      {rssSubscriptionStatus == DocumentSubscriptionStatus.ENABLED
+                        ? "Disable RSS Feed Subscription"
+                        : "Enable RSS Feed Subscription"}
+                    </Button>
+                    <Button
+                      onClick={() => setIsEditingCrawlerSettings(true)}
+                      disabled={
+                        isEditingCrawlerSettings ||
+                        rssSubscriptionStatus ==
+                          DocumentSubscriptionStatus.DISABLED
+                      }
+                    >
+                      Edit Website Crawler Configuration
+                    </Button>
+                  </SpaceBetween>
+                }
+              >
+                {loading ? (
+                  <StatusIndicator type="loading">Loading...</StatusIndicator>
+                ) : (
+                  workspace?.name
+                )}
+              </Header>
+            }
+          >
+            <SpaceBetween size="l">
+              <Container
+                header={
+                  <Header variant="h2">RSS Feed Subscription Details</Header>
+                }
+              >
+                <SpaceBetween direction="vertical" size="s">
+                  {rssSubscriptionStatus ==
+                  DocumentSubscriptionStatus.DISABLED ? (
+                    <Alert type="warning" header="RSS Feed Subscription Disabled">
+                      This RSS Subscription is currently disabled and won't check
+                      for any new posts from the RSS feed. To enable it, please
+                      click the <b>"Enable RSS Feed Subscription"</b> button.
+                      <br />
+                      <i>
+                        Any Posts from RSS Feed listed as "Pending" in the table
+                        below will still be sent for crawling, even if
+                        subscription is disabled.
+                      </i>
+                    </Alert>
+                  ) : (
+                    <></>
+                  )}
+                  <ColumnLayout columns={3} variant="text-grid">
+                    <SpaceBetween size="l">
+                      <div>
+                        <Box variant="awsui-key-label">RSS Subscription ID</Box>
+                        <div>{rssSubscription?.id}</div>
+                      </div>
+                      <div>
+                        <Box variant="awsui-key-label">RSS Feed Title</Box>
+                        <div>{rssSubscription?.title}</div>
+                      </div>
+                      <div>
+                        <Box variant="awsui-key-label">RSS Feed URL</Box>
+                        <div>{rssSubscription?.path}</div>
+                      </div>
+                    </SpaceBetween>
+                    <SpaceBetween size="l">
+                      <div>
+                        <Box variant="awsui-key-label">
+                          RSS Subscription Status
+                        </Box>
+                        <div>
+                          <StatusIndicator
+                            type={Labels.statusTypeMap[rssSubscriptionStatus]}
+                            colorOverride={
+                              rssSubscriptionStatus ==
+                              DocumentSubscriptionStatus.ENABLED
+                                ? "green"
+                                : "red"
+                            }
+                          >
+                            {Labels.statusMap[rssSubscriptionStatus]}
+                          </StatusIndicator>
+                          {}
+                        </div>
+                      </div>
+                      <div>
+                        <Box variant="awsui-key-label">
+                          RSS Subscription Created
+                        </Box>
+                        <div>
+                          {rssSubscription?.createdAt
+                            ? DateTime.fromISO(
+                                new Date(rssSubscription?.createdAt).toISOString()
+                              ).toLocaleString(DateTime.DATETIME_SHORT)
+                            : ""}
+                        </div>
+                      </div>
+                      <div>
+                        <Box variant="awsui-key-label">
+                          RSS Subscription Last Checked
+                        </Box>
+                        <div>
+                          {rssSubscription?.rssLastCheckedAt
+                            ? DateTime.fromISO(
+                                new Date(
+                                  rssSubscription?.rssLastCheckedAt
+                                ).toISOString()
+                              ).toLocaleString(DateTime.DATETIME_SHORT)
+                            : ""}
+                        </div>
+                      </div>
+                    </SpaceBetween>
+                    {isEditingCrawlerSettings &&
+                    rssSubscriptionStatus ==
+                      DocumentSubscriptionStatus.ENABLED ? (
+                      <RssFeedCrawlerForm
+                        data={{
+                          followLinks: rssCrawlerFollowLinks,
+                          limit: rssCrawlerLimit,
+                        }}
+                        documentId={rssSubscription?.id ?? ""}
+                        workspaceId={workspace?.id ?? ""}
+                        setCanceled={cancelEdit}
+                        setSubmitting={setSubmitting}
+                        submitting={submitting}
+                      />
+                    ) : (
+                      <SpaceBetween size="l">
+                        <div>
+                          <Box variant="h4">
+                            RSS Post Website Crawler Configuration
+                          </Box>
+                        </div>
+                        <div>
+                          <Box variant="awsui-key-label">Follow Links</Box>
+                          <div>
+                            <StatusIndicator
+                              type={rssCrawlerFollowLinks ? "success" : "info"}
+                              colorOverride={
+                                rssSubscriptionStatus ==
+                                DocumentSubscriptionStatus.ENABLED
+                                  ? rssCrawlerFollowLinks
+                                    ? "green"
+                                    : "grey"
+                                  : "grey"
+                              }
+                            >
+                              {rssCrawlerFollowLinks ? "Yes" : "No"}
+                            </StatusIndicator>
+                          </div>
+                        </div>
+                        <div>
+                          <Box variant="awsui-key-label">
+                            Maximum Number of Links to Follow
+                          </Box>
+                          <div>
+                            <Badge
+                              color={
+                                rssCrawlerFollowLinks &&
+                                rssSubscriptionStatus ==
+                                  DocumentSubscriptionStatus.ENABLED
+                                  ? "blue"
+                                  : "grey"
+                              }
+                            >
+                              {rssCrawlerFollowLinks ? rssCrawlerLimit : "N/A"}
+                            </Badge>
+                          </div>
+                        </div>
+                      </SpaceBetween>
+                    )}
+                  </ColumnLayout>
+                </SpaceBetween>
+              </Container>
+              <Table
+                loading={postsLoading}
+                loadingText={`Loading RSS Subscription Posts`}
+                columnDefinitions={[
+                  {
+                    id: "title",
+                    header: "Title",
+                    cell: (item: Document) => (
+                      <>{Utils.textEllipsis(item.title ?? "", 100)}</>
+                    ),
+                    isRowHeader: true,
+                  },
+                  {
+                    id: "url",
+                    header: "URL",
+                    cell: (item: Document) => (
+                      <RssFeedPostUrlPopover item={item} />
+                    ),
+                    isRowHeader: true,
+                  },
+                  {
+                    id: "status",
+                    header: "Status",
+                    cell: (item: Document) => (
+                      <StatusIndicator type={Labels.statusTypeMap[item.status!]}>
+                        {Labels.statusMap[item.status!]}
+                      </StatusIndicator>
+                    ),
+                  },
+                  {
+                    id: "createdAt",
+                    header: "RSS Post Detected",
+                    cell: (item: Document) =>
+                      item.createdAt
+                        ? DateTime.fromISO(
+                            new Date(item.createdAt).toISOString()
+                          ).toLocaleString(DateTime.DATETIME_SHORT)
+                        : "",
+                  },
+                ]}
+                items={
+                  pages[Math.min(pages.length - 1, currentPageIndex - 1)]?.items!
+                }
+                empty={
+                  <TableEmptyState
+                    resourceName="RSS Subscription Post"
+                    createText="Subcribe to a new RSS Feed"
+                    createHref={`/rag/workspaces/add-data?workspaceId=${rssSubscription?.workspaceId}&tab=rssfeed`}
+                  />
+                }
+                pagination={
+                  pages.length === 0 ? null : (
+                    <Pagination
+                      openEnd={true}
+                      pagesCount={0}
+                      currentPageIndex={currentPageIndex}
+                      onNextPageClick={onNextPageClick}
+                      onPreviousPageClick={onPreviousPageClick}
+                    />
+                  )
+                }
+                header={
+                  <Header
+                    actions={[
+                      <SpaceBetween
+                        direction="horizontal"
+                        size="xs"
+                        key="table-header-buttons"
+                      >
+                        <Button
+                          href={`/rag/workspaces/${workspaceId}?tab=website`}
+                        >
+                          View Crawled Websites
+                        </Button>
+                        <Button iconName="refresh" onClick={refreshPage} />
+                      </SpaceBetween>,
+                    ]}
+                    description="RSS Feed Subscriptions check for new posts daily and queues new posts for Website Crawling. Visit the Websites tab in the workspace to see the websites that have been crawled."
+                  >
+                    Posts from RSS Feed
+                  </Header>
+                }
+              />
+            </SpaceBetween>
+          </ContentLayout>
+        }
+      />
+    );
+  }
 }
 
 export interface RssFeedPostUrlPopoverProps {

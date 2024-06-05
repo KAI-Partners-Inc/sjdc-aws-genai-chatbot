@@ -26,6 +26,7 @@ import RssFeed from "./pages/rag/workspace/rss-feed.tsx";
 import WorkspacePane from "./pages/rag/workspace/workspace.tsx";
 import Workspaces from "./pages/rag/workspaces/workspaces.tsx";
 import SessionPage from "./pages/chatbot/sessions/sessions.tsx";
+import Feedback from "./pages/feedback.tsx";
 // import GlobalFooter from "./components/global-footer.tsx";
 // import GlobalHeader from "./components/global-header.tsx";
 
@@ -98,6 +99,37 @@ function App() {
                 element={<RssFeed />}
               />
               <Route path="workspaces/add-data" element={<AddData />} />
+            </Route>
+            <Route path="/v2" element={<Outlet />}>
+              <Route path="" element={<Playground />} />
+              <Route path = "client-admin" element={<TestPage/>} />
+              <Route path = "welcome-test" element={<WelcomeTest />} />
+              <Route path="embedded" element={<Embedded />} />
+              <Route path="user-feedback" element={<Feedback/>}/>
+              <Route path="chatbot" element={<Outlet />}>
+                <Route path="playground" element={<Playground />} />
+                <Route path="playground/:sessionId" element={<Playground />} />
+                <Route path="sessions" element={<SessionPage />} />
+                <Route path="multichat" element={<MultiChatPlayground />} />
+              </Route>
+              <Route path="rag" element={<Outlet />}>
+                <Route path="" element={<Dashboard />} />
+                <Route path="engines" element={<Engines />} />
+                <Route path="embeddings" element={<Embeddings />} />
+                <Route path="cross-encoders" element={<CrossEncoders />} />
+                <Route path="semantic-search" element={<SemanticSearch />} />
+                <Route path="workspaces" element={<Workspaces />} />
+                <Route path="workspaces/create" element={<CreateWorkspace />} />
+                <Route
+                  path="workspaces/:workspaceId"
+                  element={<WorkspacePane />}
+                />
+                <Route
+                  path="workspaces/:workspaceId/rss/:feedId"
+                  element={<RssFeed />}
+                />
+                <Route path="workspaces/add-data" element={<AddData />} />
+              </Route>
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

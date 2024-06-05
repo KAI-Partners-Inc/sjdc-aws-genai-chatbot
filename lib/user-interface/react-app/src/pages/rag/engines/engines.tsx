@@ -12,6 +12,8 @@ import useOnFollow from "../../../common/hooks/use-on-follow";
 import BaseAppLayout from "../../../components/base-app-layout";
 import { CHATBOT_NAME } from "../../../common/constants";
 import { RagEngine } from "../../../API";
+import { useLocation } from "react-router-dom";
+import BaseAppLayoutv from "../../../components/v2-base-app-layout";
 
 const CARD_DEFINITIONS = {
   header: (item: RagEngine) => (
@@ -38,6 +40,9 @@ const CARD_DEFINITIONS = {
 };
 
 export default function Engines() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const versionPath = pathname.split('/')
   const onFollow = useOnFollow();
   const appContext = useContext(AppContext);
   const [data, setData] = useState<RagEngine[]>([]);
@@ -59,40 +64,78 @@ export default function Engines() {
       setLoading(false);
     })();
   }, [appContext]);
-
-  return (
-    <BaseAppLayout
-      contentType="cards"
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: CHATBOT_NAME,
-              href: "/",
-            },
-            {
-              text: "RAG",
-              href: "/rag",
-            },
-            {
-              text: "Engines",
-              href: "/rag/engines",
-            },
-          ]}
-        />
-      }
-      content={
-        <Cards
-          stickyHeader={true}
-          cardDefinition={CARD_DEFINITIONS}
-          loading={loading}
-          loadingText="Loading engines"
-          items={data || []}
-          variant="full-page"
-          header={<EnginesPageHeader />}
-        />
-      }
-    />
-  );
+  if (versionPath[1] == 'v2'){
+    return (
+      <BaseAppLayoutv
+        contentType="cards"
+          breadcrumbs={
+            <BreadcrumbGroup
+              onFollow={onFollow}
+              items={[
+                {
+                  text: CHATBOT_NAME,
+                  href: "/",
+                },
+                {
+                  text: "RAG",
+                  href: "/rag",
+                },
+                {
+                  text: "Engines",
+                  href: "/rag/engines",
+                },
+              ]}
+            />
+          }
+          content={
+            <Cards
+              stickyHeader={true}
+              cardDefinition={CARD_DEFINITIONS}
+              loading={loading}
+              loadingText="Loading engines"
+              items={data || []}
+              variant="full-page"
+              header={<EnginesPageHeader />}
+            />
+          }
+      />
+    );
+  }
+  else{
+    return (
+      <BaseAppLayout
+        contentType="cards"
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Engines",
+                href: "/rag/engines",
+              },
+            ]}
+          />
+        }
+        content={
+          <Cards
+            stickyHeader={true}
+            cardDefinition={CARD_DEFINITIONS}
+            loading={loading}
+            loadingText="Loading engines"
+            items={data || []}
+            variant="full-page"
+            header={<EnginesPageHeader />}
+          />
+        }
+      />
+    );
+  }
 }

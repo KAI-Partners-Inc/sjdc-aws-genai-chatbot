@@ -1,0 +1,9 @@
+.awsui_header {
+  background-color: orange;  /* Orange background for header */
+  color: white;              /* White text for header */
+}
+
+.awsui_navigation {
+  background-color: #e5e5e5;    /* Grey background for navigation items */
+  color: white;              /* White text for navigation items */
+}

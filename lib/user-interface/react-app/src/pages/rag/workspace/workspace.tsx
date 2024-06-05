@@ -9,7 +9,7 @@ import {
 } from "@cloudscape-design/components";
 import useOnFollow from "../../../common/hooks/use-on-follow";
 import BaseAppLayout from "../../../components/base-app-layout";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../../../common/app-context";
 import { ApiClient } from "../../../common/api-client/api-client";
@@ -22,8 +22,12 @@ import OpenSearchWorkspaceSettings from "./open-search-workspace-settings";
 import KendraWorkspaceSettings from "./kendra-workspace-settings";
 import { CHATBOT_NAME } from "../../../common/constants";
 import { Workspace } from "../../../API";
+import BaseAppLayoutv from "../../../components/v2-base-app-layout";
 
 export default function WorkspacePane() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const versionPath = pathname.split('/')
   const appContext = useContext(AppContext);
   const navigate = useNavigate();
   const onFollow = useOnFollow();
@@ -59,181 +63,361 @@ export default function WorkspacePane() {
   const showTabs = !workspace?.kendraIndexExternal;
   const disabledTabs =
     workspace?.engine === "kendra" ? ["qna", "website", "rssfeed"] : [];
-
-  return (
-    <BaseAppLayout
-      contentType="cards"
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: CHATBOT_NAME,
-              href: "/",
-            },
-            {
-              text: "RAG",
-              href: "/rag",
-            },
-            {
-              text: "Workspaces",
-              href: "/rag/workspaces",
-            },
-            {
-              text: workspace?.name || "",
-              href: `/rag/workspaces/${workspace?.id}`,
-            },
-          ]}
-        />
-      }
-      content={
-        <ContentLayout
-          header={
-            <Header
-              variant="h1"
-              actions={
-                <SpaceBetween direction="horizontal" size="xs">
-                  <RouterButton
-                    href={`/rag/semantic-search?workspaceId=${workspaceId}`}
-                  >
-                    Semantic search
-                  </RouterButton>
-                  <RouterButtonDropdown
-                    items={[
-                      {
-                        id: "upload-file",
-                        text: "Upload files",
-                        href: `/rag/workspaces/add-data?tab=file&workspaceId=${workspaceId}`,
-                      },
-                      {
-                        id: "add-text",
-                        text: "Add texts",
-                        href: `/rag/workspaces/add-data?tab=text&workspaceId=${workspaceId}`,
-                      },
-                      {
-                        id: "add-qna",
-                        text: "Add Q&A",
-                        href: `/rag/workspaces/add-data?tab=qna&workspaceId=${workspaceId}`,
-                      },
-                      {
-                        id: "crawl-website",
-                        text: "Crawl website",
-                        href: `/rag/workspaces/add-data?tab=website&workspaceId=${workspaceId}`,
-                      },
-                      {
-                        id: "add-rss-subscription",
-                        text: "Add RSS subscription",
-                        href: `/rag/workspaces/add-data?tab=rssfeed&workspaceId=${workspaceId}`,
-                      },
-                    ]}
-                  >
-                    Add data
-                  </RouterButtonDropdown>
-                </SpaceBetween>
-              }
-            >
-              {loading ? (
-                <StatusIndicator type="loading">Loading...</StatusIndicator>
-              ) : (
-                workspace?.name
+  
+  if (versionPath[1] == 'v2'){
+    return (
+      <BaseAppLayoutv
+        contentType="cards"
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Workspaces",
+                href: "/rag/workspaces",
+              },
+              {
+                text: workspace?.name || "",
+                href: `/rag/workspaces/${workspace?.id}`,
+              },
+            ]}
+          />
+        }
+        content={
+          <ContentLayout
+            header={
+              <Header
+                variant="h1"
+                actions={
+                  <SpaceBetween direction="horizontal" size="xs">
+                    <RouterButton
+                      href={`/rag/semantic-search?workspaceId=${workspaceId}`}
+                    >
+                      Semantic search
+                    </RouterButton>
+                    <RouterButtonDropdown
+                      items={[
+                        {
+                          id: "upload-file",
+                          text: "Upload files",
+                          href: `/rag/workspaces/add-data?tab=file&workspaceId=${workspaceId}`,
+                        },
+                        {
+                          id: "add-text",
+                          text: "Add texts",
+                          href: `/rag/workspaces/add-data?tab=text&workspaceId=${workspaceId}`,
+                        },
+                        {
+                          id: "add-qna",
+                          text: "Add Q&A",
+                          href: `/rag/workspaces/add-data?tab=qna&workspaceId=${workspaceId}`,
+                        },
+                        {
+                          id: "crawl-website",
+                          text: "Crawl website",
+                          href: `/rag/workspaces/add-data?tab=website&workspaceId=${workspaceId}`,
+                        },
+                        {
+                          id: "add-rss-subscription",
+                          text: "Add RSS subscription",
+                          href: `/rag/workspaces/add-data?tab=rssfeed&workspaceId=${workspaceId}`,
+                        },
+                      ]}
+                    >
+                      Add data
+                    </RouterButtonDropdown>
+                  </SpaceBetween>
+                }
+              >
+                {loading ? (
+                  <StatusIndicator type="loading">Loading...</StatusIndicator>
+                ) : (
+                  workspace?.name
+                )}
+              </Header>
+            }
+          >
+            <SpaceBetween size="l">
+              {workspace && workspace.engine === "aurora" && (
+                <AuroraWorkspaceSettings workspace={workspace} />
               )}
-            </Header>
-          }
-        >
-          <SpaceBetween size="l">
-            {workspace && workspace.engine === "aurora" && (
-              <AuroraWorkspaceSettings workspace={workspace} />
-            )}
-            {workspace && workspace.engine === "opensearch" && (
-              <OpenSearchWorkspaceSettings workspace={workspace} />
-            )}
-            {workspace && workspace.engine === "kendra" && (
-              <KendraWorkspaceSettings workspace={workspace} />
-            )}
-            {workspace?.kendraIndexExternal && (
-              <Flashbar
-                items={[
-                  {
-                    type: "info",
-                    content: (
-                      <>
-                        Data upload is not available for external Kendra indexes
-                      </>
-                    ),
-                  },
-                ]}
-              />
-            )}
-            {workspace && showTabs && (
-              <Tabs
-                tabs={[
-                  {
-                    label: "Files",
-                    id: "file",
-                    content: (
-                      <DocumentsTab
-                        workspaceId={workspaceId}
-                        documentType="file"
-                      />
-                    ),
-                  },
-                  {
-                    label: "Texts",
-                    id: "text",
-                    content: (
-                      <DocumentsTab
-                        workspaceId={workspaceId}
-                        documentType="text"
-                      />
-                    ),
-                  },
-                  {
-                    label: "Q&A",
-                    id: "qna",
-                    disabled: disabledTabs.includes("qna"),
-                    content: (
-                      <DocumentsTab
-                        workspaceId={workspaceId}
-                        documentType="qna"
-                      />
-                    ),
-                  },
-                  {
-                    label: "Websites",
-                    id: "website",
-                    disabled: disabledTabs.includes("website"),
-                    content: (
-                      <DocumentsTab
-                        workspaceId={workspaceId}
-                        documentType="website"
-                      />
-                    ),
-                  },
-                  {
-                    label: "RSS Feeds",
-                    id: "rssfeed",
-                    disabled: disabledTabs.includes("rssfeed"),
-                    content: (
-                      <DocumentsTab
-                        workspaceId={workspaceId}
-                        documentType="rssfeed"
-                      />
-                    ),
-                  },
-                ]}
-                activeTabId={activeTab}
-                onChange={({ detail: { activeTabId } }) => {
-                  setActiveTab(activeTabId);
-                  setSearchParams((current) => ({
-                    ...Utils.urlSearchParamsToRecord(current),
-                    tab: activeTabId,
-                  }));
-                }}
-              />
-            )}
-          </SpaceBetween>
-        </ContentLayout>
-      }
-    />
-  );
+              {workspace && workspace.engine === "opensearch" && (
+                <OpenSearchWorkspaceSettings workspace={workspace} />
+              )}
+              {workspace && workspace.engine === "kendra" && (
+                <KendraWorkspaceSettings workspace={workspace} />
+              )}
+              {workspace?.kendraIndexExternal && (
+                <Flashbar
+                  items={[
+                    {
+                      type: "info",
+                      content: (
+                        <>
+                          Data upload is not available for external Kendra indexes
+                        </>
+                      ),
+                    },
+                  ]}
+                />
+              )}
+              {workspace && showTabs && (
+                <Tabs
+                  tabs={[
+                    {
+                      label: "Files",
+                      id: "file",
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="file"
+                        />
+                      ),
+                    },
+                    {
+                      label: "Texts",
+                      id: "text",
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="text"
+                        />
+                      ),
+                    },
+                    {
+                      label: "Q&A",
+                      id: "qna",
+                      disabled: disabledTabs.includes("qna"),
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="qna"
+                        />
+                      ),
+                    },
+                    {
+                      label: "Websites",
+                      id: "website",
+                      disabled: disabledTabs.includes("website"),
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="website"
+                        />
+                      ),
+                    },
+                    {
+                      label: "RSS Feeds",
+                      id: "rssfeed",
+                      disabled: disabledTabs.includes("rssfeed"),
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="rssfeed"
+                        />
+                      ),
+                    },
+                  ]}
+                  activeTabId={activeTab}
+                  onChange={({ detail: { activeTabId } }) => {
+                    setActiveTab(activeTabId);
+                    setSearchParams((current) => ({
+                      ...Utils.urlSearchParamsToRecord(current),
+                      tab: activeTabId,
+                    }));
+                  }}
+                />
+              )}
+            </SpaceBetween>
+          </ContentLayout>
+        }
+      />
+    );
+  }
+  else{
+    return (
+      <BaseAppLayout
+        contentType="cards"
+        breadcrumbs={
+          <BreadcrumbGroup
+            onFollow={onFollow}
+            items={[
+              {
+                text: CHATBOT_NAME,
+                href: "/",
+              },
+              {
+                text: "RAG",
+                href: "/rag",
+              },
+              {
+                text: "Workspaces",
+                href: "/rag/workspaces",
+              },
+              {
+                text: workspace?.name || "",
+                href: `/rag/workspaces/${workspace?.id}`,
+              },
+            ]}
+          />
+        }
+        content={
+          <ContentLayout
+            header={
+              <Header
+                variant="h1"
+                actions={
+                  <SpaceBetween direction="horizontal" size="xs">
+                    <RouterButton
+                      href={`/rag/semantic-search?workspaceId=${workspaceId}`}
+                    >
+                      Semantic search
+                    </RouterButton>
+                    <RouterButtonDropdown
+                      items={[
+                        {
+                          id: "upload-file",
+                          text: "Upload files",
+                          href: `/rag/workspaces/add-data?tab=file&workspaceId=${workspaceId}`,
+                        },
+                        {
+                          id: "add-text",
+                          text: "Add texts",
+                          href: `/rag/workspaces/add-data?tab=text&workspaceId=${workspaceId}`,
+                        },
+                        {
+                          id: "add-qna",
+                          text: "Add Q&A",
+                          href: `/rag/workspaces/add-data?tab=qna&workspaceId=${workspaceId}`,
+                        },
+                        {
+                          id: "crawl-website",
+                          text: "Crawl website",
+                          href: `/rag/workspaces/add-data?tab=website&workspaceId=${workspaceId}`,
+                        },
+                        {
+                          id: "add-rss-subscription",
+                          text: "Add RSS subscription",
+                          href: `/rag/workspaces/add-data?tab=rssfeed&workspaceId=${workspaceId}`,
+                        },
+                      ]}
+                    >
+                      Add data
+                    </RouterButtonDropdown>
+                  </SpaceBetween>
+                }
+              >
+                {loading ? (
+                  <StatusIndicator type="loading">Loading...</StatusIndicator>
+                ) : (
+                  workspace?.name
+                )}
+              </Header>
+            }
+          >
+            <SpaceBetween size="l">
+              {workspace && workspace.engine === "aurora" && (
+                <AuroraWorkspaceSettings workspace={workspace} />
+              )}
+              {workspace && workspace.engine === "opensearch" && (
+                <OpenSearchWorkspaceSettings workspace={workspace} />
+              )}
+              {workspace && workspace.engine === "kendra" && (
+                <KendraWorkspaceSettings workspace={workspace} />
+              )}
+              {workspace?.kendraIndexExternal && (
+                <Flashbar
+                  items={[
+                    {
+                      type: "info",
+                      content: (
+                        <>
+                          Data upload is not available for external Kendra indexes
+                        </>
+                      ),
+                    },
+                  ]}
+                />
+              )}
+              {workspace && showTabs && (
+                <Tabs
+                  tabs={[
+                    {
+                      label: "Files",
+                      id: "file",
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="file"
+                        />
+                      ),
+                    },
+                    {
+                      label: "Texts",
+                      id: "text",
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="text"
+                        />
+                      ),
+                    },
+                    {
+                      label: "Q&A",
+                      id: "qna",
+                      disabled: disabledTabs.includes("qna"),
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="qna"
+                        />
+                      ),
+                    },
+                    {
+                      label: "Websites",
+                      id: "website",
+                      disabled: disabledTabs.includes("website"),
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="website"
+                        />
+                      ),
+                    },
+                    {
+                      label: "RSS Feeds",
+                      id: "rssfeed",
+                      disabled: disabledTabs.includes("rssfeed"),
+                      content: (
+                        <DocumentsTab
+                          workspaceId={workspaceId}
+                          documentType="rssfeed"
+                        />
+                      ),
+                    },
+                  ]}
+                  activeTabId={activeTab}
+                  onChange={({ detail: { activeTabId } }) => {
+                    setActiveTab(activeTabId);
+                    setSearchParams((current) => ({
+                      ...Utils.urlSearchParamsToRecord(current),
+                      tab: activeTabId,
+                    }));
+                  }}
+                />
+              )}
+            </SpaceBetween>
+          </ContentLayout>
+        }
+      />
+    );
+  }
 }
