@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import BaseAppLayoutv from '../components/v2-base-app-layout';
 function Feedback() {
     return (
