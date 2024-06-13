@@ -138,7 +138,7 @@ const WelcomePage = () => {
     
         const iframe = document.createElement('iframe');
         iframe.setAttribute('title', 'Chat Window');
-        iframe.setAttribute('src', 'https://d17p4fgzczcwdj.cloudfront.net/embedded');
+        iframe.setAttribute('src', 'https://d3votmg7w0nldx.cloudfront.net/embedded');
         iframe.setAttribute('allow', 'fullscreen');
         iframe.setAttribute('name', 'chat');
         iframe.setAttribute('style', `
