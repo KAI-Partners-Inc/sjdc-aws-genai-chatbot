@@ -14,6 +14,7 @@ import adapters
 from genai_core.utils.websocket import send_to_client
 from genai_core.types import ChatbotAction
 from genai_core.langchain import DynamoDBChatMessageHistory
+from langchain.schema import AIMessage, HumanMessage
 
 
 processor = BatchProcessor(event_type=EventType.SQS)
@@ -133,8 +134,11 @@ def handle_run(record):
                 session_id=session_id,
                 user_id=user_id,
                 )
+                # db_chat_history.add_message()
                 db_chat_history.add_metadata(metadata)
-            except:
+            except Exception as e:
+                logger.error("ERROR: db add meta data")
+                logger.error(e)
                 pass
             response = {
                     "sessionId": session_id,
