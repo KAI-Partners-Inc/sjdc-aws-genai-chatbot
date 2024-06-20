@@ -57,12 +57,12 @@ def add_user_feedback(
         table = dynamodb_client.Table(sessions_table_name)
         db_response = table.update_item(
             Key={
-                'sessionId': sessionId,
-                "userId": userId
+                'SessionId': sessionId,
+                "UserId": userId
             },
-            UpdateExpression="SET feedback = :feedback",
+            UpdateExpression="SET Feedback = :Feedback",
             ExpressionAttributeValues={
-                ':feedback': new_feedback_data
+                ':Feedback': new_feedback_data
             },
             ReturnValues="UPDATED_NEW"
         )
