@@ -3,12 +3,19 @@ import uuid
 import boto3
 import json
 from pydantic import BaseModel
+from aws_lambda_powertools import Logger
 from datetime import datetime
 
-dynamodb_client = boto3.resource("dynamodb")
+logger = Logger()
+
+try:
+    dynamodb_client = boto3.resource("dynamodb")
+    USER_FEEDBACK_BUCKET_NAME = os.environ.get("USER_FEEDBACK_BUCKET_NAME")
+except:
+    pass
 s3_client = boto3.client("s3")
 
-USER_FEEDBACK_BUCKET_NAME = os.environ.get("USER_FEEDBACK_BUCKET_NAME")
+
 
 
 def add_user_feedback(
@@ -42,19 +49,21 @@ def add_user_feedback(
         "feedback": feedback,
         "date": timestamp
     }
-    
-    table = dynamodb_client.Table(table_name)
-    db_response = table.update_item(
-        Key={
-            'sessionId': session_id
-        },
-        UpdateExpression="SET feedback = :feedback",
-        ExpressionAttributeValues={
-            ':feedback': new_feedback_data
-        },
-        ReturnValues="UPDATED_NEW"
-    )
-
+    try:
+        table = dynamodb_client.Table(table_name)
+        db_response = table.update_item(
+            Key={
+                'sessionId': session_id
+            },
+            UpdateExpression="SET feedback = :feedback",
+            ExpressionAttributeValues={
+                ':feedback': new_feedback_data
+            },
+            ReturnValues="UPDATED_NEW"
+        )
+    except Exception as e:
+        logger.error("Dynamo db session feedback error")
+        logger.error(e)
     response = s3_client.put_object(
         Bucket=USER_FEEDBACK_BUCKET_NAME,
         Key=f"{prefix}{feedbackId}.json",

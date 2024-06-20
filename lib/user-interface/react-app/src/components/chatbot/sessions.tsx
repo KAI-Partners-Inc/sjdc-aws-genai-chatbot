@@ -60,6 +60,7 @@ export default function Sessions(props: SessionsProps) {
     const apiClient = new ApiClient(appContext);
     try {
       const result = await apiClient.sessions.getSessions();
+      console.log(result.data!.listSessions)
       setSessions(result.data!.listSessions);
     } catch (e) {
       console.log(e);
