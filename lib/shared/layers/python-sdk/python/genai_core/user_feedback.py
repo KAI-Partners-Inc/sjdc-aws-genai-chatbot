@@ -57,7 +57,8 @@ def add_user_feedback(
         table = dynamodb_client.Table(sessions_table_name)
         db_response = table.update_item(
             Key={
-                'sessionId': sessionId
+                'sessionId': sessionId,
+                "userId": userId
             },
             UpdateExpression="SET feedback = :feedback",
             ExpressionAttributeValues={
@@ -68,7 +69,7 @@ def add_user_feedback(
     except Exception as e:
         logger.error("Dynamo db session feedback error")
         logger.error(e)
-        
+
     response = s3_client.put_object(
         Bucket=USER_FEEDBACK_BUCKET_NAME,
         Key=f"{prefix}{feedbackId}.json",
