@@ -54,7 +54,7 @@ def add_user_feedback(
         "date": timestamp
     }
     try:
-        table = dynamodb_client.Table(table_name)
+        table = dynamodb_client.Table(sessions_table_name)
         db_response = table.update_item(
             Key={
                 'sessionId': session_id
