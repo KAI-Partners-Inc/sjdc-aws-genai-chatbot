@@ -3,10 +3,14 @@ import uuid
 import boto3
 import json
 from pydantic import BaseModel
-from aws_lambda_powertools import Logger
-from datetime import datetime
+from aws_lambda_powertools import Logger, Tracer
+from aws_lambda_powertools.event_handler.appsync import Router
 
+tracer = Tracer()
+router = Router()
 logger = Logger()
+
+from datetime import datetime
 
 try:
     dynamodb_client = boto3.resource("dynamodb")
