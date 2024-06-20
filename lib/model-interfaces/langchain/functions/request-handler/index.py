@@ -134,7 +134,8 @@ def handle_run(record):
                 session_id=session_id,
                 user_id=user_id,
                 )
-                # db_chat_history.add_message()
+                db_chat_history.add_message(HumanMessage(content=prompt))
+                db_chat_history.add_message(AIMessage(content=output))
                 db_chat_history.add_metadata(metadata)
             except Exception as e:
                 logger.error("ERROR: db add meta data")
