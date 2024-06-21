@@ -238,8 +238,8 @@ type Session @aws_cognito_user_pools {
 type SessionFeedbackItem @aws_cognito_user_pools {
   feedback: String!
   date: String!
-  message: String!
-  response: String!
+  message: String
+  response: String
 }
 
 type SessionHistoryItem @aws_cognito_user_pools {
