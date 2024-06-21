@@ -1,19 +1,47 @@
 import BaseAppLayoutv from '../components/v2-base-app-layout';
-import { React, useState, useEffect, useContext, useCallback } from "react";
-import { ApiClient } from "../../common/api-client/api-client";
-import { AppContext } from "../../common/app-context";
+import { useState, useEffect, useContext, useCallback } from "react";
+import { ApiClient } from "../common/api-client/api-client";
+import { AppContext } from "../common/app-context";
 
-type Feedback = {
-    feedback: string;
-    date: string;
-    message: string;
-    response: string;
-  };
+// interface FeedbackTableInterface  {
+//     data = Feedback[]
+// }
+// interface Feedback  {
+//     feedback: string;
+//     date: string;
+//     message: string;
+//     response: string;
+//   };
+
+// function FeedbackTable( data : FeedbackTableInterface) {
+//     return (
+//         <table>
+//           <thead>
+//             <tr>
+//               <th>Feedback</th>
+//               <th>Date</th>
+//               <th>Message</th>
+//               <th>Response</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             {data.data.map((item : Feedback, index : number) => (
+//               <tr key={index}>
+//                 <td>{item.feedback}</td>
+//                 <td>{item.date}</td>
+//                 <td>{item.message}</td>
+//                 <td>{item.response}</td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </table>
+//       );
+// }
 
 
 function Feedback() {
     const appContext = useContext(AppContext);
-    const [data, setData] =  useState<Feedback[]>([]);
+    const [data, setData] =  useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const getSessions = useCallback(async () => {
         if (!appContext) return;
@@ -55,40 +83,13 @@ function Feedback() {
             content={
                 <div>
                     <h1>Feedback Table</h1>
-                    <FeedbackTable data={data} />
+                    <pre>{JSON.stringify(data, null, 2)}</pre>
                 </div>
             }
         />
     )
 }
 
-type FeedbackTableProps = {
-    data: Feedback[];
-  };
 
-const FeedbackTable: React.FC<FeedbackTableProps> = ({ data }) => {
-return (
-    <table>
-        <thead>
-            <tr>
-            <th>Feedback</th>
-            <th>Date</th>
-            <th>Message</th>
-            <th>Response</th>
-            </tr>
-        </thead>
-        <tbody>
-            {data.map((item: { feedback: String; date: String; message: String; response: String; }) => (
-            <tr>
-                <td>{item.feedback}</td>
-                <td>{item.date}</td>
-                <td>{item.message}</td>
-                <td>{item.response}</td>
-            </tr>
-            ))}
-        </tbody>
-    </table>
-);
-  };
 
 export default Feedback;
