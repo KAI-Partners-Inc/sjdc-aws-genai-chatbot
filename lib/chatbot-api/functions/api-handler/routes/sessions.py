@@ -27,7 +27,7 @@ def get_sessions():
             .get("data", {})
             .get("content", "<no title>"),
             "startTime": f'{session.get("StartTime")}Z',
-            "feedback": session.get("Feedback")
+            "feedback": session.get("Feedback", {})
         }
         for session in sessions
     ]
