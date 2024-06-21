@@ -60,10 +60,10 @@ function Feedback() {
           for (let i = 0 ; i<listSessions.length; i++){
             if (listSessions[i].feedback != null ){
                 var fbd: FeedbackData = {
-                    "feedback": listSessions[i].feedback.feedback,
-                    "date": listSessions[i].feedback.date,
-                    "message": listSessions[i].feedback.message,
-                    "response": listSessions[i].feedback.response
+                    "feedback": listSessions[i].feedback.feedback ?? 'N/A',
+                    "date": listSessions[i].feedback.date ?? 'N/A',
+                    "message": listSessions[i].feedback.message ?? 'N/A',
+                    "response": listSessions[i].feedback.response ?? 'N/A'
                 }
                 feedbackData.push(fbd)
             }
