@@ -38,10 +38,15 @@ import { AppContext } from "../common/app-context";
 //       );
 // }
 
+interface FeedbackData {
+    message: string;
+    response: string;
+    feedback: number;
+}
 
 function Feedback() {
     const appContext = useContext(AppContext);
-    const [data, setData] =  useState([]);
+    const [data, setData] = useState<FeedbackData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const getSessions = useCallback(async () => {
         if (!appContext) return;
