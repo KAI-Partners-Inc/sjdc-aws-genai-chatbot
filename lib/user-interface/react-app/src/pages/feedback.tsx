@@ -39,9 +39,10 @@ import { AppContext } from "../common/app-context";
 // }
 
 interface FeedbackData {
-    message: string;
-    response: string;
-    feedback: number;
+    message: string | null;
+    response: string | null;
+    date: string | null;
+    feedback: number | null;
 }
 
 function Feedback() {
@@ -53,7 +54,7 @@ function Feedback() {
         const apiClient = new ApiClient(appContext);
         try {
           const result = await apiClient.sessions.getSessions();
-          const feedbackData = [];
+          const feedbackData: FeedbackData[] = []
           console.log(result.data!.listSessions)
           var listSessions = result.data!.listSessions
           for (let i = 0 ; i<listSessions.length; i++){
