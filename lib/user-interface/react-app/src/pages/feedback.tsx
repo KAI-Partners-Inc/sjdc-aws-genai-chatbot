@@ -58,7 +58,7 @@ function Feedback() {
           console.log(result.data!.listSessions)
           var listSessions = result.data!.listSessions
           for (let i = 0 ; i<listSessions.length; i++){
-            if (listSessions[i].feedback != null){
+            if (listSessions[i].feedback != null && listSessions[i].feedback != undefined){
                 feedbackData.push(listSessions[i].feedback)
             }
           }
