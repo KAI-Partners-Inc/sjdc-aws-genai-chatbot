@@ -2,6 +2,7 @@ import BaseAppLayoutv from '../components/v2-base-app-layout';
 import { useState, useEffect, useContext, useCallback } from "react";
 import { ApiClient } from "../common/api-client/api-client";
 import { AppContext } from "../common/app-context";
+import '../styles/feedback.scss';
 
 // interface FeedbackTableInterface  {
 //     data = Feedback[]
