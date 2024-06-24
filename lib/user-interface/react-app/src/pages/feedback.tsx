@@ -95,7 +95,7 @@ function Feedback() {
       }
     
 
-    const filteredFeedbackList = data.filter(item => item.feedback !== null);
+    const filteredFeedbackList = data.filter(item => item.feedback !== "N/A");
     
     
     return (
