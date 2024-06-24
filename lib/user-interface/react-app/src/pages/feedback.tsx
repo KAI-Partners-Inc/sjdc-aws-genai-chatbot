@@ -97,7 +97,14 @@ function Feedback() {
 
     const filteredFeedbackList = data.filter(item => item.feedback !== "N/A");
     
-    
+    for (var i =0 ; i < filteredFeedbackList.length; i++){
+        if (filteredFeedbackList[i].feedback == '1'){
+            filteredFeedbackList[i].feedback = 'Positive'
+        }
+        else if (filteredFeedbackList[i].feedback == '0'){
+            filteredFeedbackList[i].feedback = 'Negative'
+        }
+    }
     return (
         <BaseAppLayoutv
             content={
