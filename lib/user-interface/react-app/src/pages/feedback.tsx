@@ -42,7 +42,7 @@ interface FeedbackData {
     message: string | null;
     response: string | null;
     date: string | null;
-    feedback: number | null;
+    feedback: string | null;
 }
 
 function Feedback() {
@@ -58,14 +58,18 @@ function Feedback() {
           console.log(result.data!.listSessions)
           var listSessions = result.data!.listSessions
           for (let i = 0 ; i<listSessions.length; i++){
-            if (listSessions[i].feedback != null ){
-                var fbd: FeedbackData = {
-                    "feedback": listSessions[i].feedback.feedback ?? 'N/A',
-                    "date": listSessions[i].feedback.date ?? 'N/A',
-                    "message": listSessions[i].feedback.message ?? 'N/A',
-                    "response": listSessions[i].feedback.response ?? 'N/A'
+            if (listSessions[i] && listSessions[i].feedback){
+                const feedback = listSessions[i]?.feedback;
+                if (feedback){
+                    var fbd: FeedbackData = {
+                        "feedback": feedback.feedback ?? 'N/A',
+                        "date": feedback.date ?? 'N/A',
+                        "message": feedback.message ?? 'N/A',
+                        "response": feedback.response ?? 'N/A'
+                    }
+                    feedbackData.push(fbd)
                 }
-                feedbackData.push(fbd)
+                
             }
           }
           setData(feedbackData);
@@ -89,19 +93,40 @@ function Feedback() {
     if (isLoading) {
         return <div>Loading...</div>;
       }
+    
 
+    const filteredFeedbackList = data.filter(item => item.feedback !== null);
+    
+    
     return (
         <BaseAppLayoutv
             content={
                 <div>
                     <h1>Feedback Table</h1>
-                    <pre>{JSON.stringify(data, null, 2)}</pre>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Message</th>
+                                <th>Response</th>
+                                <th>Date</th>
+                                <th>Feedback</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredFeedbackList.map((item, index) => (
+                                <tr key={index}>
+                                    <td>{item.message}</td>
+                                    <td>{item.response}</td>
+                                    <td>{item.date}</td>
+                                    <td>{item.feedback}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             }
         />
     )
 }
-
-
 
 export default Feedback;
