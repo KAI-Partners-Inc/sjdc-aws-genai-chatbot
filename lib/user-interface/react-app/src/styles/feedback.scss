@@ -7,7 +7,7 @@
 }
 
 .feedback-table thead tr {
-    background-color: #009879;
+    background-color: gray;
     color: #ffffff;
     text-align: left;
     font-weight: bold;
@@ -28,7 +28,7 @@
 }
 
 .feedback-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
+    border-bottom: 2px solid gray;
 }
 
 .feedback-table tbody tr:hover {
