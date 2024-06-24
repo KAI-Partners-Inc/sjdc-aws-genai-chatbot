@@ -45,6 +45,22 @@ interface FeedbackData {
     feedback: string | null;
 }
 
+const formatDate = (dateString: string | null): string => {
+    if (!dateString) return '';
+    const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZoneName: 'short'
+    };
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', options);
+};
+
+
 function Feedback() {
     const appContext = useContext(AppContext);
     const [data, setData] = useState<FeedbackData[]>([]);
@@ -91,7 +107,8 @@ function Feedback() {
     }, [appContext, getSessions]);
       
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <BaseAppLayoutv
+        content={ <div>Loading...</div>;}/>
       }
     
 
@@ -105,16 +122,17 @@ function Feedback() {
             filteredFeedbackList[i].feedback = 'Negative'
         }
     }
+
+
     return (
         <BaseAppLayoutv
             content={
                 <div>
                     <h1>Feedback Table</h1>
-                    <table>
+                    <table className="feedback-table">
                         <thead>
                             <tr>
                                 <th>Message</th>
-                                <th>Response</th>
                                 <th>Date</th>
                                 <th>Feedback</th>
                             </tr>
@@ -122,9 +140,8 @@ function Feedback() {
                         <tbody>
                             {filteredFeedbackList.map((item, index) => (
                                 <tr key={index}>
-                                    <td>{item.message}</td>
                                     <td>{item.response}</td>
-                                    <td>{item.date}</td>
+                                    <td>{formatDate(item.date)}</td>
                                     <td>{item.feedback}</td>
                                 </tr>
                             ))}
