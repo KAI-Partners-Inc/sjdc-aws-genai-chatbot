@@ -108,7 +108,7 @@ function Feedback() {
       
     if (isLoading) {
         return <BaseAppLayoutv
-        content={ <div>Loading...</div>;}/>
+        content={ <div>Loading...</div>}/>
       }
     
 
