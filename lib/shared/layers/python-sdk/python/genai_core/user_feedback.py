@@ -5,6 +5,12 @@ import json
 from pydantic import BaseModel
 from aws_lambda_powertools import Logger, Tracer
 from aws_lambda_powertools.event_handler.appsync import Router
+from langchain.schema.messages import (
+    BaseMessage,
+    _message_to_dict,
+    messages_from_dict,
+    messages_to_dict,
+)
 
 tracer = Tracer()
 router = Router()
@@ -55,6 +61,23 @@ def add_user_feedback(
     }
     try:
         table = dynamodb_client.Table(sessions_table_name)
+        
+        resp = table.get_item(Key={"SessionId": sessionId, "UserId": userId})
+        if response and "Item" in response:
+            items = response["Item"]["History"]
+        else:
+            items = []
+
+        messages = messages_from_dict(items)
+        prev_message = ""
+        for i in range(len(messages)):
+            if i == 0:
+                prev_message = messages[i]["content"]
+            else:
+                prev_message = messages[i-1]["content"]
+                if messages[i]["content"] == completion:
+                    break       
+        new_feedback_data["message"] = prev_message
         db_response = table.update_item(
             Key={
                 'SessionId': sessionId,

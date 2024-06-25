@@ -133,7 +133,8 @@ function Feedback() {
                     <table className="feedback-table">
                         <thead>
                             <tr>
-                                <th>Message</th>
+                                <th>Question</th>
+                                <th>Response</th>
                                 <th>Date</th>
                                 <th>Feedback</th>
                             </tr>
@@ -141,6 +142,7 @@ function Feedback() {
                         <tbody>
                             {filteredFeedbackList.map((item, index) => (
                                 <tr key={index}>
+                                    <td>{item.message}</td>
                                     <td>{item.response}</td>
                                     <td>{formatDate(item.date)}</td>
                                     <td>{item.feedback}</td>
