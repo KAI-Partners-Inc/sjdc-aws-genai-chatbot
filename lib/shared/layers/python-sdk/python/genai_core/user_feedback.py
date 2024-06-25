@@ -67,7 +67,8 @@ def add_user_feedback(
                 items = response["Item"]["History"]
             else:
                 items = []
-
+            logger.info("items")
+            logger.info(items)
             prev_message = ""
             for i in range(len(items)):
                 if i == 0:
