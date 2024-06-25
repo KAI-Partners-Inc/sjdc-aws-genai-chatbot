@@ -37,7 +37,7 @@ def list_models():
 def get_custom_bedrock_agent():
     return [{
             "provider": Provider.BEDROCK.value,
-            "name": "CustomModelID",
+            "name": "SJDC_Model",
             "streaming": True,
             "inputModalities": [Modality.TEXT.value],
             "outputModalities": [Modality.TEXT.value],

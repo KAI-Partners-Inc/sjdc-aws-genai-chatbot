@@ -114,7 +114,7 @@ def handle_run(record):
     if not session_id:
         session_id = str(uuid.uuid4())
     try:
-        if model_id == "CustomModelID":
+        if model_id == "SJDC_Model":
             retrieve_generate_response = retrieveAndGenerate(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
             logger.info(output)
