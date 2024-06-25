@@ -72,10 +72,10 @@ def add_user_feedback(
             prev_message = ""
             for i in range(len(items)):
                 if i == 0:
-                    prev_message = items[i]["content"]
+                    prev_message = items[i]["data"]["content"]
                 else:
-                    prev_message = items[i-1]["content"]
-                    if items[i]["content"] == completion:
+                    prev_message = items[i-1]["data"]["content"]
+                    if items[i]["data"]["content"] == completion:
                         break       
             
         except Exception as e:
