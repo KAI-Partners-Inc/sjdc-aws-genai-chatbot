@@ -61,22 +61,27 @@ def add_user_feedback(
     }
     try:
         table = dynamodb_client.Table(sessions_table_name)
-        
-        resp = table.get_item(Key={"SessionId": sessionId, "UserId": userId})
-        if response and "Item" in response:
-            items = response["Item"]["History"]
-        else:
-            items = []
-
-        messages = messages_from_dict(items)
-        prev_message = ""
-        for i in range(len(messages)):
-            if i == 0:
-                prev_message = messages[i]["content"]
+        try:
+            response = table.get_item(Key={"SessionId": sessionId, "UserId": userId})
+            if response and "Item" in response:
+                items = response["Item"]["History"]
             else:
-                prev_message = messages[i-1]["content"]
-                if messages[i]["content"] == completion:
-                    break       
+                items = []
+
+            messages = messages_from_dict(items)
+            prev_message = ""
+            for i in range(len(messages)):
+                if i == 0:
+                    prev_message = messages[i]["content"]
+                else:
+                    prev_message = messages[i-1]["content"]
+                    if messages[i]["content"] == completion:
+                        break       
+            
+        except Exception as e:
+            logger.error("Table get messages feedback error")
+            logger.error(e)
+            prev_message = "There was an error retrieving the message"
         new_feedback_data["message"] = prev_message
         db_response = table.update_item(
             Key={
