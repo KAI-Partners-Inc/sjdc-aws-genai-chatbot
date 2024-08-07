@@ -43,7 +43,26 @@ def get_custom_bedrock_agent():
             "outputModalities": [Modality.TEXT.value],
             "interface": ModelInterface.LANGCHIAN.value,
             "ragSupported": True,
+        },
+        {
+            "provider": Provider.BEDROCK.value,
+            "name": "SJDC_Model_Crawler",
+            "streaming": True,
+            "inputModalities": [Modality.TEXT.value],
+            "outputModalities": [Modality.TEXT.value],
+            "interface": ModelInterface.LANGCHIAN.value,
+            "ragSupported": True,
         }]
+        # },
+        # {
+        #     "provider": Provider.BEDROCK.value,
+        #     "name": "KAIP_Model",
+        #     "streaming": True,
+        #     "inputModalities": [Modality.TEXT.value],
+        #     "outputModalities": [Modality.TEXT.value],
+        #     "interface": ModelInterface.LANGCHIAN.value,
+        #     "ragSupported": True,
+        # }]
 
 
 def list_openai_models():
