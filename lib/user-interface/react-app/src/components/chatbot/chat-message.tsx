@@ -11,7 +11,7 @@ import {
   Textarea,
 } from "@cloudscape-design/components";
 import { useEffect, useState } from "react";
-import { JsonView, darkStyles } from "react-json-view-lite";
+import { JsonView, darkStyles, defaultStyles } from "react-json-view-lite";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import styles from "../../styles/chat.module.scss";
@@ -90,7 +90,7 @@ export default function ChatMessage(props: ChatMessageProps) {
                     )
                   )}
                   style={{
-                    ...darkStyles,
+                    ...defaultStyles,
                     stringValue: "jsonStrings",
                     numberValue: "jsonNumbers",
                     booleanValue: "jsonBool",
