@@ -134,7 +134,7 @@ def retrieveAndGenerateSJDC2(input, sessionId=None, model_id = "anthropic.claude
 
 def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
-    kbId = "todo"
+    kbId = "LFT946APZG"
     if sessionId:
         return bedrock_agent_client.retrieve_and_generate(
             input={
