@@ -179,11 +179,13 @@ def handle_run(record):
         if model_id == "SJDC_Model":
             retrieve_generate_response = retrieveAndGenerateSJDC1(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
+            citations = retrieve_generate_response["citations"]
             logger.info(output)
             metadata = {
                     "modelId": model_id,
                     "modelKwargs": data.get("modelKwargs", {}),
                     "mode": mode,
+                    "citations": citations,
                     "sessionId": session_id,
                     "userId": user_id,
                     "documents": [],
@@ -222,11 +224,13 @@ def handle_run(record):
         elif model_id == "SJDC_Model_Crawler":
             retrieve_generate_response = retrieveAndGenerateSJDC2(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
+            citations = retrieve_generate_response["citations"]
             logger.info(output)
             metadata = {
                     "modelId": model_id,
                     "modelKwargs": data.get("modelKwargs", {}),
                     "mode": mode,
+                    "citations": citations,
                     "sessionId": session_id,
                     "userId": user_id,
                     "documents": [],
@@ -265,11 +269,13 @@ def handle_run(record):
         elif model_id == "KAIP_Model":
             retrieve_generate_response = retrieveAndGenerateKAIP(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
+            citations = retrieve_generate_response["citations"]
             logger.info(output)
             metadata = {
                     "modelId": model_id,
                     "modelKwargs": data.get("modelKwargs", {}),
                     "mode": mode,
+                    "citations": citations,
                     "sessionId": session_id,
                     "userId": user_id,
                     "documents": [],
