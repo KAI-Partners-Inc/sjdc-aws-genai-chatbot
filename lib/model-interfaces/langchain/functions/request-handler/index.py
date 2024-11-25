@@ -221,21 +221,21 @@ def handle_run(record):
                     "data": response,
                 }
             )
-        elif model_id == "SJDC_Model_Crawler":
-            retrieve_generate_response = retrieveAndGenerateSJDC2(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
-            output = retrieve_generate_response["output"]["text"]
-            citations = retrieve_generate_response["citations"]
-            logger.info(output)
-            metadata = {
-                    "modelId": model_id,
-                    "modelKwargs": data.get("modelKwargs", {}),
-                    "mode": mode,
-                    "citations": citations,
-                    "sessionId": session_id,
-                    "userId": user_id,
-                    "documents": [],
-                    "prompts": [],
-                }
+        # elif model_id == "SJDC_Model_Crawler":
+        #     retrieve_generate_response = retrieveAndGenerateSJDC2(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
+        #     output = retrieve_generate_response["output"]["text"]
+        #     citations = retrieve_generate_response["citations"]
+        #     logger.info(output)
+        #     metadata = {
+        #             "modelId": model_id,
+        #             "modelKwargs": data.get("modelKwargs", {}),
+        #             "mode": mode,
+        #             "citations": citations,
+        #             "sessionId": session_id,
+        #             "userId": user_id,
+        #             "documents": [],
+        #             "prompts": [],
+        #         }
             try:
 
                 db_chat_history = DynamoDBChatMessageHistory(
@@ -271,6 +271,12 @@ def handle_run(record):
             output = retrieve_generate_response["output"]["text"]
             citations = retrieve_generate_response["citations"]
             logger.info(output)
+            output += "\n\nCitations\n"
+            for citation in citations:
+                for ref in citation.get("retrievedReferences", []):
+                    title = ref["metadata"].get("x-amz-bedrock-kb-title", "Unknown Title")
+                    uri = ref["metadata"].get("x-amz-bedrock-kb-source-uri", "Unknown URI")
+                    output += f"- {title} {uri}\n"
             metadata = {
                     "modelId": model_id,
                     "modelKwargs": data.get("modelKwargs", {}),

@@ -10,7 +10,7 @@ import App from "../app";
 import { Amplify, Auth } from "aws-amplify";
 import { AppConfig } from "../common/types";
 import { AppContext } from "../common/app-context";
-import { Alert, StatusIndicator } from "@cloudscape-design/components";
+import { Alert, StatusIndicator, Button } from "@cloudscape-design/components";
 import { StorageHelper } from "../common/helpers/storage-helper";
 import { Mode } from "@cloudscape-design/global-styles";
 import "@aws-amplify/ui-react/styles.css";
@@ -22,37 +22,31 @@ export default function AppConfigured() {
   const [error, setError] = useState<boolean | null>(null);
   const [theme, setTheme] = useState(StorageHelper.getTheme());
 
+  const signInWithSSO = async () => {
+    try {
+      const federatedProvider = config?.config.auth_federated_provider;
+
+      if (!federatedProvider) {
+        console.error("Federated provider configuration missing");
+        return;
+      }
+      federatedProvider.custom = true;
+      if (!federatedProvider.custom) {
+        await Auth.federatedSignIn({ provider: federatedProvider.name });
+      } else {
+        await Auth.federatedSignIn({ customProvider: 'KAIP' });
+      }
+    } catch (err) {
+      console.error("Error during federated sign-in:", err);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
         const result = await fetch("/aws-exports.json");
         const awsExports = await result.json();
         const currentConfig = Amplify.configure(awsExports) as AppConfig | null;
-
-        if (currentConfig?.config.auth_federated_provider?.auto_redirect) {
-          let authenticated = false;
-          try {
-            const user = await Auth.currentAuthenticatedUser();
-            if (user) {
-              authenticated = true;
-            }
-          } catch (e) {
-            authenticated = false;
-          }
-
-          if (!authenticated) {
-            const federatedProvider =
-              currentConfig.config.auth_federated_provider;
-
-            if (!federatedProvider.custom) {
-              Auth.federatedSignIn({ provider: federatedProvider.name });
-            } else {
-              Auth.federatedSignIn({ customProvider: federatedProvider.name });
-            }
-
-            return;
-          }
-        }
 
         setConfig(currentConfig);
       } catch (e) {
@@ -151,6 +145,19 @@ export default function AppConfigured() {
                   >
                     {CHATBOT_NAME}
                   </Heading>
+                );
+              },
+              Footer: () => {
+                return (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginTop: "16px",
+                    }}
+                  >
+                    <Button onClick={signInWithSSO}>Sign in with SSO</Button>
+                  </div>
                 );
               },
             },
