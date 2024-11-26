@@ -17,6 +17,7 @@ from genai_core.langchain import DynamoDBChatMessageHistory
 from langchain.schema import AIMessage, HumanMessage
 
 
+
 processor = BatchProcessor(event_type=EventType.SQS)
 tracer = Tracer()
 logger = Logger()
@@ -28,8 +29,19 @@ bedrock_agent_client = boto3.client('bedrock-agent-runtime', region_name='us-eas
 sequence_number = 0
 
 
-def on_llm_new_token(user_id, session_id, self, token, run_id, *args, **kwargs):
-    if token is None or len(token) == 0:
+def on_llm_new_token(
+    user_id, session_id, self, token, run_id, chunk, parent_run_id, *args, **kwargs
+):
+    if isinstance(token, list):
+        # When using the newer Chat objects from Langchain.
+        # Token is not a string
+        text = ""
+        for t in token:
+            if "text" in t:
+                text = text + t.get("text")
+    else:
+        text = token
+    if text is None or len(text) == 0:
         return
     global sequence_number
     sequence_number += 1
@@ -46,7 +58,7 @@ def on_llm_new_token(user_id, session_id, self, token, run_id, *args, **kwargs):
                 "token": {
                     "runId": run_id,
                     "sequenceNumber": sequence_number,
-                    "value": token,
+                    "value": text,
                 },
             },
         }
@@ -391,7 +403,7 @@ def record_handler(record: SQSRecord):
     payload: str = record.body
     message: dict = json.loads(payload)
     detail: dict = json.loads(message["Message"])
-    logger.info(detail)
+    logger.debug(detail)
 
     if detail["action"] == ChatbotAction.RUN.value:
         handle_run(detail)
@@ -405,11 +417,20 @@ def handle_failed_records(records):
         payload: str = record.body
         message: dict = json.loads(payload)
         detail: dict = json.loads(message["Message"])
-        logger.info(detail)
         user_id = detail["userId"]
         data = detail.get("data", {})
         session_id = data.get("sessionId", "")
 
+        message = "⚠️ *Something went wrong*"
+        if (
+            "An error occurred (AccessDeniedException)" in error
+            and "You don't have access to the model with the specified model ID"
+            in error
+        ):
+            message = (
+                "⚠️ *This model is not enabled. Please try again later or contact "
+                "an administrator*"
+            )
         send_to_client(
             {
                 "type": "text",
@@ -419,14 +440,16 @@ def handle_failed_records(records):
                 "timestamp": str(int(round(datetime.now().timestamp()))),
                 "data": {
                     "sessionId": session_id,
-                    "content": str(error),
+                    # Log a vague message because the error can contain
+                    # internal information
+                    "content": message,
                     "type": "text",
                 },
             }
         )
 
 
-@logger.inject_lambda_context(log_event=True)
+@logger.inject_lambda_context(log_event=False)
 @tracer.capture_lambda_handler
 def handler(event, context: LambdaContext):
     batch = event["Records"]
@@ -441,7 +464,12 @@ def handler(event, context: LambdaContext):
     except BatchProcessingError as e:
         logger.error(e)
 
-    logger.info(processed_messages)
+    for message in processed_messages:
+        logger.info(
+            "Request compelte with status " + message[0],
+            status=message[0],
+            cause=message[1],
+        )
     handle_failed_records(
         message for message in processed_messages if message[0] == "fail"
     )

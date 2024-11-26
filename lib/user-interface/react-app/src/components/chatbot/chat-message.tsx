@@ -10,8 +10,8 @@ import {
   TextContent,
   Textarea,
 } from "@cloudscape-design/components";
-import { useEffect, useState } from "react";
-import { JsonView,  defaultStyles } from "react-json-view-lite";
+import { useContext, useEffect, useState } from "react";
+import { JsonView, darkStyles } from "react-json-view-lite";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import styles from "../../styles/chat.module.scss";
@@ -23,10 +23,10 @@ import {
   RagDocument,
 } from "./types";
 
-import { getSignedUrl } from "./utils";
-
 import "react-json-view-lite/dist/index.css";
 import "../../styles/app.scss";
+import { AppContext } from "../../common/app-context";
+import { ApiClient } from "../../common/api-client/api-client";
 
 export interface ChatMessageProps {
   message: ChatBotHistoryItem;
@@ -37,6 +37,7 @@ export interface ChatMessageProps {
 }
 
 export default function ChatMessage(props: ChatMessageProps) {
+  const appContext = useContext(AppContext);
   const [loading, setLoading] = useState<boolean>(false);
   const [message] = useState<ChatBotHistoryItem>(props.message);
   const [files, setFiles] = useState<ImageFile[]>([] as ImageFile[]);
@@ -45,16 +46,23 @@ export default function ChatMessage(props: ChatMessageProps) {
   const [selectedIcon, setSelectedIcon] = useState<1 | 0 | null>(null);
 
   useEffect(() => {
+    if (!appContext) return;
+
+    const apiClient = new ApiClient(appContext);
     const getSignedUrls = async () => {
       setLoading(true);
       if (message.metadata?.files as ImageFile[]) {
         const files: ImageFile[] = [];
         for await (const file of message.metadata?.files as ImageFile[]) {
-          const signedUrl = await getSignedUrl(file.key);
-          files.push({
-            ...file,
-            url: signedUrl as string,
-          });
+          const signedUrl = (
+            await apiClient.sessions.getFileSignedUrl(file.key)
+          ).data?.getFileURL;
+          if (signedUrl) {
+            files.push({
+              ...file,
+              url: signedUrl,
+            });
+          }
         }
 
         setLoading(false);
@@ -63,19 +71,36 @@ export default function ChatMessage(props: ChatMessageProps) {
     };
 
     if (message.metadata?.files as ImageFile[]) {
-      getSignedUrls();
+      getSignedUrls().catch((e) => {
+        console.log("Unable to get signed URL", e);
+      });
     }
-  }, [message]);
+  }, [appContext, message]);
 
-  const content =
-    props.message.content && props.message.content.length > 0
-      ? props.message.content
-      : props.message.tokens?.map((v) => v.value).join("");
+  let content = "";
+  if (props.message.content && props.message.content.length > 0) {
+    // Message is final
+    content = props.message.content;
+  } else if (props.message.tokens && props.message.tokens.length > 0) {
+    // Streaming in progess. Hides the tokens out of sequence
+    // If I have 1,2,4, it would only display 1,2.
+    let currentSequence: number | undefined = undefined;
+    for (const token of props.message.tokens) {
+      if (
+        currentSequence === undefined ||
+        currentSequence + 1 == token.sequenceNumber
+      ) {
+        currentSequence = token.sequenceNumber;
+        content += token.value;
+      }
+    }
+  }
 
   return (
     <div>
       {props.message?.type === ChatBotMessageType.AI && (
         <Container
+          data-locator="chatbot-ai-container"
           footer={
             ((props?.showMetadata && props.message.metadata) ||
               (props.message.metadata &&
@@ -98,62 +123,64 @@ export default function ChatMessage(props: ChatMessageProps) {
                     container: "jsonContainer",
                   }}
                 />
-                {props.message.metadata.documents && (
-                  <>
-                    <div className={styles.btn_chabot_metadata_copy}>
-                      <Popover
-                        size="medium"
-                        position="top"
-                        triggerType="custom"
-                        dismissButton={false}
-                        content={
-                          <StatusIndicator type="success">
-                            Copied to clipboard
-                          </StatusIndicator>
-                        }
-                      >
-                        <Button
-                          variant="inline-icon"
-                          iconName="copy"
-                          onClick={() => {
-                            navigator.clipboard.writeText(
-                              (
-                                props.message.metadata
-                                  .documents as RagDocument[]
-                              )[parseInt(documentIndex)].page_content
-                            );
-                          }}
-                        />
-                      </Popover>
-                    </div>
-                    <Tabs
-                      tabs={(
-                        props.message.metadata.documents as RagDocument[]
-                      ).map((p: any, i) => {
-                        return {
-                          id: `${i}`,
-                          label:
-                            p.metadata.path?.split("/").at(-1) ??
-                            p.metadata.title ??
-                            p.metadata.document_id.slice(-8),
-                          content: (
-                            <>
+                {props.message.metadata.documents &&
+                  (props.message.metadata.documents as RagDocument[]).length >
+                    0 && (
+                    <>
+                      <div className={styles.btn_chabot_metadata_copy}>
+                        <Popover
+                          size="medium"
+                          position="top"
+                          triggerType="custom"
+                          dismissButton={false}
+                          content={
+                            <StatusIndicator type="success">
+                              Copied to clipboard
+                            </StatusIndicator>
+                          }
+                        >
+                          <Button
+                            variant="inline-icon"
+                            iconName="copy"
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                (
+                                  props.message.metadata
+                                    .documents as RagDocument[]
+                                )[parseInt(documentIndex)].page_content
+                              );
+                            }}
+                          />
+                        </Popover>
+                      </div>
+                      <Tabs
+                        tabs={(
+                          props.message.metadata.documents as RagDocument[]
+                        ).map((p: RagDocument, i) => {
+                          return {
+                            id: `${i}`,
+                            label:
+                              p.metadata.path?.split("/").at(-1) ??
+                              p.metadata.title ??
+                              p.metadata.document_id.slice(-8),
+                            href: p.metadata.path,
+                            content: (
                               <Textarea
+                                key={p.metadata.chunk_id}
                                 value={p.page_content}
                                 readOnly={true}
                                 rows={8}
                               />
-                            </>
-                          ),
-                        };
-                      })}
-                      activeTabId={documentIndex}
-                      onChange={({ detail }) =>
-                        setDocumentIndex(detail.activeTabId)
-                      }
-                    />
-                  </>
-                )}
+                            ),
+                          };
+                        })}
+                        activeTabId={documentIndex}
+                        onChange={({ detail }) =>
+                          setDocumentIndex(detail.activeTabId)
+                        }
+                      />
+                    </>
+                  )}
                 {props.message.metadata.prompts && (
                   <>
                     <div className={styles.btn_chabot_metadata_copy}>
@@ -223,6 +250,7 @@ export default function ChatMessage(props: ChatMessageProps) {
           {props.message.content.length > 0 ? (
             <div className={styles.btn_chabot_message_copy}>
               <Popover
+                data-locator="copy-clipboard"
                 size="medium"
                 position="top"
                 triggerType="custom"

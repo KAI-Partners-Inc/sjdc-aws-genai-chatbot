@@ -22,8 +22,10 @@ Supported model providers:
 
 | Resource |Description|
 |:-------------|:-------------|
-| [AWS Generative AI CDK Constructs](https://github.com/awslabs/generative-ai-cdk-constructs/) | Open-source library extension of the [AWS Cloud Development Kit (AWS CDK)](https://docs.aws.amazon.com/cdk/v2/guide/home.html)  aimed to help developers build generative AI solutions using pattern-based definitions for their architecture. |
+| [Secure Messenger GenAI Chatbot](https://github.com/aws-samples/secure-messenger-genai-chatbot) | A messenger built on Wickr that can interface with this chatbot to provide Q&A service in tightly regulated environments (i.e. HIPAA). |
 | [Project Lakechain](https://github.com/awslabs/project-lakechain) | A powerful cloud-native, AI-powered, document (docs, images, audios, videos) processing framework built on top of the AWS CDK. |
+| [AWS Generative AI CDK Constructs](https://github.com/awslabs/generative-ai-cdk-constructs/) | Open-source library extension of the [AWS Cloud Development Kit (AWS CDK)](https://docs.aws.amazon.com/cdk/v2/guide/home.html)  aimed to help developers build generative AI solutions using pattern-based definitions for their architecture. |
+| [Artifacts and Tools for Bedrock](https://github.com/aws-samples/artifacts-and-tools-for-bedrock) | An innovative chat-based user interface with support for tools and artifacts. It can create graphs and diagrams, analyze data, write games, create web pages, generate files, and much more.  |
 
 # Roadmap
 
@@ -40,11 +42,17 @@ Roadmap is available through the [GitHub Project](https://github.com/orgs/aws-sa
 # License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
-
-- [Changelog](CHANGELOG.md) of the project.
 - [License](LICENSE) of the project.
 - [Code of Conduct](CODE_OF_CONDUCT.md) of the project.
 - [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+
+Although this repository is released under the  MIT-0 license, its front-end and SQL implementation use the following third party projects:
+- [psycopg2-binary](https://github.com/psycopg/psycopg2)
+- [jackspeak](https://github.com/isaacs/jackspeak)
+- [package-json-from-dist](https://github.com/isaacs/package-json-from-dist)
+- [path-scurry](https://github.com/isaacs/path-scurry)
+
+These projects' licensing includes the LGPL v3 and  BlueOak-1.0.0 licenses.
 
 # Legal Disclaimer
 

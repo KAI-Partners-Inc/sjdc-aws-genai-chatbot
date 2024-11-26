@@ -109,10 +109,12 @@ export default function CrossEncoders() {
         const result = await apiClient.crossEncoders.getModels();
 
         console.log(result?.data?.listCrossEncoders);
+        /* eslint-disable-next-line  @typescript-eslint/no-non-null-asserted-optional-chain */
         setCrossEncoderModels(result?.data?.listCrossEncoders!);
         setCrossEncoderModelsStatus("finished");
       } catch (error) {
         console.error(Utils.getErrorMessage(error));
+        setGlobalError(Utils.getErrorMessage(error));
         setCrossEncoderModelsStatus("error");
       }
     })();

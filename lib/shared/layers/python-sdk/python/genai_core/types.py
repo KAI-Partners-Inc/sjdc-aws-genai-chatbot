@@ -27,6 +27,12 @@ class Workspace(BaseModel):
     engine: str
 
 
+class WorkspaceStatus(Enum):
+    SUBMITTED = "submitted"
+    READY = "ready"
+    CREATING = "creating"
+
+
 class Provider(Enum):
     BEDROCK = "bedrock"
     OPENAI = "openai"
@@ -53,7 +59,7 @@ class ModelStatus(Enum):
 
 
 class ModelInterface(Enum):
-    LANGCHIAN = "langchain"
+    LANGCHAIN = "langchain"
     IDEFICS = "idefics"
 
 
@@ -69,13 +75,14 @@ class ChatbotMode(Enum):
 class ChatbotAction(Enum):
     HEARTBEAT = "heartbeat"
     RUN = "run"
-    LLM_NEW_TOKEN = "llm_new_token"
+    LLM_NEW_TOKEN = "llm_new_token"  # nosec B105 False positive, this is not password
     FINAL_RESPONSE = "final_response"
 
 
 class ChatbotMessageType(Enum):
     Human = "human"
     AI = "ai"
+
 
 class Task(Enum):
     STORE = "store"
