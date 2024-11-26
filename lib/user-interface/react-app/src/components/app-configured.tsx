@@ -5,12 +5,15 @@ import {
   ThemeProvider,
   defaultDarkModeOverride,
   useTheme,
+  Button,
+  Divider,
+  View,
 } from "@aws-amplify/ui-react";
 import App from "../app";
 import { Amplify, Auth } from "aws-amplify";
 import { AppConfig } from "../common/types";
 import { AppContext } from "../common/app-context";
-import { Alert, StatusIndicator, Button } from "@cloudscape-design/components";
+import { Alert, StatusIndicator } from "@cloudscape-design/components";
 import { StorageHelper } from "../common/helpers/storage-helper";
 import { Mode } from "@cloudscape-design/global-styles";
 import "@aws-amplify/ui-react/styles.css";
@@ -22,31 +25,46 @@ export default function AppConfigured() {
   const [error, setError] = useState<boolean | null>(null);
   const [theme, setTheme] = useState(StorageHelper.getTheme());
 
-  const signInWithSSO = async () => {
-    try {
-      const federatedProvider = config?.config.auth_federated_provider;
-
-      if (!federatedProvider) {
-        console.error("Federated provider configuration missing");
-        return;
-      }
-      federatedProvider.custom = true;
-      if (!federatedProvider.custom) {
-        await Auth.federatedSignIn({ provider: federatedProvider.name });
-      } else {
-        await Auth.federatedSignIn({ customProvider: 'KAIP' });
-      }
-    } catch (err) {
-      console.error("Error during federated sign-in:", err);
-    }
-  };
-
   useEffect(() => {
     (async () => {
       try {
         const result = await fetch("/aws-exports.json");
         const awsExports = await result.json();
         const currentConfig = Amplify.configure(awsExports) as AppConfig | null;
+
+        // Extract the query string from the current URL
+        const queryString = window.location.search;
+
+        // Use URLSearchParams to work with the query string easily
+        const urlParams = new URLSearchParams(queryString);
+
+        if (
+          currentConfig?.config.auth_federated_provider?.auto_redirect &&
+          urlParams.get("loginlocal") != "true"
+        ) {
+          let authenticated = false;
+          try {
+            const user = await Auth.currentAuthenticatedUser();
+            if (user) {
+              authenticated = true;
+            }
+          } catch (e) {
+            authenticated = false;
+          }
+
+          if (!authenticated) {
+            const federatedProvider =
+              currentConfig.config.auth_federated_provider;
+
+            if (!federatedProvider.custom) {
+              Auth.federatedSignIn({ provider: federatedProvider.name });
+            } else {
+              Auth.federatedSignIn({ customProvider: federatedProvider.name });
+            }
+
+            return;
+          }
+        }
 
         setConfig(currentConfig);
       } catch (e) {
@@ -138,27 +156,41 @@ export default function AppConfigured() {
           components={{
             SignIn: {
               Header: () => {
-                return (
-                  <Heading
-                    padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
-                    level={3}
-                  >
-                    {CHATBOT_NAME}
-                  </Heading>
-                );
-              },
-              Footer: () => {
-                return (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      marginTop: "16px",
-                    }}
-                  >
-                    <Button onClick={signInWithSSO}>Sign in with SSO</Button>
-                  </div>
-                );
+                if (config.config.auth_federated_provider) {
+                  const signInWithCustomProvider = () => {
+                    Auth.federatedSignIn({
+                      customProvider:
+                        config.config.auth_federated_provider?.name || "",
+                    });
+                  };
+                  return (
+                    <Heading
+                      padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
+                      level={3}
+                    >
+                      {CHATBOT_NAME}
+                      <View as="div" paddingTop="1rem" paddingBottom="1rem">
+                        <Button
+                          onClick={signInWithCustomProvider}
+                          variation="primary"
+                        >
+                          Sign in with{" "}
+                          {config.config.auth_federated_provider?.name}
+                        </Button>
+                      </View>
+                      <Divider label="OR" />
+                    </Heading>
+                  );
+                } else {
+                  return (
+                    <Heading
+                      padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
+                      level={3}
+                    >
+                      {CHATBOT_NAME}
+                    </Heading>
+                  );
+                }
               },
             },
           }}

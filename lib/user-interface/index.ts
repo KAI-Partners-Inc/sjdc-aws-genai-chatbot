@@ -82,6 +82,13 @@ export class UserInterface extends Construct {
         userPoolWebClientId: props.userPoolClientId,
         identityPoolId: props.identityPool.identityPoolId,
       },
+      oauth: {
+        domain: "kaip-chatbot.auth.us-east-1.amazoncognito.com",
+        scope: ["openid", "profile", "email"],
+        redirectSignIn: "https://d37nmi88xkdn9a.cloudfront.net",
+        redirectSignOut: "https://d37nmi88xkdn9a.cloudfront.net",
+        responseType: "code"
+      },
       aws_appsync_graphqlEndpoint: props.api.graphqlApi.graphqlUrl,
       aws_appsync_region: cdk.Aws.REGION,
       aws_appsync_authenticationType: "AMAZON_COGNITO_USER_POOLS",
