@@ -1,5 +1,4 @@
 import os
-from aws_lambda_powertools import Logger
 import boto3
 from botocore.exceptions import ClientError
 
@@ -10,7 +9,6 @@ SESSIONS_BY_USER_ID_INDEX_NAME = os.environ["SESSIONS_BY_USER_ID_INDEX_NAME"]
 
 dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
 table = dynamodb.Table(SESSIONS_TABLE_NAME)
-logger = Logger()
 
 
 def get_session(session_id, user_id):
@@ -19,9 +17,9 @@ def get_session(session_id, user_id):
         response = table.get_item(Key={"SessionId": session_id, "UserId": user_id})
     except ClientError as error:
         if error.response["Error"]["Code"] == "ResourceNotFoundException":
-            logger.warning("No record found with session id: %s", session_id)
+            print("No record found with session id: %s", session_id)
         else:
-            logger.exception(error)
+            print(error)
 
     return response.get("Item", {})
 
@@ -53,9 +51,9 @@ def list_sessions_by_user_id(user_id):
 
     except ClientError as error:
         if error.response["Error"]["Code"] == "ResourceNotFoundException":
-            logger.warning("No record found for user id: %s", user_id)
+            print("No record found for user id: %s", user_id)
         else:
-            logger.exception(error)
+            print(error)
 
     return items
 
@@ -65,9 +63,9 @@ def delete_session(session_id, user_id):
         table.delete_item(Key={"SessionId": session_id, "UserId": user_id})
     except ClientError as error:
         if error.response["Error"]["Code"] == "ResourceNotFoundException":
-            logger.warning("No record found with session id: %s", session_id)
+            print("No record found with session id: %s", session_id)
         else:
-            logger.exception(error)
+            print(error)
 
         return {"id": session_id, "deleted": False}
 

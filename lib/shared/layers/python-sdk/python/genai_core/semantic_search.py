@@ -4,7 +4,6 @@ import genai_core.embeddings
 from genai_core.aurora import query_workspace_aurora
 from genai_core.opensearch import query_workspace_open_search
 from genai_core.kendra import query_workspace_kendra
-from genai_core.bedrock_kb import query_workspace_bedrock_kb
 
 
 def semantic_search(
@@ -28,10 +27,6 @@ def semantic_search(
         )
     elif workspace["engine"] == "kendra":
         return query_workspace_kendra(
-            workspace_id, workspace, query, limit, full_response
-        )
-    elif workspace["engine"] == "bedrock_kb":
-        return query_workspace_bedrock_kb(
             workspace_id, workspace, query, limit, full_response
         )
 

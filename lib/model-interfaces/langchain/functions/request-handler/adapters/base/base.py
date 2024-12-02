@@ -1,13 +1,8 @@
 import os
-import re
 from enum import Enum
 from aws_lambda_powertools import Logger
 from langchain.callbacks.base import BaseCallbackHandler
-from langchain.chains.conversation.base import ConversationChain
-from langchain.chains import ConversationalRetrievalChain
-from langchain.chains.retrieval import create_retrieval_chain
-from langchain.chains.history_aware_retriever import create_history_aware_retriever
-from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains import ConversationalRetrievalChain, ConversationChain
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts.prompt import PromptTemplate
 from langchain.chains.conversational_retrieval.prompts import (
@@ -19,12 +14,6 @@ from typing import Dict, List, Any
 from genai_core.langchain import WorkspaceRetriever, DynamoDBChatMessageHistory
 from genai_core.types import ChatbotMode
 
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.outputs import LLMResult, ChatGeneration
-from langchain_core.messages.ai import AIMessage, AIMessageChunk
-from langchain_core.messages.human import HumanMessage
-from langchain_aws import ChatBedrockConverse
-
 logger = Logger()
 
 
@@ -34,55 +23,22 @@ class Mode(Enum):
 
 class LLMStartHandler(BaseCallbackHandler):
     prompts = []
-    usage = None
 
-    # Langchain callbacks
-    # https://python.langchain.com/v0.2/docs/concepts/#callbacks
     def on_llm_start(
         self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any
     ) -> Any:
+        logger.info(prompts)
         self.prompts.append(prompts)
-
-    def on_llm_end(
-        self, response: LLMResult, *, run_id, parent_run_id, **kwargs: Any
-    ) -> Any:
-        generation = response.generations[0][0]  # only one llm request
-        if (
-            generation is not None
-            and isinstance(generation, ChatGeneration)
-            and isinstance(generation.message, AIMessage)
-        ):
-            # In case of rag there could be 2 llm calls.
-            if self.usage is None:
-                self.usage = {
-                    "input_tokens": 0,
-                    "output_tokens": 0,
-                    "total_tokens": 0,
-                }
-            self.usage = {
-                "input_tokens": self.usage.get("input_tokens", 0)
-                + generation.message.usage_metadata.get("input_tokens", 0),
-                "output_tokens": self.usage.get("output_tokens", 0)
-                + generation.message.usage_metadata.get("output_tokens", 0),
-                "total_tokens": self.usage.get("total_tokens", 0)
-                + generation.message.usage_metadata.get("total_tokens", 0),
-            }
 
 
 class ModelAdapter:
     def __init__(
-        self,
-        session_id,
-        user_id,
-        mode=ChatbotMode.CHAIN.value,
-        disable_streaming=False,
-        model_kwargs={},
+        self, session_id, user_id, mode=ChatbotMode.CHAIN.value, model_kwargs={}
     ):
         self.session_id = session_id
         self.user_id = user_id
         self._mode = mode
         self.model_kwargs = model_kwargs
-        self.disable_streaming = disable_streaming
 
         self.callback_handler = LLMStartHandler()
         self.__bind_callbacks()
@@ -99,13 +55,6 @@ class ModelAdapter:
         for method in callback_methods:
             if method in valid_callback_names:
                 setattr(self.callback_handler, method, getattr(self, method))
-
-    def get_endpoint(self, model_id):
-        clean_name = "SAGEMAKER_ENDPOINT_" + re.sub(r"[\s.\/\-_]", "", model_id).upper()
-        if os.getenv(clean_name):
-            return os.getenv(clean_name)
-        else:
-            return model_id
 
     def get_llm(self, model_kwargs={}):
         raise ValueError("llm must be implemented")
@@ -134,7 +83,7 @@ class ModelAdapter:
         Current conversation:
         {chat_history}
 
-        Question: {input}"""  # noqa: E501
+        Question: {input}"""
 
         return PromptTemplate.from_template(template)
 
@@ -165,7 +114,7 @@ class ModelAdapter:
                 callbacks=[self.callback_handler],
             )
             result = conversation({"question": user_prompt})
-            logger.debug(result["source_documents"])
+            logger.info(result["source_documents"])
             documents = [
                 {
                     "page_content": doc.page_content,
@@ -231,9 +180,6 @@ class ModelAdapter:
         logger.debug(f"mode: {self._mode}")
 
         if self._mode == ChatbotMode.CHAIN.value:
-            if isinstance(self.llm, ChatBedrockConverse):
-                return self.run_with_chain_v2(prompt, workspace_id)
-            else:
-                return self.run_with_chain(prompt, workspace_id)
+            return self.run_with_chain(prompt, workspace_id)
 
         raise ValueError(f"unknown mode {self._mode}")

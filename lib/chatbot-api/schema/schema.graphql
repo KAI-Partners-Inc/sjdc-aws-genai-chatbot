@@ -5,8 +5,8 @@ input CreateWorkspaceAuroraInput {
   kind: String!
   embeddingsModelProvider: String!
   embeddingsModelName: String!
-  crossEncoderModelProvider: String
-  crossEncoderModelName: String
+  crossEncoderModelProvider: String!
+  crossEncoderModelName: String!
   languages: [String!]!
   metric: String!
   index: Boolean!
@@ -23,20 +23,13 @@ input CreateWorkspaceKendraInput {
   useAllData: Boolean!
 }
 
-input CreateWorkspaceBedrockKBInput {
-  name: String!
-  kind: String!
-  knowledgeBaseId: String!
-  hybridSearch: Boolean!
-}
-
 input CreateWorkspaceOpenSearchInput {
   name: String!
   kind: String!
   embeddingsModelProvider: String!
   embeddingsModelName: String!
-  crossEncoderModelProvider: String
-  crossEncoderModelName: String
+  crossEncoderModelProvider: String!
+  crossEncoderModelName: String!
   languages: [String!]!
   hybridSearch: Boolean!
   chunkingStrategy: String!
@@ -54,7 +47,6 @@ input CalculateEmbeddingsInput {
 type CrawlerProperties @aws_cognito_user_pools {
   followLinks: Boolean
   limit: Int
-  contentTypes: [String!]!
 }
 
 type CrossEncoderData @aws_cognito_user_pools {
@@ -98,11 +90,6 @@ type DocumentResult @aws_cognito_user_pools {
   status: String
 }
 
-type DeleteDocumentResult @aws_cognito_user_pools {
-  documentId: String!
-  deleted: Boolean!
-}
-
 type UserFeedbackResult @aws_cognito_user_pools {
   feedback_id: String!
 }
@@ -131,7 +118,7 @@ type EmbeddingModel @aws_cognito_user_pools {
 }
 
 input FileUploadInput {
-  workspaceId: String
+  workspaceId: String!
   fileName: String!
 }
 
@@ -152,12 +139,6 @@ input GetRSSPostsInput {
 }
 
 type KendraIndex @aws_cognito_user_pools {
-  id: String!
-  name: String!
-  external: Boolean!
-}
-
-type BedrockKB @aws_cognito_user_pools {
   id: String!
   name: String!
   external: Boolean!
@@ -209,7 +190,6 @@ input RssFeedInput {
   limit: Int!
   title: String
   followLinks: Boolean!
-  contentTypes: [String!]!
 }
 
 input SemanticSearchInput {
@@ -268,11 +248,6 @@ type SessionHistoryItem @aws_cognito_user_pools {
   metadata: String
 }
 
-input DeleteDocumentInput {
-  workspaceId: String!
-  documentId: String!
-}
-
 input UserFeedbackInput {
   sessionId: String!
   key: Int!
@@ -294,7 +269,6 @@ input WebsiteInput {
   address: String!
   followLinks: Boolean!
   limit: Int!
-  contentTypes: [String!]!
 }
 
 type Workspace @aws_cognito_user_pools {
@@ -323,8 +297,6 @@ type Workspace @aws_cognito_user_pools {
   kendraIndexId: String
   kendraIndexExternal: Boolean
   kendraUseAllData: Boolean
-  knowledgeBaseId: String
-  knowledgeBaseExternal: Boolean
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
@@ -338,19 +310,15 @@ type Channel @aws_iam @aws_cognito_user_pools {
 type Mutation {
   createKendraWorkspace(input: CreateWorkspaceKendraInput!): Workspace!
     @aws_cognito_user_pools
-  createBedrockKBWorkspace(input: CreateWorkspaceBedrockKBInput!): Workspace!
-    @aws_cognito_user_pools
   createOpenSearchWorkspace(input: CreateWorkspaceOpenSearchInput!): Workspace!
     @aws_cognito_user_pools
   createAuroraWorkspace(input: CreateWorkspaceAuroraInput!): Workspace!
     @aws_cognito_user_pools
   startKendraDataSync(workspaceId: String!): Boolean @aws_cognito_user_pools
   deleteWorkspace(workspaceId: String!): Boolean @aws_cognito_user_pools
-  deleteDocument(input: DeleteDocumentInput!): DeleteDocumentResult @aws_cognito_user_pools
   addTextDocument(input: TextDocumentInput!): DocumentResult
     @aws_cognito_user_pools
-  addUserFeedback(input: UserFeedbackInput!): UserFeedbackResult
-    @aws_cognito_user_pools
+  addUserFeedback(input: UserFeedbackInput!): UserFeedbackResult @aws_cognito_user_pools
   addQnADocument(input: QnADocumentInput!): DocumentResult
     @aws_cognito_user_pools
   setDocumentSubscriptionStatus(
@@ -371,8 +339,6 @@ type Query {
   checkHealth: Boolean @aws_cognito_user_pools
   getUploadFileURL(input: FileUploadInput!): FileUploadResult
     @aws_cognito_user_pools
-  getFileURL(fileName: String!): String
-    @aws_cognito_user_pools
   listModels: [Model!]! @aws_cognito_user_pools
   listWorkspaces: [Workspace!]! @aws_cognito_user_pools
   getWorkspace(workspaceId: String!): Workspace @aws_cognito_user_pools
@@ -385,7 +351,6 @@ type Query {
     @aws_cognito_user_pools
   getSession(id: String!): Session @aws_cognito_user_pools
   listKendraIndexes: [KendraIndex!]! @aws_cognito_user_pools
-  listBedrockKnowledgeBases: [BedrockKB!]! @aws_cognito_user_pools
   isKendraDataSynching(workspaceId: String!): Boolean @aws_cognito_user_pools
   listDocuments(input: ListDocumentsInput!): DocumentsResult!
     @aws_cognito_user_pools

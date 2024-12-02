@@ -39,10 +39,8 @@ export default function EmbeddingSelector(props: EmbeddingsSelectionProps) {
     })();
   }, [appContext]);
 
-  const embeddingsModelOptions = EmbeddingsModelHelper.getSelectOptions(
-    appContext,
-    embeddingsModels
-  );
+  const embeddingsModelOptions =
+    EmbeddingsModelHelper.getSelectOptions(embeddingsModels);
 
   return (
     <FormField

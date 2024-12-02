@@ -1,12 +1,6 @@
 import * as cdk from "aws-cdk-lib";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
-import * as kms from "aws-cdk-lib/aws-kms";
 import { Construct } from "constructs";
-
-export interface RagDynamoDBTablesProps {
-  readonly retainOnDelete?: boolean;
-  readonly kmsKey?: kms.Key;
-}
 
 export class RagDynamoDBTables extends Construct {
   public readonly workspacesTable: dynamodb.Table;
@@ -17,7 +11,7 @@ export class RagDynamoDBTables extends Construct {
     "by_compound_key_idx";
   public readonly documentsByStatusIndexName: string = "by_status_idx";
 
-  constructor(scope: Construct, id: string, props: RagDynamoDBTablesProps) {
+  constructor(scope: Construct, id: string) {
     super(scope, id);
 
     const workspacesTable = new dynamodb.Table(this, "Workspaces", {
@@ -30,15 +24,9 @@ export class RagDynamoDBTables extends Construct {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      encryption: props.kmsKey
-        ? dynamodb.TableEncryption.CUSTOMER_MANAGED
-        : dynamodb.TableEncryption.AWS_MANAGED,
-      encryptionKey: props.kmsKey,
+      encryption: dynamodb.TableEncryption.AWS_MANAGED,
       pointInTimeRecovery: true,
-      removalPolicy:
-        props.retainOnDelete === true
-          ? cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
-          : cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     workspacesTable.addGlobalSecondaryIndex({
@@ -63,15 +51,9 @@ export class RagDynamoDBTables extends Construct {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      encryption: props.kmsKey
-        ? dynamodb.TableEncryption.CUSTOMER_MANAGED
-        : dynamodb.TableEncryption.AWS_MANAGED,
-      encryptionKey: props.kmsKey,
+      encryption: dynamodb.TableEncryption.AWS_MANAGED,
       pointInTimeRecovery: true,
-      removalPolicy:
-        props.retainOnDelete === true
-          ? cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
-          : cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     documentsTable.addGlobalSecondaryIndex({

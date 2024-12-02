@@ -1,6 +1,5 @@
 import os
 import uuid
-from aws_lambda_powertools import Logger
 import boto3
 import json
 from pydantic import BaseModel
@@ -25,7 +24,6 @@ try:
 except:
     pass
 s3_client = boto3.client("s3")
-logger = Logger()
 
 
 
@@ -37,7 +35,7 @@ def add_user_feedback(
     prompt: str,
     completion: str,
     model: str,
-    userId: str,
+    userId: str
 ):
     feedbackId = str(uuid.uuid4())
     timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
@@ -52,7 +50,7 @@ def add_user_feedback(
         "completion": completion,
         "model": model,
         "feedback": feedback,
-        "createdAt": timestamp,
+        "createdAt": timestamp
     }
 
     new_feedback_data = {
@@ -105,8 +103,12 @@ def add_user_feedback(
         Key=f"{prefix}{feedbackId}.json",
         Body=json.dumps(item),
         ContentType="application/json",
-        StorageClass="STANDARD_IA",
+        StorageClass='STANDARD_IA',
     )
-    logger.info("Response for add_user_feedback", response=response)
-
-    return {"feedback_id": feedbackId}
+    print(response)
+    
+    return {
+        "feedback_id": feedbackId
+    }
+    
+    

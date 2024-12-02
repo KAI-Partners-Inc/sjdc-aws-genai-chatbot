@@ -1,5 +1,4 @@
 import {
-  Alert,
   BreadcrumbGroup,
   ContentLayout,
   Flashbar,
@@ -21,7 +20,6 @@ import AuroraWorkspaceSettings from "./aurora-workspace-settings";
 import DocumentsTab from "./documents-tab";
 import OpenSearchWorkspaceSettings from "./open-search-workspace-settings";
 import KendraWorkspaceSettings from "./kendra-workspace-settings";
-import BedrockKBWorkspaceSettings from "./bedrock-kb-workspace-settings";
 import { CHATBOT_NAME } from "../../../common/constants";
 import { Workspace } from "../../../API";
 import BaseAppLayoutv from "../../../components/v2-base-app-layout";
@@ -40,14 +38,12 @@ export default function WorkspacePane() {
   const [workspace, setWorkspace] = useState<Workspace | undefined | null>(
     null
   );
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
 
   const getWorkspace = useCallback(async () => {
     if (!appContext || !workspaceId) return;
 
     const apiClient = new ApiClient(appContext);
     try {
-      setGlobalError(undefined);
       const result = await apiClient.workspaces.getWorkspace(workspaceId);
       if (!result.data?.getWorkspace) {
         navigate("/rag/workspaces");
@@ -55,8 +51,7 @@ export default function WorkspacePane() {
       }
       setWorkspace(result.data!.getWorkspace);
     } catch (error) {
-      console.error(Utils.getErrorMessage(error));
-      setGlobalError(Utils.getErrorMessage(error));
+      console.error(error);
     }
     setLoading(false);
   }, [appContext, navigate, workspaceId]);

@@ -91,10 +91,8 @@ export default function SemanticSearch() {
       );
       console.log(result.data?.performSemanticSearch);
       setSearchResult(result.data?.performSemanticSearch);
-      /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
     } catch (error: any) {
       console.error(error);
-      /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
       setGlobalError(error.errors.map((x: any) => x.message).join(","));
     }
 
@@ -122,12 +120,10 @@ export default function SemanticSearch() {
           }
         }
 
-        /* eslint-disable-next-line  @typescript-eslint/no-non-null-asserted-optional-chain */
         setWorkspaces(result.data?.listWorkspaces!);
-        /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
       } catch (error: any) {
-        console.error(Utils.getErrorMessage(error));
-        setGlobalError(Utils.getErrorMessage(error));
+        console.error(error);
+        setGlobalError(error.errors?.map((x: any) => x.error).join(","));
       }
       setWorkspacesLoadingStatus("finished");
     })();

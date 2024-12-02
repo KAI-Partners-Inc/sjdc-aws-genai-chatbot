@@ -1,11 +1,8 @@
-from aws_lambda_powertools import Logger
 import genai_core.types
 import genai_core.clients
 import genai_core.parameters
 
 from genai_core.types import Modality, Provider, ModelInterface
-
-logger = Logger()
 
 
 def list_models():
@@ -47,15 +44,15 @@ def get_custom_bedrock_agent():
             "interface": ModelInterface.LANGCHIAN.value,
             "ragSupported": True,
         },
-        # {
-        #     "provider": Provider.BEDROCK.value,
-        #     "name": "SJDC_Model_Crawler",
-        #     "streaming": True,
-        #     "inputModalities": [Modality.TEXT.value],
-        #     "outputModalities": [Modality.TEXT.value],
-        #     "interface": ModelInterface.LANGCHIAN.value,
-        #     "ragSupported": True,
-        # },
+        {
+            "provider": Provider.BEDROCK.value,
+            "name": "SJDC_Model_Crawler",
+            "streaming": True,
+            "inputModalities": [Modality.TEXT.value],
+            "outputModalities": [Modality.TEXT.value],
+            "interface": ModelInterface.LANGCHIAN.value,
+            "ragSupported": True,
+        },
         {
             "provider": Provider.BEDROCK.value,
             "name": "KAIP_Model",
@@ -72,30 +69,26 @@ def list_openai_models():
     if not openai:
         return None
 
-    models = []
-    for model in openai.models.list():
-        if model.id.startswith("gpt"):
-            models.append(
-                {
-                    "provider": Provider.OPENAI.value,
-                    "name": model.id,
-                    "streaming": True,
-                    "inputModalities": [Modality.TEXT.value],
-                    "outputModalities": [Modality.TEXT.value],
-                    "interface": ModelInterface.LANGCHAIN.value,
-                    "ragSupported": True,
-                }
-            )
+    models = openai.Model.list()
 
-    return models
-
+    return [
+        {
+            "provider": Provider.OPENAI.value,
+            "name": model["id"],
+            "streaming": True,
+            "inputModalities": [Modality.TEXT.value],
+            "outputModalities": [Modality.TEXT.value],
+            "interface": ModelInterface.LANGCHIAN.value,
+            "ragSupported": True,
+        }
+        for model in models.data
+        if model["id"].startswith("gpt")
+    ]
 
 def list_azure_openai_models():
-    # azure openai model are listed, comma separated in
-    # AZURE_OPENAI_MODELS variable in external API secret
+    # azure openai model are listed, comma separated in AZURE_OPENAI_MODELS variable in external API secret
     models = genai_core.parameters.get_external_api_key("AZURE_OPENAI_MODELS") or ""
-    if not models:
-        return None
+
     return [
         {
             "provider": Provider.AZURE_OPENAI.value,
@@ -103,12 +96,11 @@ def list_azure_openai_models():
             "streaming": True,
             "inputModalities": [Modality.TEXT.value],
             "outputModalities": [Modality.TEXT.value],
-            "interface": ModelInterface.LANGCHAIN.value,
+            "interface": ModelInterface.LANGCHIAN.value,
             "ragSupported": True,
         }
-        for model in models.split(",")
+        for model in models.split(',')
     ]
-
 
 def list_bedrock_models():
     try:
@@ -134,7 +126,7 @@ def list_bedrock_models():
                 "streaming": model.get("responseStreamingSupported", False),
                 "inputModalities": model["inputModalities"],
                 "outputModalities": model["outputModalities"],
-                "interface": ModelInterface.LANGCHAIN.value,
+                "interface": ModelInterface.LANGCHIAN.value,
                 "ragSupported": True,
             }
             for model in bedrock_models
@@ -147,7 +139,7 @@ def list_bedrock_models():
 
         return models
     except Exception as e:
-        logger.error(f"Error listing Bedrock models: {e}")
+        print(f"Error listing Bedrock models: {e}")
         return None
 
 
@@ -167,7 +159,7 @@ def list_bedrock_finetuned_models():
                 "streaming": model.get("responseStreamingSupported", False),
                 "inputModalities": model["inputModalities"],
                 "outputModalities": model["outputModalities"],
-                "interface": ModelInterface.LANGCHAIN.value,
+                "interface": ModelInterface.LANGCHIAN.value,
                 "ragSupported": True,
             }
             for model in bedrock_custom_models
@@ -180,7 +172,7 @@ def list_bedrock_finetuned_models():
 
         return models
     except Exception as e:
-        logger.error(f"Error listing fine-tuned Bedrock models: {e}")
+        print(f"Error listing fine-tuned Bedrock models: {e}")
         return None
 
 

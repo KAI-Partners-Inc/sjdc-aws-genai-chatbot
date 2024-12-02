@@ -67,16 +67,12 @@ export default function OpenSearchWorkspaceSettings(
             <div>{props.workspace.embeddingsModelDimensions}</div>
           </div>
           <div>
-            <Box variant="awsui-key-label">Hybrid search</Box>
-            <div>{props.workspace.hybridSearch ? "Yes" : "No"}</div>
-          </div>
-          <div>
             <Box variant="awsui-key-label">Cross-encoder provider</Box>
-            <div>{props.workspace.crossEncoderModelProvider ?? "None"}</div>
+            <div>{props.workspace.crossEncoderModelProvider}</div>
           </div>
           <div>
             <Box variant="awsui-key-label">Cross-encoder model</Box>
-            <div>{props.workspace.crossEncoderModelName ?? "None"}</div>
+            <div>{props.workspace.crossEncoderModelName}</div>
           </div>
         </SpaceBetween>
         <SpaceBetween size="l">

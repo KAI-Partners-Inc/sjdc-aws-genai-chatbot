@@ -85,7 +85,6 @@ export default function AddData() {
           }
         }
 
-        /* eslint-disable-next-line  @typescript-eslint/no-non-null-asserted-optional-chain */
         setWorkspaces(result.data?.listWorkspaces!);
         setWorkspacesLoadingStatus("finished");
       } catch (error) {

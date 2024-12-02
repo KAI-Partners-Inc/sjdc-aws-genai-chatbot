@@ -10,6 +10,7 @@ import * as path from "path";
 import { Shared } from "../../shared";
 import { SystemConfig } from "../../shared/types";
 import { RagDynamoDBTables } from "../rag-dynamodb-tables";
+import { RemovalPolicy } from "aws-cdk-lib";
 
 export interface CreateOpenSearchWorkspaceProps {
   readonly config: SystemConfig;
@@ -39,14 +40,12 @@ export class CreateOpenSearchWorkspace extends Construct {
         code: props.shared.sharedCode.bundleWithLambdaAsset(
           path.join(__dirname, "./functions/create-workflow/create")
         ),
-        description: "Creates the Open Search workspace",
         runtime: props.shared.pythonRuntime,
         architecture: props.shared.lambdaArchitecture,
         handler: "index.lambda_handler",
         layers: [props.shared.powerToolsLayer, props.shared.commonLayer],
         timeout: cdk.Duration.minutes(5),
-        logRetention: props.config.logRetention ?? logs.RetentionDays.ONE_WEEK,
-        loggingFormat: lambda.LoggingFormat.JSON,
+        logRetention: logs.RetentionDays.ONE_WEEK,
         environment: {
           ...props.shared.defaultEnvironmentVariables,
           WORKSPACES_TABLE_NAME:
@@ -146,15 +145,7 @@ export class CreateOpenSearchWorkspace extends Construct {
       this,
       "CreateOpenSearchWorkspaceSMLogGroup",
       {
-        removalPolicy:
-          props.config.retainOnDelete === true
-            ? cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
-            : cdk.RemovalPolicy.DESTROY,
-        retention: props.config.logRetention,
-        // Log group name should start with `/aws/vendedlogs/` to not exceed Cloudwatch Logs Resource Policy
-        // size limit.
-        // https://docs.aws.amazon.com/step-functions/latest/dg/bp-cwl.html
-        logGroupName: `/aws/vendedlogs/states/CreateOpenSearchWorkspace-${this.node.addr}`,
+        removalPolicy: RemovalPolicy.DESTROY,
       }
     );
 
@@ -172,9 +163,6 @@ export class CreateOpenSearchWorkspace extends Construct {
         },
       }
     );
-    if (props.shared.kmsKey) {
-      props.shared.kmsKey.grantEncryptDecrypt(stateMachine.role);
-    }
 
     this.stateMachine = stateMachine;
     this.createWorkspaceRole = createFunction.role;

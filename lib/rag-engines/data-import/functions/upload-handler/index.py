@@ -56,7 +56,6 @@ def process_record(record):
         workspace_id=workspace_id,
         document_type="file",
         path=file_name,
-        title=file_name,
         size_in_bytes=object_size,
     )
 

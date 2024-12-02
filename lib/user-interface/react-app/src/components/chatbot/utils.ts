@@ -1,10 +1,10 @@
+import { Storage } from "aws-amplify";
 import { Dispatch, SetStateAction } from "react";
 import {
   ChatBotAction,
   ChatBotHistoryItem,
   ChatBotMessageResponse,
   ChatBotMessageType,
-  ChatBotToken,
 } from "./types";
 import { ChatSession } from "./multi-chat";
 import { SelectProps } from "@cloudscape-design/components";
@@ -116,8 +116,7 @@ export function updateMessageHistory(
 export function updateMessageHistoryRef(
   sessionId: string,
   messageHistory: ChatBotHistoryItem[],
-  response: ChatBotMessageResponse,
-  messageTokens: { [key: string]: ChatBotToken[] }
+  response: ChatBotMessageResponse
 ) {
   if (response.data?.sessionId !== sessionId) return;
 
@@ -136,12 +135,8 @@ export function updateMessageHistoryRef(
       messageHistory.length > 0 &&
       messageHistory.at(-1)?.type !== ChatBotMessageType.Human
     ) {
-      const lastMessageIndex = messageHistory.length - 1;
-      const lastMessage = messageHistory[lastMessageIndex]!;
-      if (messageTokens[lastMessageIndex] === undefined) {
-        messageTokens[lastMessageIndex] = [];
-      }
-      lastMessage.tokens = messageTokens[lastMessageIndex];
+      const lastMessage = messageHistory.at(-1)!;
+      lastMessage.tokens = lastMessage.tokens ?? [];
       if (hasToken) {
         lastMessage.tokens.push(token);
       }
@@ -306,6 +301,11 @@ export function updateChatSessions(
       }
     }
   }
+}
+
+export async function getSignedUrl(key: string) {
+  const signedUrl = await Storage.get(key as string);
+  return signedUrl;
 }
 
 export function getSelectedModelMetadata(

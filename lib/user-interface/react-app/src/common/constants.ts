@@ -37,7 +37,6 @@ export abstract class Labels {
     aurora: "Aurora Serverless v2 (pgvector)",
     opensearch: "OpenSearch Serverless",
     kendra: "Kendra",
-    bedrock_kb: "Bedrock Knowledge Base",
   };
 
   static statusTypeMap: Record<string, StatusIndicatorProps.Type> = {

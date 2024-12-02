@@ -34,7 +34,7 @@ const defaults: AuroraWorkspaceCreateInput = {
   languages: [{ value: "english", label: "English" }],
   metric: metrics[0].value,
   index: true,
-  hybridSearch: false,
+  hybridSearch: true,
   chunkSize: 1000,
   chunkOverlap: 200,
 };
@@ -51,9 +51,6 @@ export default function CreateWorkspaceAurora() {
         embeddingsModel: EmbeddingsModelHelper.getSelectOption(
           appContext?.config.default_embeddings_model
         ),
-        crossEncodingEnabled:
-          appContext?.config.cross_encoders_enabled || false,
-        hybridSearch: appContext?.config.cross_encoders_enabled || false,
         crossEncoderModel: OptionsHelper.getSelectOption(
           appContext?.config.default_cross_encoder_model
         ),
@@ -131,15 +128,9 @@ export default function CreateWorkspaceAurora() {
       data.embeddingsModel?.value
     );
 
-    let crossEncoderModel;
-    const crossEncoderSelected =
-      data.crossEncoderModel?.value !== "__none__" &&
-      appContext?.config.cross_encoders_enabled;
-    if (crossEncoderSelected) {
-      crossEncoderModel = OptionsHelper.parseValue(
-        data.crossEncoderModel?.value
-      );
-    }
+    const crossEncoderModel = OptionsHelper.parseValue(
+      data.crossEncoderModel?.value
+    );
 
     const apiClient = new ApiClient(appContext);
     try {
@@ -147,12 +138,12 @@ export default function CreateWorkspaceAurora() {
         name: data.name.trim(),
         embeddingsModelProvider: embeddingsModel.provider,
         embeddingsModelName: embeddingsModel.name,
-        crossEncoderModelProvider: crossEncoderModel?.provider,
-        crossEncoderModelName: crossEncoderModel?.name,
+        crossEncoderModelProvider: crossEncoderModel.provider,
+        crossEncoderModelName: crossEncoderModel.name,
         languages: data.languages.map((x) => x.value ?? ""),
         metric: data.metric,
         index: data.index,
-        hybridSearch: data.hybridSearch && crossEncoderSelected,
+        hybridSearch: data.hybridSearch,
         chunkingStrategy: "recursive",
         chunkSize: data.chunkSize,
         chunkOverlap: data.chunkOverlap,
@@ -160,11 +151,9 @@ export default function CreateWorkspaceAurora() {
 
       navigate(`/rag/workspaces/${result.data?.createAuroraWorkspace.id}`);
       return;
-      /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
     } catch (e: any) {
       setSubmitting(false);
       console.error(
-        /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
         `Invocation error: ${e.errors.map((x: any) => x.message).join("")}`
       );
       setGlobalError("Something went wrong");
@@ -197,9 +186,6 @@ export default function CreateWorkspaceAurora() {
       >
         <AuroraForm
           data={data}
-          crossEncodingEnabled={
-            appContext?.config.cross_encoders_enabled || false
-          }
           onChange={onChange}
           errors={errors}
           submitting={submitting}

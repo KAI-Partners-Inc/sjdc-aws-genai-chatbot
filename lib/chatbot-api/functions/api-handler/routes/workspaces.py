@@ -1,15 +1,9 @@
-from typing import Annotated, List, Optional
-from common.constant import (
-    SAFE_SHORT_STR_VALIDATION,
-    SAFE_SHORT_STR_VALIDATION_OPTIONAL,
-)
-from common.validation import WorkspaceIdValidation
+import re
 import genai_core.types
 import genai_core.kendra
-import genai_core.bedrock_kb
 import genai_core.parameters
 import genai_core.workspaces
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from aws_lambda_powertools import Logger, Tracer
 from aws_lambda_powertools.event_handler.appsync import Router
 
@@ -17,63 +11,48 @@ tracer = Tracer()
 router = Router()
 logger = Logger()
 
-name_regex = r"^[\w+_-]+$"
+name_regex = re.compile(r"^[\w+_-]+$")
 
 
 class GenericCreateWorkspaceRequest(BaseModel):
-    kind: str = SAFE_SHORT_STR_VALIDATION
+    kind: str
 
 
 class CreateWorkspaceAuroraRequest(BaseModel):
-    kind: str = SAFE_SHORT_STR_VALIDATION
-    name: str = Field(min_length=1, max_length=100, pattern=name_regex)
-    embeddingsModelProvider: str = SAFE_SHORT_STR_VALIDATION
-    embeddingsModelName: str = Field(
-        min_length=0, max_length=500, pattern=r"^[A-Za-z0-9-_. /]*$", default=None
-    )
-    crossEncoderModelProvider: Optional[str] = SAFE_SHORT_STR_VALIDATION_OPTIONAL
-    crossEncoderModelName: Optional[str] = Field(
-        min_length=0, max_length=500, pattern=r"^[A-Za-z0-9-_. /]*$", default=None
-    )
-    languages: List[Annotated[str, SAFE_SHORT_STR_VALIDATION]]
-    metric: str = SAFE_SHORT_STR_VALIDATION
+    kind: str
+    name: str
+    embeddingsModelProvider: str
+    embeddingsModelName: str
+    crossEncoderModelProvider: str
+    crossEncoderModelName: str
+    languages: list[str]
+    metric: str
     index: bool
     hybridSearch: bool
-    chunkingStrategy: str = SAFE_SHORT_STR_VALIDATION
-    chunkSize: int = Field(gt=100)
-    chunkOverlap: int = Field(gt=0)
+    chunkingStrategy: str
+    chunkSize: int
+    chunkOverlap: int
 
 
 class CreateWorkspaceOpenSearchRequest(BaseModel):
-    kind: str = SAFE_SHORT_STR_VALIDATION
-    name: str = Field(min_length=1, max_length=100, pattern=name_regex)
-    embeddingsModelProvider: str = SAFE_SHORT_STR_VALIDATION
-    embeddingsModelName: str = Field(
-        min_length=0, max_length=500, pattern=r"^[A-Za-z0-9-_. /]*$", default=None
-    )
-    crossEncoderModelProvider: Optional[str] = SAFE_SHORT_STR_VALIDATION_OPTIONAL
-    crossEncoderModelName: Optional[str] = Field(
-        min_length=0, max_length=500, pattern=r"^[A-Za-z0-9-_. /]*$", default=None
-    )
-    languages: List[Annotated[str, SAFE_SHORT_STR_VALIDATION]]
+    kind: str
+    name: str
+    embeddingsModelProvider: str
+    embeddingsModelName: str
+    crossEncoderModelProvider: str
+    crossEncoderModelName: str
+    languages: list[str]
     hybridSearch: bool
-    chunkingStrategy: str = SAFE_SHORT_STR_VALIDATION
-    chunkSize: int = Field(gt=0)
-    chunkOverlap: int = Field(gt=0)
+    chunkingStrategy: str
+    chunkSize: int
+    chunkOverlap: int
 
 
 class CreateWorkspaceKendraRequest(BaseModel):
-    kind: str = SAFE_SHORT_STR_VALIDATION
-    name: str = Field(min_length=1, max_length=100, pattern=name_regex)
-    kendraIndexId: str = SAFE_SHORT_STR_VALIDATION
+    kind: str
+    name: str
+    kendraIndexId: str
     useAllData: bool
-
-
-class CreateWorkspaceBedrockKBRequest(BaseModel):
-    kind: str = SAFE_SHORT_STR_VALIDATION
-    name: str = SAFE_SHORT_STR_VALIDATION
-    knowledgeBaseId: str = SAFE_SHORT_STR_VALIDATION
-    hybridSearch: bool
 
 
 @router.resolver(field_name="listWorkspaces")
@@ -88,8 +67,7 @@ def list_workspaces():
 
 @router.resolver(field_name="getWorkspace")
 @tracer.capture_method
-def get_workspace(workspaceId: id):
-    WorkspaceIdValidation(**{"workspaceId": workspaceId})
+def get_workspace(workspaceId: str):
     workspace = genai_core.workspaces.get_workspace(workspaceId)
 
     if not workspace:
@@ -103,7 +81,6 @@ def get_workspace(workspaceId: id):
 @router.resolver(field_name="deleteWorkspace")
 @tracer.capture_method
 def delete_workspace(workspaceId: str):
-    WorkspaceIdValidation(**{"workspaceId": workspaceId})
     genai_core.workspaces.delete_workspace(workspaceId)
 
 
@@ -138,16 +115,6 @@ def create_kendra_workspace(input: dict):
     return ret_value
 
 
-@router.resolver(field_name="createBedrockKBWorkspace")
-@tracer.capture_method
-def create_bedrock_kb_workspace(input: dict):
-    config = genai_core.parameters.get_config()
-
-    request = CreateWorkspaceBedrockKBRequest(**input)
-    ret_value = _create_workspace_bedrock_kb(request, config)
-    return ret_value
-
-
 def _create_workspace_aurora(request: CreateWorkspaceAuroraRequest, config: dict):
     workspace_name = request.name.strip()
     embedding_models = config["rag"]["embeddingsModels"]
@@ -174,10 +141,19 @@ def _create_workspace_aurora(request: CreateWorkspaceAuroraRequest, config: dict
     if embeddings_model is None:
         raise genai_core.types.CommonError("Embeddings model not found")
 
-    if request.crossEncoderModelName is not None and cross_encoder_model is None:
+    if cross_encoder_model is None:
         raise genai_core.types.CommonError("Cross encoder model not found")
 
     embeddings_model_dimensions = embeddings_model["dimensions"]
+
+    workspace_name_match = name_regex.match(workspace_name)
+    workspace_name_is_match = bool(workspace_name_match)
+    if (
+        len(workspace_name) == 0
+        or len(workspace_name) > 100
+        or not workspace_name_is_match
+    ):
+        raise genai_core.types.CommonError("Invalid workspace name")
 
     if len(request.languages) == 0 or len(request.languages) > 3:
         raise genai_core.types.CommonError("Invalid languages")
@@ -241,10 +217,19 @@ def _create_workspace_open_search(
     if embeddings_model is None:
         raise genai_core.types.CommonError("Embeddings model not found")
 
-    if request.crossEncoderModelName is not None and cross_encoder_model is None:
+    if cross_encoder_model is None:
         raise genai_core.types.CommonError("Cross encoder model not found")
 
     embeddings_model_dimensions = embeddings_model["dimensions"]
+
+    workspace_name_match = name_regex.match(workspace_name)
+    workspace_name_is_match = bool(workspace_name_match)
+    if (
+        len(workspace_name) == 0
+        or len(workspace_name) > 100
+        or not workspace_name_is_match
+    ):
+        raise genai_core.types.CommonError("Invalid workspace name")
 
     if len(request.languages) == 0 or len(request.languages) > 3:
         raise genai_core.types.CommonError("Invalid languages")
@@ -279,6 +264,15 @@ def _create_workspace_kendra(request: CreateWorkspaceKendraRequest, config: dict
     workspace_name = request.name.strip()
     kendra_indexes = genai_core.kendra.get_kendra_indexes()
 
+    workspace_name_match = name_regex.match(workspace_name)
+    workspace_name_is_match = bool(workspace_name_match)
+    if (
+        len(workspace_name) == 0
+        or len(workspace_name) > 100
+        or not workspace_name_is_match
+    ):
+        raise genai_core.types.CommonError("Invalid workspace name")
+
     kendra_index = None
     for current in kendra_indexes:
         if current["id"] == request.kendraIndexId:
@@ -293,30 +287,6 @@ def _create_workspace_kendra(request: CreateWorkspaceKendraRequest, config: dict
             workspace_name=workspace_name,
             kendra_index=kendra_index,
             use_all_data=request.useAllData,
-        )
-    )
-
-
-def _create_workspace_bedrock_kb(
-    request: CreateWorkspaceBedrockKBRequest, config: dict
-):
-    workspace_name = request.name.strip()
-    kbs = genai_core.bedrock_kb.list_bedrock_kbs()
-
-    knowledge_base = None
-    for current in kbs:
-        if current["id"] == request.knowledgeBaseId:
-            knowledge_base = current
-            break
-
-    if knowledge_base is None:
-        raise genai_core.types.CommonError("Knowledge Base id not found")
-
-    return _convert_workspace(
-        genai_core.workspaces.create_workspace_bedrock_kb(
-            workspace_name=workspace_name,
-            knowledge_base=knowledge_base,
-            hybrid_search=request.hybridSearch,
         )
     )
 
@@ -350,8 +320,6 @@ def _convert_workspace(workspace: dict):
         "kendraIndexId": workspace.get("kendra_index_id"),
         "kendraIndexExternal": kendra_index_external,
         "kendraUseAllData": workspace.get("kendra_use_all_data", kendra_index_external),
-        "knowledgeBaseId": workspace.get("knowledge_base_id"),
-        "knowledgeBaseExternal": workspace.get("knowledge_base_external"),
         "createdAt": workspace.get("created_at"),
         "updatedAt": workspace.get("updated_at"),
     }

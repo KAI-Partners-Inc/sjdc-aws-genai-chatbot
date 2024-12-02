@@ -1,4 +1,3 @@
-from common.constant import ID_FIELD_VALIDATION, SAFE_SHORT_STR_VALIDATION
 import genai_core.semantic_search
 from pydantic import BaseModel
 from aws_lambda_powertools import Logger, Tracer
@@ -10,14 +9,18 @@ logger = Logger()
 
 
 class SemanticSearchRequest(BaseModel):
-    workspaceId: str = ID_FIELD_VALIDATION
-    query: str = SAFE_SHORT_STR_VALIDATION
+    workspaceId: str
+    query: str
 
 
 @router.resolver(field_name="performSemanticSearch")
 @tracer.capture_method
 def semantic_search(input: dict):
     request = SemanticSearchRequest(**input)
+    if len(request.query) == 0 or len(request.query) > 1000:
+        raise genai_core.types.CommonError(
+            "Query must be between 1 and 1000 characters"
+        )
 
     result = genai_core.semantic_search.semantic_search(
         workspace_id=request.workspaceId,

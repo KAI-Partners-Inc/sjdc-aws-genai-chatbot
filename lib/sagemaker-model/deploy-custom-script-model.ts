@@ -9,19 +9,12 @@ export function deployCustomScriptModel(
   props: SageMakerModelProps,
   modelConfig: ModelCustomScriptConfig
 ) {
-  const {
-    vpc,
-    region,
-    logRetention,
-    kmsKey,
-    retainOnDelete,
-    enableEndpointKMSEncryption,
-  } = props;
+  const { vpc, region } = props;
   const { modelId, instanceType, codeFolder, container, env } = modelConfig;
 
   const endpointName = (
     Array.isArray(modelId)
-      ? `Multi${createHash("md5") // NOSONAR Not sensitive (naming)
+      ? `Multi${createHash("md5")
           .update(modelId.join(","))
           .digest("hex")
           .toUpperCase()
@@ -38,10 +31,6 @@ export function deployCustomScriptModel(
     codeFolder,
     container,
     env,
-    kmsKey,
-    retainOnDelete,
-    logRetention,
-    enableEndpointKMSEncryption,
   });
 
   return { model: llmModel.model, endpoint: llmModel.endpoint };

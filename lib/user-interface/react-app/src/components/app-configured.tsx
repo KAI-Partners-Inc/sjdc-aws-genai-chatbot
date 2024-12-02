@@ -5,9 +5,6 @@ import {
   ThemeProvider,
   defaultDarkModeOverride,
   useTheme,
-  Button,
-  Divider,
-  View,
 } from "@aws-amplify/ui-react";
 import App from "../app";
 import { Amplify, Auth } from "aws-amplify";
@@ -32,16 +29,7 @@ export default function AppConfigured() {
         const awsExports = await result.json();
         const currentConfig = Amplify.configure(awsExports) as AppConfig | null;
 
-        // Extract the query string from the current URL
-        const queryString = window.location.search;
-
-        // Use URLSearchParams to work with the query string easily
-        const urlParams = new URLSearchParams(queryString);
-
-        if (
-          currentConfig?.config.auth_federated_provider?.auto_redirect &&
-          urlParams.get("loginlocal") != "true"
-        ) {
+        if (currentConfig?.config.auth_federated_provider?.auto_redirect) {
           let authenticated = false;
           try {
             const user = await Auth.currentAuthenticatedUser();
@@ -156,41 +144,14 @@ export default function AppConfigured() {
           components={{
             SignIn: {
               Header: () => {
-                if (config.config.auth_federated_provider) {
-                  const signInWithCustomProvider = () => {
-                    Auth.federatedSignIn({
-                      customProvider:
-                        config.config.auth_federated_provider?.name || "",
-                    });
-                  };
-                  return (
-                    <Heading
-                      padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
-                      level={3}
-                    >
-                      {CHATBOT_NAME}
-                      <View as="div" paddingTop="1rem" paddingBottom="1rem">
-                        <Button
-                          onClick={signInWithCustomProvider}
-                          variation="primary"
-                        >
-                          Sign in with{" "}
-                          {config.config.auth_federated_provider?.name}
-                        </Button>
-                      </View>
-                      <Divider label="OR" />
-                    </Heading>
-                  );
-                } else {
-                  return (
-                    <Heading
-                      padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
-                      level={3}
-                    >
-                      {CHATBOT_NAME}
-                    </Heading>
-                  );
-                }
+                return (
+                  <Heading
+                    padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
+                    level={3}
+                  >
+                    {CHATBOT_NAME}
+                  </Heading>
+                );
               },
             },
           }}

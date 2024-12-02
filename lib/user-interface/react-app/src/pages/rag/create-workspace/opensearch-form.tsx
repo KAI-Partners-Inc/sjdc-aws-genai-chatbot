@@ -12,11 +12,9 @@ import { CrossEncoderSelectorField } from "./cross-encoder-selector-field";
 import { ChunkSelectorField } from "./chunks-selector";
 import { HybridSearchField } from "./hybrid-search-field";
 import { LanguageSelectorField } from "./language-selector-field";
-import { useState } from "react";
 
 export interface OpenSearchFormProps {
   data: OpenSearchWorkspaceCreateInput;
-  crossEncodingEnabled: boolean;
   onChange: (data: Partial<OpenSearchWorkspaceCreateInput>) => void;
   errors: Record<string, string | string[]>;
   submitting: boolean;
@@ -29,7 +27,6 @@ export function OpenSearchForm(props: OpenSearchFormProps) {
       footer={
         <OpenSearchFooter
           data={props.data}
-          crossEncodingEnabled={props.crossEncodingEnabled}
           onChange={props.onChange}
           errors={props.errors}
           submitting={props.submitting}
@@ -66,32 +63,23 @@ export function OpenSearchForm(props: OpenSearchFormProps) {
 
 function OpenSearchFooter(props: {
   data: OpenSearchWorkspaceCreateInput;
-  crossEncodingEnabled: boolean;
   onChange: (data: Partial<OpenSearchWorkspaceCreateInput>) => void;
   errors: Record<string, string | string[]>;
   submitting: boolean;
 }) {
-  const [noEncodingSelected, setNoEncodingSelected] = useState(
-    !props.crossEncodingEnabled
-  );
   return (
     <ExpandableSection headerText="Additional settings" variant="footer">
       <SpaceBetween size="l">
+        <HybridSearchField
+          submitting={props.submitting}
+          errors={props.errors}
+          checked={props.data.hybridSearch}
+          onChange={props.onChange}
+        />
         <CrossEncoderSelectorField
           errors={props.errors}
           submitting={props.submitting}
-          disabled={!props.crossEncodingEnabled}
           selectedModel={props.data.crossEncoderModel}
-          onChange={(data) => {
-            setNoEncodingSelected(data.crossEncoderModel?.value === "__none__");
-            props.onChange(data);
-          }}
-        />
-        <HybridSearchField
-          submitting={props.submitting}
-          disabled={!props.crossEncodingEnabled || noEncodingSelected}
-          errors={props.errors}
-          checked={props.data.hybridSearch && props.crossEncodingEnabled}
           onChange={props.onChange}
         />
         <ChunkSelectorField

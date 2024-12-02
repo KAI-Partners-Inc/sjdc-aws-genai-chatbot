@@ -11,16 +11,11 @@ import type {
   SQSBatchResponse,
 } from "aws-lambda";
 import { graphQlQuery } from "./graphql";
-import * as AWSXRay from "aws-xray-sdk-core";
-
-// Configure the context missing strategy to do nothing
-AWSXRay.setContextMissingStrategy(() => {});
 
 const processor = new BatchProcessor(EventType.SQS);
 const logger = new Logger();
 
 const recordHandler = async (record: SQSRecord): Promise<void> => {
-  const segment = AWSXRay.getSegment(); //returns the facade segment
   const payload = record.body;
   if (payload) {
     const item = JSON.parse(payload);
@@ -49,11 +44,7 @@ const recordHandler = async (record: SQSRecord): Promise<void> => {
         }
     `;
     //logger.info(query);
-    const subsegment = segment?.addNewSubsegment("AppSync - Publish Response");
-    subsegment?.addMetadata("sessionId", req.data.sessionId);
-    await graphQlQuery(query);
-    subsegment?.close();
-
+    const resp = await graphQlQuery(query);
     //logger.info(resp);
   }
 };
@@ -65,10 +56,8 @@ export const handler = async (
   logger.debug("Event", { event });
   event.Records = event.Records.sort((a, b) => {
     try {
-      const x: number = JSON.parse(JSON.parse(a.body).Message).data?.token
-        ?.sequenceNumber;
-      const y: number = JSON.parse(JSON.parse(b.body).Message).data?.token
-        ?.sequenceNumber;
+      const x: number = JSON.parse(a.body).Message.data?.token?.sequenceNumber;
+      const y: number = JSON.parse(b.body).Message.data?.token?.sequenceNumber;
       return x - y;
     } catch {
       return 0;

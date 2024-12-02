@@ -1,8 +1,4 @@
-import {
-  Alert,
-  ContentLayout,
-  SpaceBetween,
-} from "@cloudscape-design/components";
+import { ContentLayout, SpaceBetween } from "@cloudscape-design/components";
 import { BreadcrumbGroup } from "@cloudscape-design/components";
 import { useContext, useEffect, useState } from "react";
 import { ApiClient } from "../../../common/api-client/api-client";
@@ -16,7 +12,6 @@ import { CHATBOT_NAME } from "../../../common/constants";
 import { Workspace } from "../../../API";
 import { useLocation } from "react-router-dom";
 import BaseAppLayoutv from "../../../components/v2-base-app-layout";
-import { Utils } from "../../../common/utils";
 
 export default function Dashboard() {
   const location = useLocation();
@@ -29,7 +24,6 @@ export default function Dashboard() {
   const [statistics, setStatistics] = useState<WorkspacesStatistics | null>(
     null
   );
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
@@ -38,10 +32,8 @@ export default function Dashboard() {
 
       const apiClient = new ApiClient(appContext);
       try {
-        setGlobalError(undefined);
         const result = await apiClient.workspaces.getWorkspaces();
 
-        /* eslint-disable-next-line  @typescript-eslint/no-non-null-asserted-optional-chain */
         const data = result.data?.listWorkspaces!;
         setWorkspaces(data);
         console.log(data);
@@ -53,9 +45,8 @@ export default function Dashboard() {
         });
 
         setLoading(false);
-      } catch (error) {
-        console.error(Utils.getErrorMessage(error));
-        setGlobalError(Utils.getErrorMessage(error));
+      } catch (e) {
+        console.log(e);
       }
     })();
   }, [appContext]);

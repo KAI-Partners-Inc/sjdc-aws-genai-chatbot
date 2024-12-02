@@ -3,7 +3,6 @@ import {
   Cards,
   StatusIndicator,
   Header,
-  Alert,
 } from "@cloudscape-design/components";
 import { EnginesPageHeader } from "./engines-page-header";
 import { ApiClient } from "../../../common/api-client/api-client";
@@ -15,7 +14,6 @@ import { CHATBOT_NAME } from "../../../common/constants";
 import { RagEngine } from "../../../API";
 import { useLocation } from "react-router-dom";
 import BaseAppLayoutv from "../../../components/v2-base-app-layout";
-import { Utils } from "../../../common/utils";
 
 const CARD_DEFINITIONS = {
   header: (item: RagEngine) => (
@@ -49,7 +47,6 @@ export default function Engines() {
   const appContext = useContext(AppContext);
   const [data, setData] = useState<RagEngine[]>([]);
   const [loading, setLoading] = useState(true);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!appContext?.config) return;
@@ -57,14 +54,11 @@ export default function Engines() {
     (async () => {
       const apiClient = new ApiClient(appContext);
       try {
-        setGlobalError(undefined);
         const result = await apiClient.ragEngines.getRagEngines();
 
-        /* eslint-disable-next-line  @typescript-eslint/no-non-null-asserted-optional-chain */
         setData(result.data?.listRagEngines!);
       } catch (error) {
-        console.error(Utils.getErrorMessage(error));
-        setGlobalError(Utils.getErrorMessage(error));
+        console.error(error);
       }
 
       setLoading(false);

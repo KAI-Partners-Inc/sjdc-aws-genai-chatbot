@@ -1,6 +1,5 @@
 import { SelectProps } from "@cloudscape-design/components";
 import { EmbeddingModel } from "../../API";
-import { AppConfig } from "../types";
 
 export abstract class EmbeddingsModelHelper {
   static getSelectOption(model?: string): SelectProps.Option | null {
@@ -33,18 +32,9 @@ export abstract class EmbeddingsModelHelper {
     };
   }
 
-  static getSelectOptions(
-    appContext: AppConfig | null,
-    embeddingsModels: EmbeddingModel[]
-  ) {
+  static getSelectOptions(embeddingsModels: EmbeddingModel[]) {
     const modelsMap = new Map<string, EmbeddingModel[]>();
     embeddingsModels.forEach((model) => {
-      if (
-        model.provider === "sagemaker" &&
-        !appContext?.config.sagemaker_embeddings_enabled
-      ) {
-        return;
-      }
       let items = modelsMap.get(model.provider);
       if (!items) {
         items = [];

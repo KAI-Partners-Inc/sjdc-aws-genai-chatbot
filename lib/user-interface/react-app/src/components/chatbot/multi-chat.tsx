@@ -14,7 +14,6 @@ import {
   Toggle,
   StatusIndicator,
   Container,
-  Alert,
 } from "@cloudscape-design/components";
 import { v4 as uuidv4 } from "uuid";
 import { AppContext } from "../../common/app-context";
@@ -39,7 +38,6 @@ import {
   ChatBotHeartbeatRequest,
   ChatBotModelInterface,
   FeedbackData,
-  ChatBotToken,
 } from "./types";
 import { LoadingStatus, ModelInterface } from "../../common/types";
 import { getSelectedModelMetadata, updateMessageHistoryRef } from "./utils";
@@ -110,7 +108,6 @@ export default function MultiChat() {
   const [readyState, setReadyState] = useState<ReadyState>(
     ReadyState.UNINSTANTIATED
   );
-  const [initError, setInitError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!appContext) return;
@@ -122,9 +119,7 @@ export default function MultiChat() {
     (async () => {
       const apiClient = new ApiClient(appContext);
       let workspaces: Workspace[] = [];
-      /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
       let modelsResult: GraphQLResult<any>;
-      /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
       let workspacesResult: GraphQLResult<any>;
       try {
         if (appContext?.config.rag_enabled) {
@@ -142,7 +137,6 @@ export default function MultiChat() {
 
         const models = modelsResult.data
           ? modelsResult.data.listModels.filter(
-              /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
               (m: any) =>
                 m.inputModalities.includes(ChabotInputModality.Text) &&
                 m.outputModalities.includes(ChabotOutputModality.Text)
@@ -153,9 +147,7 @@ export default function MultiChat() {
         setModelsStatus("finished");
       } catch (error) {
         console.error(Utils.getErrorMessage(error));
-        setInitError(Utils.getErrorMessage(error));
         setModelsStatus("error");
-        setReadyState(ReadyState.CLOSED);
       }
     })();
 
@@ -166,7 +158,7 @@ export default function MultiChat() {
       });
       refChatSessions.current = [];
     };
-  }, [appContext]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [appContext]);
 
   const enabled =
     readyState === ReadyState.OPEN &&
@@ -237,7 +229,6 @@ export default function MultiChat() {
 
   function subscribe(sessionId: string): ZenObservable.Subscription {
     console.log("Subscribing to AppSync");
-    const messageTokens: { [key: string]: ChatBotToken[] } = {};
     const sub = API.graphql<GraphQLSubscription<ReceiveMessagesSubscription>>({
       query: receiveMessages,
       variables: {
@@ -249,6 +240,7 @@ export default function MultiChat() {
         const data = value.data!.receiveMessages?.data;
         if (data !== undefined && data !== null) {
           const response: ChatBotMessageResponse = JSON.parse(data);
+          console.log(JSON.stringify(response));
           if (response.action === ChatBotAction.Heartbeat) {
             console.log("Heartbeat pong!");
             return;
@@ -262,8 +254,7 @@ export default function MultiChat() {
             updateMessageHistoryRef(
               session.id,
               session.messageHistory,
-              response,
-              messageTokens
+              response
             );
             if ((response.action = ChatBotAction.FinalResponse)) {
               session.running = false;
@@ -339,21 +330,13 @@ export default function MultiChat() {
     [ReadyState.UNINSTANTIATED]: "Uninstantiated",
   }[readyState];
 
-  const handleFeedback = (
-    feedbackType: 1 | 0,
-    idx: number,
-    message: ChatBotHistoryItem,
-    messageHistory: ChatBotHistoryItem[]
-  ) => {
+  const handleFeedback = (feedbackType: 1 | 0, idx: number, message: ChatBotHistoryItem, messageHistory: ChatBotHistoryItem[]) => {
     console.log("Message history: ", messageHistory);
     // metadata.prompts[0][0]
     if (message.metadata.sessionId) {
       let prompt = "";
-      if (
-        Array.isArray(message.metadata.prompts) &&
-        Array.isArray(message.metadata.prompts[0])
-      ) {
-        prompt = message.metadata.prompts[0][0];
+      if (Array.isArray(message.metadata.prompts) && Array.isArray(message.metadata.prompts[0])) { 
+          prompt = message.metadata.prompts[0][0];
       }
       const completion = message.content;
       const model = message.metadata.modelId;
@@ -363,7 +346,7 @@ export default function MultiChat() {
         feedback: feedbackType,
         prompt: prompt,
         completion: completion,
-        model: model as string,
+        model: model as string
       };
       addUserFeedback(feedbackData);
     }
@@ -373,21 +356,12 @@ export default function MultiChat() {
     if (!appContext) return;
 
     const apiClient = new ApiClient(appContext);
-    await apiClient.userFeedback.addUserFeedback({ feedbackData });
+    await apiClient.userFeedback.addUserFeedback({feedbackData});
   };
 
   return (
     <div className={styles.chat_container}>
       <SpaceBetween size="m">
-        {initError && (
-          <Alert
-            statusIconAriaLabel="Error"
-            type="error"
-            header="Unable to initalize the Chatbots."
-          >
-            {initError}
-          </Alert>
-        )}
         <SpaceBetween size="m" alignItems="end">
           <SpaceBetween size="m" direction="horizontal" alignItems="center">
             <StatusIndicator

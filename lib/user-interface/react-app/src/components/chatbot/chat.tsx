@@ -5,11 +5,7 @@ import {
   ChatBotMessageType,
   FeedbackData,
 } from "./types";
-import {
-  Alert,
-  SpaceBetween,
-  StatusIndicator,
-} from "@cloudscape-design/components";
+import { SpaceBetween, StatusIndicator } from "@cloudscape-design/components";
 import { v4 as uuidv4 } from "uuid";
 import { AppContext } from "../../common/app-context";
 import { ApiClient } from "../../common/api-client/api-client";
@@ -20,10 +16,10 @@ import styles from "../../styles/chat.module.scss";
 export default function Chat(props: { sessionId?: string }) {
   const appContext = useContext(AppContext);
   const [running, setRunning] = useState<boolean>(false);
-  const [session, setSession] = useState<
-    { id: string; loading: boolean } | undefined
-  >();
-  const [initError, setInitError] = useState<string | undefined>(undefined);
+  const [session, setSession] = useState<{ id: string; loading: boolean }>({
+    id: props.sessionId ?? uuidv4(),
+    loading: typeof props.sessionId !== "undefined",
+  });
   const [configuration, setConfiguration] = useState<ChatBotConfiguration>(
     () => ({
       streaming: true,
@@ -83,18 +79,12 @@ export default function Chat(props: { sessionId?: string }) {
     })();
   }, [appContext, props.sessionId]);
 
-  const handleFeedback = (
-    feedbackType: 1 | 0,
-    idx: number,
-    message: ChatBotHistoryItem
-  ) => {
+  const handleFeedback = (feedbackType: 1 | 0, idx: number, message: ChatBotHistoryItem) => {
     if (message.metadata.sessionId) {
+      
       let prompt = "";
-      if (
-        Array.isArray(message.metadata.prompts) &&
-        Array.isArray(message.metadata.prompts[0])
-      ) {
-        prompt = message.metadata.prompts[0][0];
+      if (Array.isArray(message.metadata.prompts) && Array.isArray(message.metadata.prompts[0])) { 
+          prompt = message.metadata.prompts[0][0];
       }
       const completion = message.content;
       const model = message.metadata.modelId;
@@ -104,7 +94,7 @@ export default function Chat(props: { sessionId?: string }) {
         feedback: feedbackType,
         prompt: prompt,
         completion: completion,
-        model: model as string,
+        model: model as string
       };
       addUserFeedback(feedbackData);
     }
@@ -114,20 +104,11 @@ export default function Chat(props: { sessionId?: string }) {
     if (!appContext) return;
 
     const apiClient = new ApiClient(appContext);
-    await apiClient.userFeedback.addUserFeedback({ feedbackData });
+    await apiClient.userFeedback.addUserFeedback({feedbackData});
   };
   const collegeName = localStorage.getItem("collegeName") || "KAI Partners GenAI"
   return (
     <div className={styles.chat_container}>
-      {initError && (
-        <Alert
-          statusIconAriaLabel="Error"
-          type="error"
-          header="Unable to initalize the Chatbot."
-        >
-          {initError}
-        </Alert>
-      )}
       <SpaceBetween direction="vertical" size="m">
         {messageHistory.map((message, idx) => (
           <ChatMessage
@@ -154,18 +135,15 @@ export default function Chat(props: { sessionId?: string }) {
         )}
       </div>
       <div className={styles.input_container}>
-        {session && (
-          <ChatInputPanel
-            session={session}
-            running={running}
-            setRunning={setRunning}
-            messageHistory={messageHistory}
-            setMessageHistory={(history) => setMessageHistory(history)}
-            setInitErrorMessage={(error) => setInitError(error)}
-            configuration={configuration}
-            setConfiguration={setConfiguration}
-          />
-        )}
+        <ChatInputPanel
+          session={session}
+          running={running}
+          setRunning={setRunning}
+          messageHistory={messageHistory}
+          setMessageHistory={(history) => setMessageHistory(history)}
+          configuration={configuration}
+          setConfiguration={setConfiguration}
+        />
       </div>
     </div>
   );

@@ -23,14 +23,13 @@ export abstract class Utils {
     }
   }
 
-  static getDefaultEmbeddingsModel(config: SystemConfig): string | undefined {
+  static getDefaultEmbeddingsModel(config: SystemConfig): string {
     const defaultModel = config.rag.embeddingsModels.find(
       (model) => model.default === true
     );
 
     if (!defaultModel) {
-      // No default embdeding is set in the config when Aurora or Opensearch are not used.
-      return undefined;
+      throw new Error("No default embeddings model found");
     }
 
     return `${defaultModel.provider}::${defaultModel.dimensions}::${defaultModel.name}`;

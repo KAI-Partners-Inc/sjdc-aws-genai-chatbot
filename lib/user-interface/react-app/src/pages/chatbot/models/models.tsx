@@ -6,7 +6,6 @@ import {
   PropertyFilter,
   Table,
   Link,
-  Alert,
 } from "@cloudscape-design/components";
 import useOnFollow from "../../../common/hooks/use-on-follow";
 import BaseAppLayout from "../../../components/base-app-layout";
@@ -31,7 +30,6 @@ export default function Models() {
   const appContext = useContext(AppContext);
   const [models, setModels] = useState<Model[]>([]);
   const [loading, setLoading] = useState(true);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const {
     items,
     actions,
@@ -66,13 +64,11 @@ export default function Models() {
 
     const apiClient = new ApiClient(appContext);
     try {
-      setGlobalError(undefined);
       const result = await apiClient.models.getModels();
 
       setModels(result.data!.listModels);
     } catch (error) {
       console.error(Utils.getErrorMessage(error));
-      setGlobalError(Utils.getErrorMessage(error));
     }
     setLoading(false);
   }, [appContext]);
@@ -102,40 +98,29 @@ export default function Models() {
         />
       }
       content={
-        <>
-          {globalError && (
-            <Alert
-              statusIconAriaLabel="Error"
-              type="error"
-              header="Unable to load the models."
-            >
-              {globalError}
-            </Alert>
-          )}
-          <Table
-            {...collectionProps}
-            items={items}
-            columnDefinitions={ModelsColumnDefinitions}
-            variant="full-page"
-            stickyHeader={true}
-            resizableColumns={true}
-            header={<Header variant="awsui-h1-sticky">Models</Header>}
-            loading={loading}
-            loadingText="Loading Models"
-            filter={
-              <PropertyFilter
-                {...propertyFilterProps}
-                i18nStrings={PropertyFilterI18nStrings}
-                filteringPlaceholder={"Filter Models"}
-                countText={TextHelper.getTextFilterCounterText(
-                  filteredItemsCount
-                )}
-                expandToViewport={true}
-              />
-            }
-            pagination={<Pagination {...paginationProps} />}
-          />
-        </>
+        <Table
+          {...collectionProps}
+          items={items}
+          columnDefinitions={ModelsColumnDefinitions}
+          variant="full-page"
+          stickyHeader={true}
+          resizableColumns={true}
+          header={<Header variant="awsui-h1-sticky">Models</Header>}
+          loading={loading}
+          loadingText="Loading Models"
+          filter={
+            <PropertyFilter
+              {...propertyFilterProps}
+              i18nStrings={PropertyFilterI18nStrings}
+              filteringPlaceholder={"Filter Models"}
+              countText={TextHelper.getTextFilterCounterText(
+                filteredItemsCount
+              )}
+              expandToViewport={true}
+            />
+          }
+          pagination={<Pagination {...paginationProps} />}
+        />
       }
       info={
         <HelpPanel header={<Header variant="h3">Foundation Models</Header>}>

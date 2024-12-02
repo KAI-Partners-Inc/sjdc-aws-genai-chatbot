@@ -9,10 +9,8 @@ import {
   SegmentedControl,
   SpaceBetween,
   Toggle,
-  Multiselect,
 } from "@cloudscape-design/components";
-import { AddDataData, SelectOption, multiselectOptions } from "./types";
-import { generateSelectedOptions } from "./utils";
+import { AddDataData } from "./types";
 import { useForm } from "../../../common/hooks/use-form";
 import { useContext, useState } from "react";
 import { AppContext } from "../../../common/app-context";
@@ -35,7 +33,6 @@ interface CrawlWebisteData {
   sitemapUrl: string;
   followLinks: boolean;
   limit: number;
-  contentTypes: (string | undefined)[];
 }
 
 export default function CrawlWebsite(props: CrawlWebsiteProps) {
@@ -52,7 +49,6 @@ export default function CrawlWebsite(props: CrawlWebsiteProps) {
         sitemapUrl: "",
         followLinks: true,
         limit: 250,
-        contentTypes: ["text/html"],
       };
     },
     validate: (form) => {
@@ -78,10 +74,6 @@ export default function CrawlWebsite(props: CrawlWebsiteProps) {
         errors.limit = "Page limit should be between 1 and 1000";
       }
 
-      if (form.contentTypes.length === 0) {
-        errors.contentTypes = "At least one content type must be selected.";
-      }
-
       return errors;
     },
   });
@@ -99,17 +91,13 @@ export default function CrawlWebsite(props: CrawlWebsiteProps) {
 
     const apiClient = new ApiClient(appContext);
     const isSitemap = data.urlType === "sitemap";
-    const contentTypesToUse = data.contentTypes.filter(
-      (ct): ct is string => ct !== undefined
-    );
     try {
       await apiClient.documents.addWebsiteDocument(
         props.data.workspace.value,
         isSitemap,
         isSitemap ? data.sitemapUrl : data.websiteUrl,
         data.followLinks,
-        data.limit,
-        contentTypesToUse
+        data.limit
       );
 
       setFlashbarItem({
@@ -126,29 +114,12 @@ export default function CrawlWebsite(props: CrawlWebsiteProps) {
       });
 
       onChange({ websiteUrl: "", sitemapUrl: "" }, true);
-      /* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
     } catch (error: any) {
       setGlobalError(Utils.getErrorMessage(error));
       console.error(Utils.getErrorMessage(error));
     }
 
     props.setSubmitting(false);
-  };
-
-  const handleContentTypeChange = (
-    selectedOptions: ReadonlyArray<SelectOption>
-  ) => {
-    const options: SelectOption[] = selectedOptions.map((option) => {
-      if (option.value === undefined) {
-        throw new Error(`Option value cannot be undefined`);
-      }
-      return {
-        label: option.label,
-        value: option.value,
-        description: option.description,
-      };
-    });
-    onChange({ contentTypes: options.map((option) => option.value) });
   };
 
   const hasReadyWorkspace =
@@ -246,20 +217,6 @@ export default function CrawlWebsite(props: CrawlWebsiteProps) {
                 value={data.limit.toString()}
                 onChange={({ detail: { value } }) =>
                   onChange({ limit: parseInt(value) })
-                }
-              />
-            </FormField>
-            <FormField
-              label="Enabled Content Types"
-              errorText={errors.contentTypes}
-              description="Content Types to Enable for crawlingl"
-            >
-              <Multiselect
-                disabled={props.submitting}
-                selectedOptions={generateSelectedOptions(data.contentTypes)}
-                options={multiselectOptions}
-                onChange={({ detail }) =>
-                  handleContentTypeChange(detail.selectedOptions)
                 }
               />
             </FormField>

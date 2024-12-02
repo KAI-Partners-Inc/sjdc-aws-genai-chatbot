@@ -8,7 +8,7 @@ sns = boto3.client("sns")
 
 ### 7 
 def send_to_client(detail, topic_arn=None):
-    if "direction" not in detail:
+    if not "direction" in detail:
         detail["direction"] = Direction.OUT.value
 
     if not topic_arn:

@@ -9,7 +9,7 @@ import * as tasks from "aws-cdk-lib/aws-stepfunctions-tasks";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as logs from "aws-cdk-lib/aws-logs";
 import * as rds from "aws-cdk-lib/aws-rds";
-import { AURORA_DB_USERS } from ".";
+import { RemovalPolicy } from "aws-cdk-lib";
 
 export interface CreateAuroraWorkspaceProps {
   readonly config: SystemConfig;
@@ -32,19 +32,15 @@ export class CreateAuroraWorkspace extends Construct {
         code: props.shared.sharedCode.bundleWithLambdaAsset(
           path.join(__dirname, "./functions/create-workflow/create")
         ),
-        description: "Creates Aurora workspace",
         runtime: props.shared.pythonRuntime,
         architecture: props.shared.lambdaArchitecture,
         handler: "index.lambda_handler",
         layers: [props.shared.powerToolsLayer, props.shared.commonLayer],
         timeout: cdk.Duration.minutes(5),
-        logRetention: props.config.logRetention ?? logs.RetentionDays.ONE_WEEK,
-        loggingFormat: lambda.LoggingFormat.JSON,
+        logRetention: logs.RetentionDays.ONE_WEEK,
         environment: {
           ...props.shared.defaultEnvironmentVariables,
-          AURORA_DB_USER: AURORA_DB_USERS.ADMIN,
-          AURORA_DB_HOST: props.dbCluster?.clusterEndpoint?.hostname ?? "",
-          AURORA_DB_PORT: props.dbCluster?.clusterEndpoint?.port + "",
+          AURORA_DB_SECRET_ID: props.dbCluster.secret?.secretArn as string,
           WORKSPACES_TABLE_NAME:
             props.ragDynamoDBTables.workspacesTable.tableName,
           WORKSPACES_BY_OBJECT_TYPE_INDEX_NAME:
@@ -53,8 +49,7 @@ export class CreateAuroraWorkspace extends Construct {
       }
     );
 
-    // Process will create a new table and requires Admin permission on the SQL Schema
-    props.dbCluster.grantConnect(createFunction, AURORA_DB_USERS.ADMIN);
+    props.dbCluster.secret?.grantRead(createFunction);
     props.dbCluster.connections.allowDefaultPortFrom(createFunction);
     props.ragDynamoDBTables.workspacesTable.grantReadWriteData(createFunction);
 
@@ -132,15 +127,7 @@ export class CreateAuroraWorkspace extends Construct {
       this,
       "CreateAuroraWorkspaceSMLogGroup",
       {
-        removalPolicy:
-          props.config.retainOnDelete === true
-            ? cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
-            : cdk.RemovalPolicy.DESTROY,
-        retention: props.config.logRetention,
-        // Log group name should start with `/aws/vendedlogs/` to not exceed Cloudwatch Logs Resource Policy
-        // size limit.
-        // https://docs.aws.amazon.com/step-functions/latest/dg/bp-cwl.html
-        logGroupName: `/aws/vendedlogs/states/CreateAuroraWorkspace-${this.node.addr}`,
+        removalPolicy: RemovalPolicy.DESTROY,
       }
     );
 
@@ -154,9 +141,6 @@ export class CreateAuroraWorkspace extends Construct {
         level: sfn.LogLevel.ALL,
       },
     });
-    if (props.shared.kmsKey) {
-      props.shared.kmsKey.grantEncryptDecrypt(stateMachine.role);
-    }
 
     this.stateMachine = stateMachine;
   }

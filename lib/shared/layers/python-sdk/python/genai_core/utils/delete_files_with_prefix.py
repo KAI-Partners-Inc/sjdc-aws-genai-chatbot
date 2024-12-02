@@ -1,7 +1,4 @@
-from aws_lambda_powertools import Logger
 import boto3
-
-logger = Logger()
 
 
 def delete_files_with_prefix(bucket_name, prefix):
@@ -32,5 +29,5 @@ def delete_files_with_prefix(bucket_name, prefix):
         if "NextContinuationToken" in objects_to_delete:
             continuation_token = objects_to_delete["NextContinuationToken"]
         else:
-            logger.info("Finished deleting all objects with the specified prefix.")
+            print("Finished deleting all objects with the specified prefix.")
             break

@@ -5,7 +5,6 @@ import {
   createAuroraWorkspace,
   createKendraWorkspace,
   createOpenSearchWorkspace,
-  createBedrockKBWorkspace,
   deleteWorkspace,
 } from "../../graphql/mutations";
 import {
@@ -15,7 +14,6 @@ import {
   CreateKendraWorkspaceMutation,
   CreateOpenSearchWorkspaceMutation,
   DeleteWorkspaceMutation,
-  CreateBedrockKBWorkspaceMutation,
 } from "../../API";
 
 export class WorkspacesClient {
@@ -56,8 +54,8 @@ export class WorkspacesClient {
     name: string;
     embeddingsModelProvider: string;
     embeddingsModelName: string;
-    crossEncoderModelProvider?: string;
-    crossEncoderModelName?: string;
+    crossEncoderModelProvider: string;
+    crossEncoderModelName: string;
     languages: string[];
     metric: string;
     index: boolean;
@@ -79,8 +77,8 @@ export class WorkspacesClient {
     name: string;
     embeddingsModelProvider: string;
     embeddingsModelName: string;
-    crossEncoderModelProvider?: string;
-    crossEncoderModelName?: string;
+    crossEncoderModelProvider: string;
+    crossEncoderModelName: string;
     languages: string[];
     hybridSearch: boolean;
     chunkingStrategy: string;
@@ -107,20 +105,6 @@ export class WorkspacesClient {
       query: createKendraWorkspace,
       variables: {
         input: { ...params, kind: "kendra" },
-      },
-    });
-    return result;
-  }
-
-  async createBedrockKBWorkspace(params: {
-    name: string;
-    knowledgeBaseId: string;
-    hybridSearch: boolean;
-  }): Promise<GraphQLResult<GraphQLQuery<CreateBedrockKBWorkspaceMutation>>> {
-    const result = API.graphql<GraphQLQuery<CreateBedrockKBWorkspaceMutation>>({
-      query: createBedrockKBWorkspace,
-      variables: {
-        input: { ...params, kind: "bedrock_kb" },
       },
     });
     return result;

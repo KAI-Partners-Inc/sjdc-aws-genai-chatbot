@@ -8,7 +8,6 @@ import {
   Header,
   CollectionPreferences,
   Modal,
-  Alert,
 } from "@cloudscape-design/components";
 import { DateTime } from "luxon";
 import { useState, useEffect, useContext, useCallback } from "react";
@@ -19,7 +18,6 @@ import { ApiClient } from "../../common/api-client/api-client";
 import { AppContext } from "../../common/app-context";
 import RouterButton from "../wrappers/router-button";
 import { Session } from "../../API";
-import { Utils } from "../../common/utils";
 
 export interface SessionsProps {
   readonly toolsOpen: boolean;
@@ -33,7 +31,6 @@ export default function Sessions(props: SessionsProps) {
   const [preferences, setPreferences] = useState({ pageSize: 20 });
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [deleteAllSessions, setDeleteAllSessions] = useState(false);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
 
   const { items, collectionProps, paginationProps } = useCollection(sessions, {
     filtering: {
@@ -62,13 +59,11 @@ export default function Sessions(props: SessionsProps) {
 
     const apiClient = new ApiClient(appContext);
     try {
-      setGlobalError(undefined);
       const result = await apiClient.sessions.getSessions();
       console.log(result.data!.listSessions)
       setSessions(result.data!.listSessions);
-    } catch (error) {
-      console.log(Utils.getErrorMessage(error));
-      setGlobalError(Utils.getErrorMessage(error));
+    } catch (e) {
+      console.log(e);
       setSessions([]);
     }
   }, [appContext]);
@@ -153,15 +148,6 @@ export default function Sessions(props: SessionsProps) {
       >
         {`Do you want to delete ${sessions.length} sessions?`}
       </Modal>
-      {globalError && (
-        <Alert
-          statusIconAriaLabel="Error"
-          type="error"
-          header="Unable to load the sessions."
-        >
-          {globalError}
-        </Alert>
-      )}
       <Table
         {...collectionProps}
         variant="full-page"

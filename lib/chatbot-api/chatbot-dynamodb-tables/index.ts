@@ -1,18 +1,12 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
-import * as kms from "aws-cdk-lib/aws-kms";
-
-export interface ChatBotDynamoDBTablesProps {
-  readonly retainOnDelete?: boolean;
-  readonly kmsKey?: kms.Key;
-}
 
 export class ChatBotDynamoDBTables extends Construct {
   public readonly sessionsTable: dynamodb.Table;
   public readonly byUserIdIndex: string = "byUserId";
 
-  constructor(scope: Construct, id: string, props: ChatBotDynamoDBTablesProps) {
+  constructor(scope: Construct, id: string) {
     super(scope, id);
 
     const sessionsTable = new dynamodb.Table(this, "SessionsTable", {
@@ -25,14 +19,8 @@ export class ChatBotDynamoDBTables extends Construct {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      encryption: props.kmsKey
-        ? dynamodb.TableEncryption.CUSTOMER_MANAGED
-        : dynamodb.TableEncryption.AWS_MANAGED,
-      encryptionKey: props.kmsKey,
-      removalPolicy:
-        props.retainOnDelete === true
-          ? cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
-          : cdk.RemovalPolicy.DESTROY,
+      encryption: dynamodb.TableEncryption.AWS_MANAGED,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
       pointInTimeRecovery: true,
     });
 
