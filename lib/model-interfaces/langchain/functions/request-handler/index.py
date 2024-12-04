@@ -148,7 +148,7 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
                     'generationConfiguration': {
                         'guardrailConfiguration': {
                             'guardrailId': '3cfzoipc4j97',
-                            'guardrailVersion': 'Version 2'
+                            'guardrailVersion': '2'
                         }
                     }
                 }
@@ -165,12 +165,19 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
                 'knowledgeBaseConfiguration': {
                     'knowledgeBaseId': kbId,
                     'modelArn': model_arn,
+                    retrieveAndGenerateConfiguration={
+                'type': 'KNOWLEDGE_BASE',
+                'knowledgeBaseConfiguration': {
+                    'knowledgeBaseId': kbId,
+                    'modelArn': model_arn,
                     'generationConfiguration': {
                         'guardrailConfiguration': {
                             'guardrailId': '3cfzoipc4j97',
-                            'guardrailVersion': 'Version 2'
+                            'guardrailVersion': '2'
                         }
                     }
+                }
+            },
                 }
             },
         )
