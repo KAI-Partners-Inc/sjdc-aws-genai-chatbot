@@ -72,7 +72,7 @@ def handle_heartbeat(record):
 
 def retrieveAndGenerateSJDC1(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
-    kbId = "APQWAWBG21"
+    kbId = "ABM3Q1NO8Z"
     if sessionId:
         return bedrock_agent_client.retrieve_and_generate(
             input={
@@ -134,7 +134,7 @@ def retrieveAndGenerateSJDC2(input, sessionId=None, model_id = "anthropic.claude
 
 def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
-    kbId = "XGDJNPNJFB"
+    kbId = "EEZJ01SGD8"
     if sessionId:
         return bedrock_agent_client.retrieve_and_generate(
             input={
@@ -144,7 +144,13 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
                 'type': 'KNOWLEDGE_BASE',
                 'knowledgeBaseConfiguration': {
                     'knowledgeBaseId': kbId,
-                    'modelArn': model_arn
+                    'modelArn': model_arn,
+                    'generationConfiguration': {
+                        'guardrailConfiguration': {
+                            'guardrailId': '3cfzoipc4j97',
+                            'guardrailVersion': 'Version 2'
+                        }
+                    }
                 }
             },
             sessionId=sessionId
@@ -158,9 +164,15 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
                 'type': 'KNOWLEDGE_BASE',
                 'knowledgeBaseConfiguration': {
                     'knowledgeBaseId': kbId,
-                    'modelArn': model_arn
+                    'modelArn': model_arn,
+                    'generationConfiguration': {
+                        'guardrailConfiguration': {
+                            'guardrailId': '3cfzoipc4j97',
+                            'guardrailVersion': 'Version 2'
+                        }
+                    }
                 }
-            }
+            },
         )
 
 ### 2
