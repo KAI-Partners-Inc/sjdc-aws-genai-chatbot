@@ -98,6 +98,19 @@ const WelcomePage = () => {
     const chatTextColor = setTextColor(chatcolor)
     const headTextColor = setTextColor(color)
     useEffect(() => {
+      const handleBeforeUnload = () => {
+        localStorage.removeItem('collegeName');
+      };
+  
+      // Add event listener when the component mounts
+      window.addEventListener('beforeunload', handleBeforeUnload);
+  
+      // Cleanup function to remove the event listener when the component unmounts
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+    }, []);
+    useEffect(() => {
         document.title = collegeName + 'Chatbot Sandbox';
         const style = document.createElement('style');
         document.head.appendChild(style);
@@ -138,7 +151,7 @@ const WelcomePage = () => {
     
         const iframe = document.createElement('iframe');
         iframe.setAttribute('title', 'Chat Window');
-        iframe.setAttribute('src', 'https://d1fyhwrowxci5e.cloudfront.net/embedded');
+        iframe.setAttribute('src', 'https://d37nmi88xkdn9a.cloudfront.net/embedded');
         iframe.setAttribute('allow', 'fullscreen');
         iframe.setAttribute('name', 'chat');
         iframe.setAttribute('style', `

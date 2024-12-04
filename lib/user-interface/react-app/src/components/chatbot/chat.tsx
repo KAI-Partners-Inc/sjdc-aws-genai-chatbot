@@ -124,7 +124,7 @@ export default function Chat(props: { sessionId?: string }) {
         {messageHistory.length == 0 && !session?.loading && (
           <center>
             What can we help you with today?
-            <div style={{fontSize: 12}}>{collegeName} Chatbot.</div>
+            <div style={{fontSize: 12}}>Demo Version: {collegeName} Chatbot.</div>
             <div style={{fontSize: 12}}>© 2024 KAI Partners, Inc. All Rights Reserved.</div>
           </center>
         )}
