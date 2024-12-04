@@ -221,51 +221,51 @@ def handle_run(record):
                     "data": response,
                 }
             )
-        elif model_id == "SJDC_Model_Crawler":
-            retrieve_generate_response = retrieveAndGenerateSJDC2(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
-            output = retrieve_generate_response["output"]["text"]
-            citations = retrieve_generate_response["citations"]
-            logger.info(output)
-            metadata = {
-                    "modelId": model_id,
-                    "modelKwargs": data.get("modelKwargs", {}),
-                    "mode": mode,
-                    "citations": citations,
-                    "sessionId": session_id,
-                    "userId": user_id,
-                    "documents": [],
-                    "prompts": [],
-                }
-            try:
+        # elif model_id == "SJDC_Model_Crawler":
+        #     retrieve_generate_response = retrieveAndGenerateSJDC2(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
+        #     output = retrieve_generate_response["output"]["text"]
+        #     citations = retrieve_generate_response["citations"]
+        #     logger.info(output)
+        #     metadata = {
+        #             "modelId": model_id,
+        #             "modelKwargs": data.get("modelKwargs", {}),
+        #             "mode": mode,
+        #             "citations": citations,
+        #             "sessionId": session_id,
+        #             "userId": user_id,
+        #             "documents": [],
+        #             "prompts": [],
+        #         }
+        #     try:
 
-                db_chat_history = DynamoDBChatMessageHistory(
-                table_name=os.environ["SESSIONS_TABLE_NAME"],
-                session_id=session_id,
-                user_id=user_id,
-                )
-                db_chat_history.add_message(HumanMessage(content=prompt))
-                db_chat_history.add_message(AIMessage(content=output))
-                db_chat_history.add_metadata(metadata)
-            except Exception as e:
-                logger.error("ERROR: db add meta data")
-                logger.error(e)
-                pass
-            response = {
-                    "sessionId": session_id,
-                    "type": "text",
-                    "content": output,
-                    "metadata": metadata
-                }
-            logger.info(response)
-            send_to_client(
-                {
-                    "type": "text",
-                    "action": ChatbotAction.FINAL_RESPONSE.value,
-                    "timestamp": str(int(round(datetime.now().timestamp()))),
-                    "userId": user_id,
-                    "data": response,
-                }
-            )
+        #         db_chat_history = DynamoDBChatMessageHistory(
+        #         table_name=os.environ["SESSIONS_TABLE_NAME"],
+        #         session_id=session_id,
+        #         user_id=user_id,
+        #         )
+        #         db_chat_history.add_message(HumanMessage(content=prompt))
+        #         db_chat_history.add_message(AIMessage(content=output))
+        #         db_chat_history.add_metadata(metadata)
+        #     except Exception as e:
+        #         logger.error("ERROR: db add meta data")
+        #         logger.error(e)
+        #         pass
+        #     response = {
+        #             "sessionId": session_id,
+        #             "type": "text",
+        #             "content": output,
+        #             "metadata": metadata
+        #         }
+        #     logger.info(response)
+        #     send_to_client(
+        #         {
+        #             "type": "text",
+        #             "action": ChatbotAction.FINAL_RESPONSE.value,
+        #             "timestamp": str(int(round(datetime.now().timestamp()))),
+        #             "userId": user_id,
+        #             "data": response,
+        #         }
+        #     )
         elif model_id == "KAIP_Model":
             retrieve_generate_response = retrieveAndGenerateKAIP(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
@@ -281,8 +281,18 @@ def handle_run(record):
                     "documents": [],
                     "prompts": [],
                 }
+            output += "\n\nCitations\n"
+            titles = []
+            for citation in citations:
+                for ref in citation.get("retrievedReferences", []):
+                    title = ref["metadata"].get("x-amz-bedrock-kb-title", "Unknown Title")
+                    if title not in titles:
+                        titles.append(title)
+                        uri = ref["metadata"].get("x-amz-bedrock-kb-source-uri", "Unknown URI")
+                        output += f"- {title} {uri}\n"
+                    else:
+                        pass
             try:
-
                 db_chat_history = DynamoDBChatMessageHistory(
                 table_name=os.environ["SESSIONS_TABLE_NAME"],
                 session_id=session_id,
