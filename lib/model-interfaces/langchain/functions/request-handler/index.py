@@ -165,19 +165,12 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
                 'knowledgeBaseConfiguration': {
                     'knowledgeBaseId': kbId,
                     'modelArn': model_arn,
-                    retrieveAndGenerateConfiguration={
-                'type': 'KNOWLEDGE_BASE',
-                'knowledgeBaseConfiguration': {
-                    'knowledgeBaseId': kbId,
-                    'modelArn': model_arn,
                     'generationConfiguration': {
                         'guardrailConfiguration': {
                             'guardrailId': '3cfzoipc4j97',
                             'guardrailVersion': '2'
                         }
                     }
-                }
-            },
                 }
             },
         )
@@ -301,16 +294,30 @@ def handle_run(record):
                     "prompts": [],
                 }
             output += "\n\nCitations\n"
+            citations_string = ''
             titles = []
             for citation in citations:
+                index_start = citation.get['generatedResponsePart']['textResponsePart']['span']['start']
+                index_end = citation.get['generatedResponsePart']['textResponsePart']['span']['end']
+                # output = output[index_start:index_end+1] + '[' + str(ref_num)+']' + output[index_end+1:]
                 for ref in citation.get("retrievedReferences", []):
                     title = ref["metadata"].get("x-amz-bedrock-kb-title", "Unknown Title")
+                    uri = ref["metadata"].get("x-amz-bedrock-kb-source-uri", "Unknown URI")
+                    cit_nums=''
                     if title not in titles:
                         titles.append(title)
-                        uri = ref["metadata"].get("x-amz-bedrock-kb-source-uri", "Unknown URI")
-                        output += f"- {title} {uri}\n"
+                        ref_num = len(titles)
+                        cit_nums += '['+str(ref_num)+']'
+                        citations_string += f"  {ref_num}. {title} {uri}\n"
                     else:
-                        pass
+                        ref_num = titles.index(title)
+                        ref_num+=1
+                        temp_cit_num = '['+str(ref_num)+']'
+                        if temp_cit_num not in cit_nums:
+                            cit_nums+=temp_cit_num
+                        else:
+                            pass
+                output = output[index_start:index_end+1] + cit_nums + output[index_end+1:]
             try:
                 db_chat_history = DynamoDBChatMessageHistory(
                 table_name=os.environ["SESSIONS_TABLE_NAME"],
