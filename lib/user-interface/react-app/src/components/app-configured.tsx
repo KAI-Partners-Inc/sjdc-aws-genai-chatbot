@@ -38,20 +38,33 @@ export default function AppConfigured() {
         // Use URLSearchParams to work with the query string easily
         const urlParams = new URLSearchParams(queryString);
         const authCode = urlParams.get("code");
-
+        const client_id = currentConfig?.aws_user_pools_web_client_id || '3fd8t8j929vop26jukj610q78b'
+        
         if (authCode) {
+          const tokenEndpoint = `https://kaip-chatbot.auth.us-east-1.amazoncognito.com/oauth2/token`
+          const params = new URLSearchParams();
+
+          params.append('grant_type', 'authorization_code');
+          params.append('code', authCode);
+          params.append('client_id', client_id);
           // If the code is present, exchange it for tokens
           try {
-            await Auth.federatedSignIn({
-              customProvider: currentConfig?.config.auth_federated_provider?.name || "KAIP" // Your provider name
-              // customState: authCode, // Pass the code if needed
+            const response = await fetch(tokenEndpoint, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              }, body: params
             });
-            // console.log(federatedsignin)
-            // const user = await Auth.currentAuthenticatedUser();
-            // console.log("User authenticated:", user);
-            window.location.href = "/";
-            // Handle authenticated user, e.g., redirect them to the home page
-            // window.location.href = '/';  // Redirect to the homepage or dashboard
+      
+            if (!response.ok) {
+              throw new Error(`HTTP ERROR! status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (chrome.storage) {
+              chrome.storage.local.set({ authTokens: data });
+            } else {
+              localStorage.setItem('authTokens', JSON.stringify(data));
+            }
           } catch (error) {
             console.error("Error exchanging code for tokens:", error);
           }
