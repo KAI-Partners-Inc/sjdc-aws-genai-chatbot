@@ -47,6 +47,7 @@ export default function AppConfigured() {
           params.append('grant_type', 'authorization_code');
           params.append('code', authCode);
           params.append('client_id', client_id);
+          params.append('redirect_uri', 'https://d37nmi88xkdn9a.cloudfront.net/')
           // If the code is present, exchange it for tokens
           try {
             const response = await fetch(tokenEndpoint, {
@@ -60,12 +61,10 @@ export default function AppConfigured() {
               throw new Error(`HTTP ERROR! status: ${response.status}`);
             }
             const data = await response.json();
-            
             localStorage.setItem('authTokens', JSON.stringify(data));
             window.location.reload();
           } catch (error) {
             console.error("Error exchanging code for tokens:", error);
-            window.location.reload();
           }
         } else {
           // If no code is present, proceed as normal
