@@ -43,8 +43,8 @@ export default function AppConfigured() {
           // If the code is present, exchange it for tokens
           try {
             await Auth.federatedSignIn({
-              customProvider: currentConfig?.config.auth_federated_provider?.name || "KAIP", // Your provider name
-              customState: authCode, // Pass the code if needed
+              customProvider: currentConfig?.config.auth_federated_provider?.name || "KAIP" // Your provider name
+              // customState: authCode, // Pass the code if needed
             });
             // console.log(federatedsignin)
             // const user = await Auth.currentAuthenticatedUser();
