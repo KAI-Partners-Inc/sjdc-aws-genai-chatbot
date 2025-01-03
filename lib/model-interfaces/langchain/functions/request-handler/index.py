@@ -293,31 +293,41 @@ def handle_run(record):
                     "documents": [],
                     "prompts": [],
                 }
-            output += "\n\nCitations\n"
+            output += "\n\nCitations\n\n"
             citations_string = ''
             titles = []
+            citations_indexes = []
             for citation in citations:
-                index_start = citation.get['generatedResponsePart']['textResponsePart']['span']['start']
-                index_end = citation.get['generatedResponsePart']['textResponsePart']['span']['end']
-                # output = output[index_start:index_end+1] + '[' + str(ref_num)+']' + output[index_end+1:]
+                generated_response = citation.get('generatedResponsePart', {})
+                text_response = generated_response.get('textResponsePart', {})
+                span = text_response.get('span', {})
+                
+                index_start = span.get('start')
+                index_end = span.get('end')
+                cit_nums=''
                 for ref in citation.get("retrievedReferences", []):
-                    title = ref["metadata"].get("x-amz-bedrock-kb-title", "Unknown Title")
-                    uri = ref["metadata"].get("x-amz-bedrock-kb-source-uri", "Unknown URI")
-                    cit_nums=''
+                    md = ref.get("metadata", {})
+                    title = md.get("x-amz-bedrock-kb-title", "Unknown Title")
+                    uri = md.get("x-amz-bedrock-kb-source-uri", "Unknown URI")
                     if title not in titles:
                         titles.append(title)
                         ref_num = len(titles)
-                        cit_nums += '['+str(ref_num)+']'
-                        citations_string += f"  {ref_num}. {title} {uri}\n"
+                        cit_nums += f'[[{ref_num}]]({uri})'
+                        citations_string += f"{ref_num}. {title} {uri}\n"
                     else:
                         ref_num = titles.index(title)
                         ref_num+=1
-                        temp_cit_num = '['+str(ref_num)+']'
+                        temp_cit_num = f'[[{ref_num}]]({uri})'
                         if temp_cit_num not in cit_nums:
                             cit_nums+=temp_cit_num
                         else:
                             pass
-                output = output[index_start:index_end+1] + cit_nums + output[index_end+1:]
+                citations_indexes.append((index_start,index_end, cit_nums))
+            citations_indexes = sorted(citations_indexes, key=lambda x: x[1], reverse=True)
+            # Insert strings into the output
+            for start_index, end_index, string in citations_indexes:
+                output = output[:end_index + 1] + "**" + string + "**" + output[end_index + 1:]
+            output+= citations_string
             try:
                 db_chat_history = DynamoDBChatMessageHistory(
                 table_name=os.environ["SESSIONS_TABLE_NAME"],

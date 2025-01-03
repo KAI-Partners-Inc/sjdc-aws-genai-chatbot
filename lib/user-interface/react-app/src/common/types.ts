@@ -6,14 +6,17 @@ export interface AppConfig {
   aws_cognito_identity_pool_id: string;
   aws_user_pools_id: string;
   aws_user_pools_web_client_id: string;
+  oauth: {
+    domain: string;
+    scope: ["email", "openid", "profile"]; // Static array of scopes
+    redirectSignIn: string; // A single string containing comma-separated URLs
+    redirectSignOut: string; // Same as above
+    responseType: "code"; // Fixed value
+  };
   config: {
-    auth_federated_provider?:
+    auth_federated_provider?: 
       | { auto_redirect: boolean; custom: true; name: string }
-      | {
-          auto_redirect: boolean;
-          custom: false;
-          name: CognitoHostedUIIdentityProvider;
-        };
+      | { auto_redirect: boolean; custom: false; name: CognitoHostedUIIdentityProvider };
     rag_enabled: boolean;
     cross_encoders_enabled: boolean;
     sagemaker_embeddings_enabled: boolean;

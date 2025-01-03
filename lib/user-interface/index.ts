@@ -76,6 +76,13 @@ export class UserInterface extends Construct {
       aws_user_pools_id: props.userPoolId,
       aws_user_pools_web_client_id: props.userPoolClientId,
       aws_cognito_identity_pool_id: props.identityPool.identityPoolId,
+      oauth: {
+        "domain": "kaip-chatbot.auth.us-east-1.amazoncognito.com",
+        "scope": ["email", "openid", "profile"],
+        "redirectSignIn": "http://localhost:3000/,https://d37nmi88xkdn9a.cloudfront.net/",
+        "redirectSignOut": "http://localhost:3000/,https://d37nmi88xkdn9a.cloudfront.net/",
+        "responseType": "code"
+      },
       Auth: {
         region: cdk.Aws.REGION,
         userPoolId: props.userPoolId,
@@ -93,6 +100,11 @@ export class UserInterface extends Construct {
         },
       },
       config: {
+        auth_federated_provider: {
+          auto_redirect: false, // Set to true if you want auto-redirect for SSO login
+          custom: true, // Indicates this is a custom provider
+          name: "KAIP", // Your custom provider name (must match your Cognito configuration)
+        },
         rag_enabled: props.config.rag.enabled,
         cross_encoders_enabled: props.crossEncodersEnabled,
         sagemaker_embeddings_enabled: props.sagemakerEmbeddingsEnabled,
