@@ -42,13 +42,14 @@ export default function AppConfigured() {
         if (authCode) {
           // If the code is present, exchange it for tokens
           try {
-            const federatedsignin = await Auth.federatedSignIn({
+            await Auth.federatedSignIn({
               customProvider: currentConfig?.config.auth_federated_provider?.name || "KAIP", // Your provider name
               customState: authCode, // Pass the code if needed
             });
-            console.log(federatedsignin)
+            // console.log(federatedsignin)
             const user = await Auth.currentAuthenticatedUser();
             console.log("User authenticated:", user);
+            window.location.href = "/";
             // Handle authenticated user, e.g., redirect them to the home page
             // window.location.href = '/';  // Redirect to the homepage or dashboard
           } catch (error) {
