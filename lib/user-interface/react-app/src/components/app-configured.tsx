@@ -47,8 +47,8 @@ export default function AppConfigured() {
               customState: authCode, // Pass the code if needed
             });
             // console.log(federatedsignin)
-            const user = await Auth.currentAuthenticatedUser();
-            console.log("User authenticated:", user);
+            // const user = await Auth.currentAuthenticatedUser();
+            // console.log("User authenticated:", user);
             window.location.href = "/";
             // Handle authenticated user, e.g., redirect them to the home page
             // window.location.href = '/';  // Redirect to the homepage or dashboard
