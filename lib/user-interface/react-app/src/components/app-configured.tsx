@@ -62,7 +62,7 @@ export default function AppConfigured() {
             const data = await response.json();
             
             localStorage.setItem('authTokens', JSON.stringify(data));
-            
+            window.location.reload();
           } catch (error) {
             console.error("Error exchanging code for tokens:", error);
           }
