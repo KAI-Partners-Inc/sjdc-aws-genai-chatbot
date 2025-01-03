@@ -79,8 +79,8 @@ export class UserInterface extends Construct {
       oauth: {
         "domain": "kaip-chatbot.auth.us-east-1.amazoncognito.com",
         "scope": ["email", "openid", "profile"],
-        "redirectSignIn": "http://localhost:3000/,https://d37nmi88xkdn9a.cloudfront.net/",
-        "redirectSignOut": "http://localhost:3000/,https://d37nmi88xkdn9a.cloudfront.net/",
+        "redirectSignIn": "https://d37nmi88xkdn9a.cloudfront.net/",
+        "redirectSignOut": "https://d37nmi88xkdn9a.cloudfront.net/",
         "responseType": "code"
       },
       Auth: {

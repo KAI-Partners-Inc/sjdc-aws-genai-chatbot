@@ -34,36 +34,28 @@ export default function AppConfigured() {
 
         // Extract the query string from the current URL
         const queryString = window.location.search;
+
+        // Use URLSearchParams to work with the query string easily
         const urlParams = new URLSearchParams(queryString);
+        const authCode = urlParams.get("code");
 
-        if (
-          currentConfig?.config.auth_federated_provider?.auto_redirect &&
-          urlParams.get("loginlocal") != "true"
-        ) {
-          let authenticated = false;
+        if (authCode) {
+          // If the code is present, exchange it for tokens
           try {
-            const user = await Auth.currentAuthenticatedUser();
-            if (user) {
-              authenticated = true;
-            }
-          } catch (e) {
-            authenticated = false;
+            const user = await Auth.federatedSignIn({
+              provider: currentConfig?.config.auth_federated_provider?.name || "KAIP", // Your provider name
+              customState: authCode, // Pass the code if needed
+            });
+            console.log("User authenticated:", user);
+            // Handle authenticated user, e.g., redirect them to the home page
+            window.location.href = '/';  // Redirect to the homepage or dashboard
+          } catch (error) {
+            console.error("Error exchanging code for tokens:", error);
           }
-
-          if (!authenticated) {
-            const federatedProvider =
-              currentConfig.config.auth_federated_provider;
-
-            if (federatedProvider.custom) {
-              Auth.federatedSignIn({ customProvider: federatedProvider.name });
-            } else {
-              Auth.federatedSignIn({ provider: federatedProvider.name });
-            }
-            return;
-          }
+        } else {
+          // If no code is present, proceed as normal
+          setConfig(currentConfig);
         }
-
-        setConfig(currentConfig);
       } catch (e) {
         console.error(e);
         setError(true);
@@ -139,6 +131,8 @@ export default function AppConfigured() {
     );
   }
 
+  const signInUrl = `https://kaip-chatbot.auth.us-east-1.amazoncognito.com/login?client_id=${config?.aws_user_pools_web_client_id}&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=${encodeURIComponent("https://d37nmi88xkdn9a.cloudfront.net/")}`;
+
   return (
     <AppContext.Provider value={config}>
       <ThemeProvider
@@ -153,41 +147,25 @@ export default function AppConfigured() {
           components={{
             SignIn: {
               Header: () => {
-                if (config.config.auth_federated_provider) {
-                  const signInWithCustomProvider = () => {
-                    Auth.federatedSignIn({
-                      customProvider:
-                        config.config.auth_federated_provider?.name || "",
-                    });
-                  };
-                  return (
-                    <Heading
-                      padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
-                      level={3}
-                    >
-                      {CHATBOT_NAME}
-                      <View as="div" paddingTop="1rem" paddingBottom="1rem">
-                        <Button
-                          onClick={signInWithCustomProvider}
-                          variation="primary"
-                        >
+                return (
+                  <Heading
+                    padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
+                    level={3}
+                  >
+                    {CHATBOT_NAME}
+                    <View as="div" paddingTop="1rem" paddingBottom="1rem">
+                      <a
+                        href={signInUrl} // Sign-in with KAIP redirects here
+                      >
+                        <Button variation="primary">
                           Sign in with{" "}
                           {config.config.auth_federated_provider?.name}
                         </Button>
-                      </View>
-                      <Divider label="OR" />
-                    </Heading>
-                  );
-                } else {
-                  return (
-                    <Heading
-                      padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
-                      level={3}
-                    >
-                      {CHATBOT_NAME}
-                    </Heading>
-                  );
-                }
+                      </a>
+                    </View>
+                    <Divider label="OR" />
+                  </Heading>
+                );
               },
             },
           }}
