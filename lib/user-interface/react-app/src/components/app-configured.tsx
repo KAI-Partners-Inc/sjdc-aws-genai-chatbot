@@ -10,7 +10,7 @@ import {
   View,
 } from "@aws-amplify/ui-react";
 import App from "../app";
-import { Amplify, Auth } from "aws-amplify";
+import { Amplify} from "aws-amplify";
 import { AppConfig } from "../common/types";
 import { AppContext } from "../common/app-context";
 import { Alert, StatusIndicator } from "@cloudscape-design/components";
@@ -60,11 +60,9 @@ export default function AppConfigured() {
               throw new Error(`HTTP ERROR! status: ${response.status}`);
             }
             const data = await response.json();
-            if (chrome.storage) {
-              chrome.storage.local.set({ authTokens: data });
-            } else {
-              localStorage.setItem('authTokens', JSON.stringify(data));
-            }
+            
+            localStorage.setItem('authTokens', JSON.stringify(data));
+            
           } catch (error) {
             console.error("Error exchanging code for tokens:", error);
           }
