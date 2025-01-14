@@ -19,6 +19,20 @@ import { Mode } from "@cloudscape-design/global-styles";
 import "@aws-amplify/ui-react/styles.css";
 import { CHATBOT_NAME } from "../common/constants";
 
+function parseJwt( token: string) {
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split("")
+      .map((c) => {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+  return JSON.parse(jsonPayload);
+}
+
 export default function AppConfigured() {
   const { tokens } = useTheme();
   const [config, setConfig] = useState<AppConfig | null>(null);
@@ -61,7 +75,25 @@ export default function AppConfigured() {
               throw new Error(`HTTP ERROR! status: ${response.status}`);
             }
             const data = await response.json();
+            const decodedIdToken = parseJwt(data.id_token);
+            const userIdentifier = decodedIdToken.email || decodedIdToken.preferred_username || decodedIdToken.sub;
             localStorage.setItem('authTokens', JSON.stringify(data));
+            localStorage.setItem(
+              `CognitoIdentityServiceProvider.${client_id}.LastAuthUser`,
+              userIdentifier
+            );
+            localStorage.setItem(
+              `CognitoIdentityServiceProvider.${client_id}.${userIdentifier}.idToken`,
+              data.id_token
+            );
+            localStorage.setItem(
+              `CognitoIdentityServiceProvider.${client_id}.${userIdentifier}.accessToken`,
+              data.access_token
+            );
+            localStorage.setItem(
+              `CognitoIdentityServiceProvider.${client_id}.${userIdentifier}.refreshToken`,
+              data.refresh_token
+            );
             window.location.reload();
           } catch (error) {
             console.error("Error exchanging code for tokens:", error);
