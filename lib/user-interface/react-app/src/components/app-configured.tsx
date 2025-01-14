@@ -97,6 +97,7 @@ export default function AppConfigured() {
             window.location.reload();
           } catch (error) {
             console.error("Error exchanging code for tokens:", error);
+            window.location.reload();
           }
         } else {
           // If no code is present, proceed as normal
