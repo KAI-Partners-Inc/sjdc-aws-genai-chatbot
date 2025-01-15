@@ -106,7 +106,7 @@ export default function Chat(props: { sessionId?: string }) {
     const apiClient = new ApiClient(appContext);
     await apiClient.userFeedback.addUserFeedback({feedbackData});
   };
-  const collegeName = localStorage.getItem("collegeName") || "KAI Partners GenAI"
+  const collegeName = localStorage.getItem("collegeName") || " Sage - KAI Partners GenAI"
   return (
     <div className={styles.chat_container}>
       <SpaceBetween direction="vertical" size="m">
@@ -123,7 +123,7 @@ export default function Chat(props: { sessionId?: string }) {
       <div className={styles.welcome_text}>
         {messageHistory.length == 0 && !session?.loading && (
           <center>
-            What can we help you with today?
+            Hello, my name is Sage. How can I help you?
             <div style={{fontSize: 12}}>Demo Version: {collegeName} Chatbot.</div>
             <div style={{fontSize: 12}}>© 2024 KAI Partners, Inc. All Rights Reserved.</div>
           </center>
