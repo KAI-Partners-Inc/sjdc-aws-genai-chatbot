@@ -57,7 +57,7 @@ export default function AppConfigured() {
         if (authCode) {
           const tokenEndpoint = `https://kaip-chatbot.auth.us-east-1.amazoncognito.com/oauth2/token`
           const params = new URLSearchParams();
-
+          localStorage.setItem('aws-genai-llm-chatbot-navigation-panel-state', '{"collapsed":false}')
           params.append('grant_type', 'authorization_code');
           params.append('code', authCode);
           params.append('client_id', client_id);

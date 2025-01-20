@@ -12,21 +12,21 @@ def list_models():
     if bedrock_models:
         models.extend(bedrock_models)
 
-    fine_tuned_models = list_bedrock_finetuned_models()
-    if fine_tuned_models:
-        models.extend(fine_tuned_models)
+    # fine_tuned_models = list_bedrock_finetuned_models()
+    # if fine_tuned_models:
+    #     models.extend(fine_tuned_models)
 
-    sagemaker_models = list_sagemaker_models()
-    if sagemaker_models:
-        models.extend(sagemaker_models)
+    # sagemaker_models = list_sagemaker_models()
+    # if sagemaker_models:
+    #     models.extend(sagemaker_models)
 
     openai_models = list_openai_models()
     if openai_models:
         models.extend(openai_models)
 
-    azure_openai_models = list_azure_openai_models()
-    if azure_openai_models:
-        models.extend(azure_openai_models)  
+    # azure_openai_models = list_azure_openai_models()
+    # if azure_openai_models:
+    #     models.extend(azure_openai_models)  
 
     test = get_custom_bedrock_agent()
     models.extend(test)
