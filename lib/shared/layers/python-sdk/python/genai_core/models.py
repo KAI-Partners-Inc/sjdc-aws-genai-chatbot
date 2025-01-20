@@ -61,7 +61,17 @@ def get_custom_bedrock_agent():
             "outputModalities": [Modality.TEXT.value],
             "interface": ModelInterface.LANGCHIAN.value,
             "ragSupported": True,
-        }]
+        },
+        {
+            "provider": Provider.BEDROCK.value,
+            "name": "C4O_Model",
+            "streaming": True,
+            "inputModalities": [Modality.TEXT.value],
+            "outputModalities": [Modality.TEXT.value],
+            "interface": ModelInterface.LANGCHIAN.value,
+            "ragSupported": True,
+        }
+        ]
 
 
 def list_openai_models():

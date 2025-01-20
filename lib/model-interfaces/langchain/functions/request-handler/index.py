@@ -174,6 +174,36 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
                 }
             },
         )
+def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
+    model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
+    kbId = "COXAUXAUCG"
+    if sessionId:
+        return bedrock_agent_client.retrieve_and_generate(
+            input={
+                'text': input
+            },
+            retrieveAndGenerateConfiguration={
+                'type': 'KNOWLEDGE_BASE',
+                'knowledgeBaseConfiguration': {
+                    'knowledgeBaseId': kbId,
+                    'modelArn': model_arn
+                }
+            },
+            sessionId=sessionId
+        )
+    else:
+        return bedrock_agent_client.retrieve_and_generate(
+            input={
+                'text': input
+            },
+            retrieveAndGenerateConfiguration={
+                'type': 'KNOWLEDGE_BASE',
+                'knowledgeBaseConfiguration': {
+                    'knowledgeBaseId': kbId,
+                    'modelArn': model_arn
+                }
+            }
+        )  
 
 ### 2
 def handle_run(record):
@@ -278,6 +308,85 @@ def handle_run(record):
         #             "data": response,
         #         }
         #     )
+        elif model_id == "C4O_Model":
+            retrieve_generate_response = retrieveAndGenerateC4O(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
+            output = retrieve_generate_response["output"]["text"]
+            citations = retrieve_generate_response["citations"]
+            logger.info(output)
+            metadata = {
+                    "modelId": model_id,
+                    "modelKwargs": data.get("modelKwargs", {}),
+                    "mode": mode,
+                    "citations": citations,
+                    "sessionId": session_id,
+                    "userId": user_id,
+                    "documents": [],
+                    "prompts": [],
+                }
+            output += "\n\nCitations\n\n"
+            citations_string = ''
+            titles = []
+            citations_indexes = []
+            for citation in citations:
+                generated_response = citation.get('generatedResponsePart', {})
+                text_response = generated_response.get('textResponsePart', {})
+                span = text_response.get('span', {})
+                
+                index_start = span.get('start')
+                index_end = span.get('end')
+                cit_nums=''
+                for ref in citation.get("retrievedReferences", []):
+                    md = ref.get("metadata", {})
+                    title = md.get("x-amz-bedrock-kb-title", "Unknown Title")
+                    uri = md.get("x-amz-bedrock-kb-source-uri", "Unknown URI")
+                    if title not in titles:
+                        titles.append(title)
+                        ref_num = len(titles)
+                        cit_nums += f'[[{ref_num}]]({uri})'
+                        citations_string += f"{ref_num}. {title} {uri}\n"
+                    else:
+                        ref_num = titles.index(title)
+                        ref_num+=1
+                        temp_cit_num = f'[[{ref_num}]]({uri})'
+                        if temp_cit_num not in cit_nums:
+                            cit_nums+=temp_cit_num
+                        else:
+                            pass
+                citations_indexes.append((index_start,index_end, cit_nums))
+            citations_indexes = sorted(citations_indexes, key=lambda x: x[1], reverse=True)
+            # Insert strings into the output
+            for start_index, end_index, string in citations_indexes:
+                output = output[:end_index + 1] + "**" + string + "**" + output[end_index + 1:]
+            output+= citations_string
+            try:
+                db_chat_history = DynamoDBChatMessageHistory(
+                table_name=os.environ["SESSIONS_TABLE_NAME"],
+                session_id=session_id,
+                user_id=user_id,
+                )
+                db_chat_history.add_message(HumanMessage(content=prompt))
+                db_chat_history.add_message(AIMessage(content=output))
+                db_chat_history.add_metadata(metadata)
+            except Exception as e:
+                logger.error("ERROR: db add meta data")
+                logger.error(e)
+                pass
+            response = {
+                    "sessionId": session_id,
+                    "type": "text",
+                    "content": output,
+                    "metadata": metadata
+                }
+            logger.info(response)
+            send_to_client(
+                {
+                    "type": "text",
+                    "action": ChatbotAction.FINAL_RESPONSE.value,
+                    "timestamp": str(int(round(datetime.now().timestamp()))),
+                    "userId": user_id,
+                    "data": response,
+                }
+            )
         elif model_id == "KAIP_Model":
             retrieve_generate_response = retrieveAndGenerateKAIP(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
