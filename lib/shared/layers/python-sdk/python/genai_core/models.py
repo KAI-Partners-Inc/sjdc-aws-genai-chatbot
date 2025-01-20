@@ -8,9 +8,9 @@ from genai_core.types import Modality, Provider, ModelInterface
 def list_models():
     models = []
 
-    bedrock_models = list_bedrock_models()
-    if bedrock_models:
-        models.extend(bedrock_models)
+    # bedrock_models = list_bedrock_models()
+    # if bedrock_models:
+    #     models.extend(bedrock_models)
 
     # fine_tuned_models = list_bedrock_finetuned_models()
     # if fine_tuned_models:
@@ -20,9 +20,9 @@ def list_models():
     # if sagemaker_models:
     #     models.extend(sagemaker_models)
 
-    openai_models = list_openai_models()
-    if openai_models:
-        models.extend(openai_models)
+    # openai_models = list_openai_models()
+    # if openai_models:
+    #     models.extend(openai_models)
 
     # azure_openai_models = list_azure_openai_models()
     # if azure_openai_models:
