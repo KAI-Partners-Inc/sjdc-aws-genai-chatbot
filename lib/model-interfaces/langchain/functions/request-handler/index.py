@@ -136,6 +136,16 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
     kbId = "EEZJ01SGD8"
     if sessionId:
+        # input_payload = {
+        # "prompt": "Use the following information to generate a summary:\n" + file_content,
+        # "modelId": "your-model-id",  # Replace with the model ID you're using in Bedrock
+        # "parameters": {
+        #     "maxTokens": 200,  # Adjust token limit as needed
+        #     "temperature": 0.7,  # Adjust creativity level
+        #     "topP": 0.9  # Optional parameter for randomness control
+        #     }
+        # }
+        # bedrock_agent_client.retrieve_and_generate(input = input_payload)
         return bedrock_agent_client.retrieve_and_generate(
             input={
                 'text': input

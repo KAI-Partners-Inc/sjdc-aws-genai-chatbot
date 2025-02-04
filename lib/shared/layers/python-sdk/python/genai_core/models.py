@@ -35,15 +35,16 @@ def list_models():
 
 ### 1
 def get_custom_bedrock_agent():
-    return [{
-            "provider": Provider.BEDROCK.value,
-            "name": "SJDC_Model",
-            "streaming": True,
-            "inputModalities": [Modality.TEXT.value],
-            "outputModalities": [Modality.TEXT.value],
-            "interface": ModelInterface.LANGCHIAN.value,
-            "ragSupported": True,
-        },
+    return [
+        # {
+        #     "provider": Provider.BEDROCK.value,
+        #     "name": "SJDC_Model",
+        #     "streaming": True,
+        #     "inputModalities": [Modality.TEXT.value],
+        #     "outputModalities": [Modality.TEXT.value],
+        #     "interface": ModelInterface.LANGCHIAN.value,
+        #     "ragSupported": True,
+        # },
         # {
         #     "provider": Provider.BEDROCK.value,
         #     "name": "SJDC_Model_Crawler",
@@ -53,15 +54,15 @@ def get_custom_bedrock_agent():
         #     "interface": ModelInterface.LANGCHIAN.value,
         #     "ragSupported": True,
         # },
-        {
-            "provider": Provider.BEDROCK.value,
-            "name": "KAIP_Model",
-            "streaming": True,
-            "inputModalities": [Modality.TEXT.value],
-            "outputModalities": [Modality.TEXT.value],
-            "interface": ModelInterface.LANGCHIAN.value,
-            "ragSupported": True,
-        },
+        # {
+        #     "provider": Provider.BEDROCK.value,
+        #     "name": "KAIP_Model",
+        #     "streaming": True,
+        #     "inputModalities": [Modality.TEXT.value],
+        #     "outputModalities": [Modality.TEXT.value],
+        #     "interface": ModelInterface.LANGCHIAN.value,
+        #     "ragSupported": True,
+        # },
         {
             "provider": Provider.BEDROCK.value,
             "name": "C4O_Model",
