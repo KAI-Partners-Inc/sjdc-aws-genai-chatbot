@@ -70,7 +70,7 @@ def handle_heartbeat(record):
     )
 
 
-def retrieveAndGenerateSJDC1(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
+def retrieveAndGenerateSJDC1(input, sessionId=None, model_id = "anthropic.claude-3-5-sonnet-20241022-v2:0"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
     kbId = "ABM3Q1NO8Z"
     if sessionId:
@@ -101,7 +101,7 @@ def retrieveAndGenerateSJDC1(input, sessionId=None, model_id = "anthropic.claude
             }
         )
 
-def retrieveAndGenerateSJDC2(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
+def retrieveAndGenerateSJDC2(input, sessionId=None, model_id = "anthropic.claude-3-5-sonnet-20241022-v2:0"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
     kbId = "75GGXZP2LO"
     if sessionId:
@@ -132,7 +132,7 @@ def retrieveAndGenerateSJDC2(input, sessionId=None, model_id = "anthropic.claude
             }
         )
 
-def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
+def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-3-5-sonnet-20241022-v2:0"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
     kbId = "EEZJ01SGD8"
     if sessionId:
@@ -174,7 +174,7 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
                 }
             },
         )
-def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-instant-v1"):
+def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3-5-sonnet-20241022-v2:0"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
     kbId = "COXAUXAUCG"
     if sessionId:
