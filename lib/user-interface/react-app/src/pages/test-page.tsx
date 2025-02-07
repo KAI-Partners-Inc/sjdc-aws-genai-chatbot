@@ -8,25 +8,11 @@ function TestPage() {
     const [district, setDistrict] = useState('');
     const [chatbotLabel, setChatbotLabel] = useState('');
     const [language, setLanguage] = useState('english');
-    const [color, setColor] = useState('');
-    const [chatcolor, setChatColor] = useState('');
-    const [collegeLogo, setFile] = useState<File | null>(null);
+    const [collegeUrl, setCollegeUrl] = useState('');
     const history = useNavigate();
     useEffect(() => {
       document.title = 'KAI Partners Chatbot Tool';
     })
-    const handleColorChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-      setColor(event.target.value);
-    };
-    const handleChatColorChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-      setChatColor(event.target.value);
-    };
-    const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files && event.target.files[0];
-      if (file) {
-        setFile(file);
-      }
-    };
     const handleSubmit = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         // Do something with the form data, such as submitting it to a server
@@ -36,24 +22,8 @@ function TestPage() {
         }
         localStorage.setItem('collegeName', collegeName);
         console.log(localStorage.getItem('collegeName'))
-        if (collegeLogo) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            var imageData = reader.result;
-            if(imageData== null){
-              imageData= ""
-            }
-            localStorage.setItem('uploadedImage', imageData.toString()); // Store image data in local storage
-            
-            history('/welcome-test',
-              {state: { collegeName, district, language, color, chatcolor, chatbotLabel }});
-          };
-          reader.readAsDataURL(collegeLogo);
-        }
-        else{
-          history('/welcome-test',
-              {state: { collegeName, district, language, color, chatcolor, chatbotLabel }});
-        }
+        history('/welcome-test',
+            {state: { collegeName, district, language, collegeUrl, chatbotLabel }});
     };
       
    return (
@@ -109,46 +79,8 @@ function TestPage() {
               </select>
             </div>
             <div className='form-group'>
-              <label htmlFor="collegeLogo">Upload your college logo:</label>
-              <input type="file" onChange={handleLogoChange} accept='image/*' />
-            </div>
-            <div className="form-group">
-              <label htmlFor="color">Select Header Color:</label>
-              <select
-                id="color"
-                value={color}
-                onChange={handleColorChange}
-                required
-              >
-                <option value="">Select Color</option>
-                <option value="navy">Navy Blue</option>
-                <option value="gray">Gray</option>
-                <option value="blue">Blue</option>
-                <option value="green">Green</option>
-                <option value="yellow">Yellow</option>
-                <option value="red">Red</option>
-                <option value="orange">Orange</option>
-                <option value="purple">Purple</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="chatcolor">Select Chatbot Button Color:</label>
-              <select
-                id="chatcolor"
-                value={chatcolor}
-                onChange={handleChatColorChange}
-                required
-              >
-                <option value="">Select Color</option>
-                <option value="navy">Navy Blue</option>
-                <option value="gray">Gray</option>
-                <option value="blue">Blue</option>
-                <option value="green">Green</option>
-                <option value="yellow">Yellow</option>
-                <option value="red">Red</option>
-                <option value="orange">Orange</option>
-                <option value="purple">Purple</option>
-              </select>
+              <label htmlFor="collegeUrl">Enter your College Website URL:</label>
+              <input type="text" onChange={(e) => setCollegeUrl(e.target.value)} accept='image/*' />
             </div>
             <button type="submit">Submit</button>
           </form>

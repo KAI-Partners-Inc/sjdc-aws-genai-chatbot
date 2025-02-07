@@ -60,7 +60,7 @@ const C4OPage = () => {
     
         const iframe = document.createElement('iframe');
         iframe.setAttribute('title', 'Chat Window');
-        iframe.setAttribute('src', 'https://d4gk3r9rw1yc7.cloudfront.net/embedded');
+        iframe.setAttribute('src', 'https://d37nmi88xkdn9a.cloudfront.net/embedded');
         iframe.setAttribute('allow', 'fullscreen');
         iframe.setAttribute('name', 'chat');
         iframe.setAttribute('style', `
