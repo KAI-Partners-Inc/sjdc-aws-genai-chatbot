@@ -95,10 +95,10 @@ const WelcomePage = () => {
     }
     // const logoUrl = localStorage.getItem('uploadedImage') || defaultLogo;
     // localStorage.removeItem("uploadedImage")
-    const chatTextColor = 'Gray'
+    const chatTextColor = 'lightgray'
     const color = 'Navy'
     const chatcolor = 'Navy'
-    const headTextColor = 'Gray'
+    const headTextColor = 'lightgray'
     useEffect(() => {
       const handleBeforeUnload = () => {
         localStorage.removeItem('collegeName');
