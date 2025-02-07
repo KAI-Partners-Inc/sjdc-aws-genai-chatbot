@@ -15,6 +15,7 @@ import "./styles/app.scss";
 import Embedded from "./pages/chatbot/embedded/embedded.tsx";
 import TestPage from "./pages/test-page.tsx";
 import WelcomeTest from "./pages/welcome_test.tsx";
+import C4OPage from "./pages/c4o-sample.tsx";
 import AddData from "./pages/rag/add-data/add-data.tsx";
 import CreateWorkspace from "./pages/rag/create-workspace/create-workspace.tsx";
 import CrossEncoders from "./pages/rag/cross-encoders/cross-encoders.tsx";
@@ -104,6 +105,7 @@ function App() {
               <Route path="" element={<Playground />} />
               <Route path = "client-admin" element={<TestPage/>} />
               <Route path = "welcome-test" element={<WelcomeTest />} />
+              <Route path = "c4o-sample" element={<C4OPage />} />
               <Route path="embedded" element={<Embedded />} />
               <Route path="user-feedback" element={<Feedback/>}/>
               <Route path="chatbot" element={<Outlet />}>

@@ -35,6 +35,11 @@ export default function NavigationPanelv() {
             type: "link",
             text: "Client Admin",
             href: "/v2/client-admin",
+          },
+          {
+            type: "link",
+            text: "C4O Sample",
+            href: "/v2/c4o-sample",
           }
         ],
       },
