@@ -70,6 +70,15 @@ def get_custom_bedrock_agent():
             "outputModalities": [Modality.TEXT.value],
             "interface": ModelInterface.LANGCHIAN.value,
             "ragSupported": True,
+        },
+        {
+            "provider": Provider.BEDROCK.value,
+            "name": "C4O_Model_Custom",
+            "streaming": True,
+            "inputModalities": [Modality.TEXT.value],
+            "outputModalities": [Modality.TEXT.value],
+            "interface": ModelInterface.LANGCHIAN.value,
+            "ragSupported": True,
         }
         ]
 

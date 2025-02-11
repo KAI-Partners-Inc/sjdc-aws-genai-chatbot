@@ -1,6 +1,7 @@
 import os
 import json
 import uuid
+import requests
 from datetime import datetime
 from genai_core.registry import registry
 from aws_lambda_powertools import Logger, Tracer
@@ -205,6 +206,24 @@ def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3
             }
         )  
 
+def callKendraQueryAPI(query):
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "user_query": query
+    }
+
+    try:
+        response = requests.post("https://dbudjfjd69.execute-api.us-east-1.amazonaws.com/prod/C4O-custom-response-notavailable", headers=headers, json=payload)
+        response.raise_for_status()  # Raise an error for non-2xx responses
+        
+        return response_json.get("answer", "No answer found.")  # Return the parsed JSON response
+
+    except requests.exceptions.RequestException as e:
+        return f"Error: {str(e)}"
+
 ### 2
 def handle_run(record):
     user_id = record["userId"]
@@ -263,51 +282,47 @@ def handle_run(record):
                     "data": response,
                 }
             )
-        # elif model_id == "SJDC_Model_Crawler":
-        #     retrieve_generate_response = retrieveAndGenerateSJDC2(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
-        #     output = retrieve_generate_response["output"]["text"]
-        #     citations = retrieve_generate_response["citations"]
-        #     logger.info(output)
-        #     metadata = {
-        #             "modelId": model_id,
-        #             "modelKwargs": data.get("modelKwargs", {}),
-        #             "mode": mode,
-        #             "citations": citations,
-        #             "sessionId": session_id,
-        #             "userId": user_id,
-        #             "documents": [],
-        #             "prompts": [],
-        #         }
-        #     try:
-
-        #         db_chat_history = DynamoDBChatMessageHistory(
-        #         table_name=os.environ["SESSIONS_TABLE_NAME"],
-        #         session_id=session_id,
-        #         user_id=user_id,
-        #         )
-        #         db_chat_history.add_message(HumanMessage(content=prompt))
-        #         db_chat_history.add_message(AIMessage(content=output))
-        #         db_chat_history.add_metadata(metadata)
-        #     except Exception as e:
-        #         logger.error("ERROR: db add meta data")
-        #         logger.error(e)
-        #         pass
-        #     response = {
-        #             "sessionId": session_id,
-        #             "type": "text",
-        #             "content": output,
-        #             "metadata": metadata
-        #         }
-        #     logger.info(response)
-        #     send_to_client(
-        #         {
-        #             "type": "text",
-        #             "action": ChatbotAction.FINAL_RESPONSE.value,
-        #             "timestamp": str(int(round(datetime.now().timestamp()))),
-        #             "userId": user_id,
-        #             "data": response,
-        #         }
-        #     )
+        elif model_id == "C4O_Model_Custom":
+            output = callKendraQueryAPI(prompt)
+            metadata = {
+                    "modelId": model_id,
+                    "modelKwargs": data.get("modelKwargs", {}),
+                    "mode": mode,
+                    "citations": [],
+                    "sessionId": session_id,
+                    "userId": user_id,
+                    "documents": [],
+                    "prompts": [],
+                }
+            try:
+                db_chat_history = DynamoDBChatMessageHistory(
+                table_name=os.environ["SESSIONS_TABLE_NAME"],
+                session_id=session_id,
+                user_id=user_id,
+                )
+                db_chat_history.add_message(HumanMessage(content=prompt))
+                db_chat_history.add_message(AIMessage(content=output))
+                db_chat_history.add_metadata(metadata)
+            except Exception as e:
+                logger.error("ERROR: db add meta data")
+                logger.error(e)
+                pass
+            response = {
+                    "sessionId": session_id,
+                    "type": "text",
+                    "content": output,
+                    "metadata": metadata
+                }
+            logger.info(response)
+            send_to_client(
+                {
+                    "type": "text",
+                    "action": ChatbotAction.FINAL_RESPONSE.value,
+                    "timestamp": str(int(round(datetime.now().timestamp()))),
+                    "userId": user_id,
+                    "data": response,
+                }
+            )
         elif model_id == "C4O_Model":
             retrieve_generate_response = retrieveAndGenerateC4O(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
