@@ -198,7 +198,7 @@ def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3
                                 </instructions>
                                 <query>{input}</query>
                                 <response_requirements>
-                                    <requirement>If the requested information is unavailable, respond with: "Sorry, I am unable to assist you with this request."</requirement>
+                                    <requirement>If the requested information is unavailable, respond with: "I couldn't find relevant information within the CAEP documents provided. Try rephrasing your question or checking other resources."</requirement>
                                     <requirement>Do not generate an answer if it cannot be verified from provided documents.</requirement>
                                     <requirement>Ask for additional details if the user query is vague or lacks context.</requirement>
                                 </response_requirements>
@@ -237,7 +237,7 @@ def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3
                                 </instructions>
                                 <query>{input}</query>
                                 <response_requirements>
-                                    <requirement>If the requested information is unavailable, respond with: "Sorry, I am unable to assist you with this request."</requirement>
+                                    <requirement>If the requested information is unavailable, respond with: "I couldn't find relevant information within the CAEP documents provided. Try rephrasing your question or checking other resources."</requirement>
                                     <requirement>Do not generate an answer if it cannot be verified from provided documents.</requirement>
                                     <requirement>Ask for additional details if the user query is vague or lacks context.</requirement>
                                 </response_requirements>
