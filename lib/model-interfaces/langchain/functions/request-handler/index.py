@@ -24,6 +24,8 @@ logger = Logger()
 
 AWS_REGION = os.environ["AWS_REGION"]
 API_KEYS_SECRETS_ARN = os.environ["API_KEYS_SECRETS_ARN"]
+
+lambda_client = boto3.client('lambda', region_name='us-east-1')
 bedrock_agent_client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
 
 sequence_number = 0
@@ -178,6 +180,21 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
 def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3-5-sonnet-20241022-v2:0"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
     kbId = "COXAUXAUCG"
+    custom_prompt = f"""
+    You are an AI assistant providing accurate answers based on the given context.
+
+    CONTEXT:
+    {context}
+
+    USER QUESTION:
+    {query}
+
+    INSTRUCTIONS:
+    - Use only the provided context to answer.
+    - If the context lacks relevant information, say "I couldn't find relevant information within the CAEP documents provided. Try rephrasing your question or checking other resources."
+    - Keep responses clear and concise.
+    """
+    
     if sessionId:
         return bedrock_agent_client.retrieve_and_generate(
             input={
@@ -187,7 +204,24 @@ def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3
                 'type': 'KNOWLEDGE_BASE',
                 'knowledgeBaseConfiguration': {
                     'knowledgeBaseId': kbId,
-                    'modelArn': model_arn
+                    'modelArn': model_arn,
+                    'promptTemplate': {
+                        "textPromptTemplate": """
+                            Instructions:
+                            You are an AI assistant providing funding-related guidance. Do not assume or infer information. Only provide answers based on verified, factual data.
+
+                            Response Requirements:
+                            - If the requested information is unavailable, respond with: "I do not have enough data to provide an accurate answer. Please check official funding sources or contact support."
+                            - Do not generate an answer if it cannot be verified from provided documents.
+                            - Ask for additional details if the user query is vague or lacks context.
+
+                            Examples:
+                            - User: When will funds be available for CAEP?
+                            AI: Funding amounts vary based on eligibility criteria. Please refer to the official funding guidelines or contact support.
+                            - User: Am I eligible for CAEP funding?
+                            AI: Eligibility depends on multiple factors. Please provide more details or refer to official funding policies.
+                            """
+                    }
                 }
             },
             sessionId=sessionId
@@ -207,21 +241,24 @@ def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3
         )  
 
 def callKendraQueryAPI(query):
-    headers = {
-        "Content-Type": "application/json"
-    }
-
     payload = {
         "user_query": query
     }
-
+    KENDRA_QUERY_LAMBDA_NAME = 'C4O-custom-response-notavailable'
     try:
-        response = requests.post("https://dbudjfjd69.execute-api.us-east-1.amazonaws.com/prod/C4O-custom-response-notavailable", headers=headers, json=payload)
-        response.raise_for_status()  # Raise an error for non-2xx responses
-        
-        return response_json.get("answer", "No answer found.")  # Return the parsed JSON response
+        # Invoke the Lambda function
+        response = lambda_client.invoke(
+            FunctionName=KENDRA_QUERY_LAMBDA_NAME,
+            InvocationType='RequestResponse',  # Synchronous execution
+            Payload=json.dumps(payload)
+        )
 
-    except requests.exceptions.RequestException as e:
+        # Read the response payload
+        response_payload = json.loads(response['Payload'].read().decode('utf-8'))
+        
+        return response_payload.get("answer", "No answer found.")  # Extract the answer field
+
+    except Exception as e:
         return f"Error: {str(e)}"
 
 ### 2
