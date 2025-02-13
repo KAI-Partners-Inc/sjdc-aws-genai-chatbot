@@ -197,7 +197,7 @@ def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3
                             </instructions>
                             <query>{input}</query>
                             <response_requirements>
-                                <requirement>If the requested information is unavailable, respond with: "I do not have enough data to provide an accurate answer. Please check official funding sources or contact support."</requirement>
+                                <requirement>If the requested information is unavailable, respond with: "Sorry, I am unable to assist you with this request."</requirement>
                                 <requirement>Do not generate an answer if it cannot be verified from provided documents.</requirement>
                                 <requirement>Ask for additional details if the user query is vague or lacks context.</requirement>
                             </response_requirements>
@@ -226,7 +226,30 @@ def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3
                 'type': 'KNOWLEDGE_BASE',
                 'knowledgeBaseConfiguration': {
                     'knowledgeBaseId': kbId,
-                    'modelArn': model_arn
+                    'modelArn': model_arn,
+                    'promptTemplate': {
+                        "textPromptTemplate": f"""<prompt>
+                            <instructions>
+                                You are an AI assistant providing funding-related guidance. Do not assume or infer information. Only provide answers based on verified, factual data from the knowledge base. Please respond to the user query inside <query></query>. Please follow the requirements inside <response_requirements></response_requirements>.
+                            </instructions>
+                            <query>{input}</query>
+                            <response_requirements>
+                                <requirement>If the requested information is unavailable, respond with: "Sorry, I am unable to assist you with this request."</requirement>
+                                <requirement>Do not generate an answer if it cannot be verified from provided documents.</requirement>
+                                <requirement>Ask for additional details if the user query is vague or lacks context.</requirement>
+                            </response_requirements>
+                            <examples>
+                                <example>
+                                    <user>When will funds be available for CAEP?</user>
+                                    <assistant>Funding amounts vary based on eligibility criteria. Please refer to the official funding guidelines or contact support.</assistant>
+                                </example>
+                                <example>
+                                    <user>Am I eligible for CAEP funding?</user>
+                                    <assistant>Eligibility depends on multiple factors. Please provide more details or refer to official funding policies.</assistant>
+                                </example>
+                            </examples>
+                        </prompt>"""
+                    }
                 }
             }
         )  
