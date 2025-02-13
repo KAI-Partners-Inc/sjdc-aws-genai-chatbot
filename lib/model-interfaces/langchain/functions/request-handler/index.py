@@ -179,22 +179,7 @@ def retrieveAndGenerateKAIP(input, sessionId=None, model_id = "anthropic.claude-
         )
 def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3-5-sonnet-20241022-v2:0"):
     model_arn = f'arn:aws:bedrock:us-east-1::foundation-model/{model_id}'
-    kbId = "COXAUXAUCG"
-    custom_prompt = f"""
-    You are an AI assistant providing accurate answers based on the given context.
-
-    CONTEXT:
-    {context}
-
-    USER QUESTION:
-    {query}
-
-    INSTRUCTIONS:
-    - Use only the provided context to answer.
-    - If the context lacks relevant information, say "I couldn't find relevant information within the CAEP documents provided. Try rephrasing your question or checking other resources."
-    - Keep responses clear and concise.
-    """
-    
+    kbId = "COXAUXAUCG"    
     if sessionId:
         return bedrock_agent_client.retrieve_and_generate(
             input={
