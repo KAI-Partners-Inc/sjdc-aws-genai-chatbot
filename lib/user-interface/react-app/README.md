@@ -67,7 +67,7 @@ npm run dev
 > - [Chat-bot script config page](https://d2ins6zcpv691t.cloudfront.net/kai/common-ui/embed-chat.html)
 > - [Chat-bot script embedded into a host page](https://d2ins6zcpv691t.cloudfront.net/kai/common-ui/embed-chat-host.html)
 
-1. In the browser open [/kai/common-ui/embed-chat.html](https://d2ins6zcpv691t.cloudfront.net/kai/common-ui/embed-chat.html).
+1. In the browser open [/kai/common-ui/embed-chat.html](https://d37nmi88xkdn9a.cloudfront.net/kai/common-ui/embed-chat.html).
 1. Make the appropriate configurations
 1. Click the Copy button.
 1. In a new tab open one of the following:
@@ -75,9 +75,6 @@ npm run dev
    1. https://kaipartners.com
    1. https://www.deltacollege.edu
 
->[!Note]
-> You can add a new domain by adding it to the list of `Content-Security-Policy` `frame-ancestors` in the `vite.config.ts` located at:
-> - `/lib/user-interface/react-app/vite.config.ts` file.
 
 5. Open the developer tools in the web browser.
 1. Make sure the Developer Tools **Console** is open.

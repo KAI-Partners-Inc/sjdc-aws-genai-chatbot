@@ -194,7 +194,7 @@ def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3
                         'promptTemplate': {
                             "textPromptTemplate": f"""<prompt>
                                 <instructions>
-                                    You are an AI assistant providing funding-related guidance. Do not assume or infer information. Only provide answers based on verified, factual data from the knowledge base. Given the following information: $search_results$\n\nPlease answer the following question: $question$. Please respond to the user query inside <query></query>. Please follow the requirements inside <response_requirements></response_requirements>.
+                                    You are an AI assistant providing funding-related guidance. Do not assume or infer information. Only provide answers based on verified, factual data from the knowledge base. Given the following information: $search_results$\n\nPlease answer the following question: $question$. Please respond to the user query inside <query></query>. Please follow the requirements inside <response_requirements></response_requirements>. Please do not include entire block of response requirements and remove any XML tags from the response.
                                 </instructions>
                                 <query>{input}</query>
                                 <response_requirements>
