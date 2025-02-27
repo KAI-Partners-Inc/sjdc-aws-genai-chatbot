@@ -232,7 +232,7 @@ type Session @aws_cognito_user_pools {
   title: String
   startTime: AWSDateTime!
   history: [SessionHistoryItem]
-  feedback: FeedbackUnion
+  feedback: [SessionFeedbackItem]
 }
 
 type SessionFeedbackItem @aws_cognito_user_pools {
@@ -241,8 +241,6 @@ type SessionFeedbackItem @aws_cognito_user_pools {
   message: String
   response: String
 }
-
-union FeedbackUnion = SessionFeedbackItem | [SessionFeedbackItem]
 
 type SessionHistoryItem @aws_cognito_user_pools {
   type: String!
