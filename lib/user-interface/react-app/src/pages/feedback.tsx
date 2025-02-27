@@ -123,7 +123,7 @@ function Feedback() {
             filteredFeedbackList[i].feedback = 'Negative'
         }
     }
-
+    console.log(filteredFeedbackList)
 
     return (
         <BaseAppLayoutv
