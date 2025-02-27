@@ -68,10 +68,9 @@ def add_user_feedback(
                 items = response["Item"]["History"]
             else:
                 items = []
-            if response and "Item" in response:
-                if "Feedback" in response["Item"]:
-                    prev_feedback = response["Item"]["Feedback"]
-        
+            if "Item" in response:
+                prev_feedback = response.get("Item", {}).get("Feedback") or []
+                
             logger.info("items")
             logger.info(items)
             prev_message = ""
@@ -87,9 +86,12 @@ def add_user_feedback(
             logger.error("Table get messages feedback error")
             logger.error(e)
             prev_message = "There was an error retrieving the message"
+
         new_feedback_data["message"] = prev_message
+
         if isinstance(prev_feedback, list):
-            new_feedback_data = prev_feedback.append(new_feedback_data)
+            prev_feedback.append(new_feedback_data)
+            new_feedback_data =prev_feedback
         else:
             new_feedback_data = [prev_feedback, new_feedback_data]
         db_response = table.update_item(
