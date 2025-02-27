@@ -77,16 +77,29 @@ function Feedback() {
           for (let i = 0 ; i<listSessions.length; i++){
             if (listSessions[i] && listSessions[i].feedback){
                 const feedback = listSessions[i]?.feedback;
-                if (feedback){
-                    var fbd: FeedbackData = {
-                        "feedback": feedback.feedback ?? 'N/A',
-                        "date": feedback.date ?? 'N/A',
-                        "message": feedback.message ?? 'N/A',
-                        "response": feedback.response ?? 'N/A'
-                    }
-                    feedbackData.push(fbd)
-                }
                 
+                if (feedback){
+                    if (Array.isArray(feedback)){
+                        for (let j = 0; j<feedback.length; j++){
+                            var fbd: FeedbackData = {
+                                "feedback": feedback[j].feedback ?? 'N/A',
+                                "date": feedback[j].date ?? 'N/A',
+                                "message": feedback[j].message ?? 'N/A',
+                                "response": feedback[j].response ?? 'N/A'
+                            }
+                            feedbackData.push(fbd)
+                        }
+                    }
+                    else{
+                        var fbd: FeedbackData = {
+                            "feedback": feedback.feedback ?? 'N/A',
+                            "date": feedback.date ?? 'N/A',
+                            "message": feedback.message ?? 'N/A',
+                            "response": feedback.response ?? 'N/A'
+                        }
+                        feedbackData.push(fbd)
+                    }   
+                }
             }
           }
           setData(feedbackData);
