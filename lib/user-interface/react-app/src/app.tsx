@@ -107,7 +107,7 @@ function App() {
               <Route path = "welcome-test" element={<WelcomeTest />} />
               <Route path = "c4o-sample" element={<C4OPage />} />
               <Route path="embedded" element={<Embedded />} />
-              <Route path="user-feedback" element={<Feedback/>}/>
+              <Route path="user-feedback/:sessionId" element={<Feedback/>}/>
               <Route path="chatbot" element={<Outlet />}>
                 <Route path="playground" element={<Playground />} />
                 <Route path="playground/:sessionId" element={<Playground />} />

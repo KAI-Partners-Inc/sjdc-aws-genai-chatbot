@@ -120,7 +120,7 @@ function Feedback() {
     
 
     const filteredFeedbackList = data.filter(item => item.feedback !== "N/A");
-    
+    console.log(data)
     for (var i =0 ; i < filteredFeedbackList.length; i++){
         if (filteredFeedbackList[i].feedback == '1'){
             filteredFeedbackList[i].feedback = 'Positive'
@@ -129,7 +129,7 @@ function Feedback() {
             filteredFeedbackList[i].feedback = 'Negative'
         }
     }
-    console.log(filteredFeedbackList)
+    // console.log(filteredFeedbackList)
 
     return (
         <BaseAppLayoutv
