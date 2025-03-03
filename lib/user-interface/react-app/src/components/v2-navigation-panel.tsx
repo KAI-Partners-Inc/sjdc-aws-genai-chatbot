@@ -84,14 +84,6 @@ export default function NavigationPanelv() {
       { type: "divider" },
       {
         type: "link",
-        text: "User Feedback",
-        href: "/v2/user-feedback",
-      }
-    )
-    items.push(
-      { type: "divider" },
-      {
-        type: "link",
         text: "Sessions",
         href: "/v2/chatbot/sessions",
       }

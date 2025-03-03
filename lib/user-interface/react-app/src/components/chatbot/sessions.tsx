@@ -276,9 +276,17 @@ export default function Sessions(props: SessionsProps) {
             {
               id: "feedBack",
               header: "Feedback",
-              cell: (e) => (
-                <Link to={`/v2/user-feedback/${e.id}`}>View Feedback</Link>
-              )
+              cell: (e) => {
+                const feedback = e.feedback;
+            
+                // Check if feedback is an empty array
+                if (Array.isArray(feedback) && feedback.length === 0) {
+                  return "No Feedback Data"; // Show this when feedback is an empty array
+                }
+            
+                // Otherwise, show the "View Feedback" link
+                return <Link to={`/v2/user-feedback/${e.id}`}>View Feedback</Link>;
+              }
             },
           ] as TableProps.ColumnDefinition<Session>[]
         }
