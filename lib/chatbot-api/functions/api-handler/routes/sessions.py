@@ -19,7 +19,11 @@ def get_sessions():
         raise genai_core.types.CommonError("User not found")
 
     sessions = genai_core.sessions.list_sessions_by_user_id(user_id)
-
+    for session in sessions:
+        if session.get("Feedback") != None:
+            fb = session.get("Feedback")
+            if type(fb) is dict:
+                session["Feedback"] = [fb]
     return [
         {
             "id": session.get("SessionId"),
@@ -27,11 +31,7 @@ def get_sessions():
             .get("data", {})
             .get("content", "<no title>"),
             "startTime": f'{session.get("StartTime")}Z',
-            "feedback": (
-                [session["Feedback"]]  # Wrap single feedback in a list
-                if isinstance(session.get("Feedback"), dict) else
-                list(filter(lambda x: x and x != {}, session.get("Feedback", [])))  # Remove None and empty dicts
-            )
+            "feedback": session.get("Feedback", [])
         }
         for session in sessions
     ]
