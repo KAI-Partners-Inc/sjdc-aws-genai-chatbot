@@ -3,6 +3,7 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import { ApiClient } from "../common/api-client/api-client";
 import { AppContext } from "../common/app-context";
 import '../styles/feedback.scss';
+import { useParams } from 'react-router-dom';
 
 // interface FeedbackTableInterface  {
 //     data = Feedback[]
@@ -64,6 +65,7 @@ const formatDate = (dateString: string | null): string => {
 
 function Feedback() {
     const appContext = useContext(AppContext);
+    const { sessionId } = useParams();
     const [data, setData] = useState<FeedbackData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const getSessions = useCallback(async () => {
@@ -75,18 +77,21 @@ function Feedback() {
             // console.log(result.data!.listSessions)
             const listSessions = result.data?.listSessions || [];
 
-            listSessions.forEach((session) => {
+            listSessions.filter(session => session?.id === sessionId) // Only process sessions with the given ID
+            .forEach(session => {
                 if (!session?.feedback) return;
-
+            
                 const feedbackList = Array.isArray(session.feedback) ? session.feedback : [session.feedback];
-
-                feedbackList.forEach((feedback) => {
-                    feedbackData.push({
+            
+                feedbackList.forEach(feedback => {
+                  if (!feedback) return; // Ensure feedback is not null
+            
+                  feedbackData.push({
                     feedback: feedback.feedback ?? 'N/A',
                     date: feedback.date ?? 'N/A',
                     message: feedback.message ?? 'N/A',
                     response: feedback.response ?? 'N/A',
-                    });
+                  });
                 });
             });
             console.log(feedbackData)
