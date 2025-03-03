@@ -74,7 +74,7 @@ function Feedback() {
         try {
             const result = await apiClient.sessions.getSessions();
             const feedbackData: FeedbackData[] = []
-            // console.log(result.data!.listSessions)
+            console.log(result.data!.listSessions)
             const listSessions = result.data?.listSessions || [];
 
             listSessions.filter(session => session?.id === sessionId) // Only process sessions with the given ID
