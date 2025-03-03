@@ -27,7 +27,11 @@ def get_sessions():
             .get("data", {})
             .get("content", "<no title>"),
             "startTime": f'{session.get("StartTime")}Z',
-            "feedback": session.get("Feedback", {})
+            "feedback": (
+                [session["Feedback"]]  # Wrap single feedback in a list
+                if isinstance(session.get("Feedback"), dict) else
+                list(filter(lambda x: x and x != {}, session.get("Feedback", [])))  # Remove None and empty dicts
+            )
         }
         for session in sessions
     ]
