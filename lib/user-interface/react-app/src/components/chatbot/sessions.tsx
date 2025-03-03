@@ -273,6 +273,13 @@ export default function Sessions(props: SessionsProps) {
                 );
               },
             },
+            {
+              id: "feedBack",
+              header: "Feedback",
+              cell: (e) => (
+                <Link to={`/v2/user-feedback/${e.id}`}>View Feedback</Link>
+              )
+            },
           ] as TableProps.ColumnDefinition<Session>[]
         }
       />

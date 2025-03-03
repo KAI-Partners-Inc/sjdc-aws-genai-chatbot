@@ -70,43 +70,31 @@ function Feedback() {
         if (!appContext) return;
         const apiClient = new ApiClient(appContext);
         try {
-          const result = await apiClient.sessions.getSessions();
-          const feedbackData: FeedbackData[] = []
-          console.log(result.data!.listSessions)
-          var listSessions = result.data!.listSessions
-          for (let i = 0 ; i<listSessions.length; i++){
-            if (listSessions[i] && listSessions[i].feedback){
-                const feedback = listSessions[i]?.feedback;
-                
-                if (feedback){
-                    if (Array.isArray(feedback)){
-                        for (let j = 0; j<feedback.length; j++){
-                            var fbd: FeedbackData = {
-                                "feedback": feedback[j].feedback ?? 'N/A',
-                                "date": feedback[j].date ?? 'N/A',
-                                "message": feedback[j].message ?? 'N/A',
-                                "response": feedback[j].response ?? 'N/A'
-                            }
-                            feedbackData.push(fbd)
-                        }
-                    }
-                    else{
-                        var fbd: FeedbackData = {
-                            "feedback": feedback.feedback ?? 'N/A',
-                            "date": feedback.date ?? 'N/A',
-                            "message": feedback.message ?? 'N/A',
-                            "response": feedback.response ?? 'N/A'
-                        }
-                        feedbackData.push(fbd)
-                    }   
-                }
-            }
-          }
-          setData(feedbackData);
-          setIsLoading(false)
+            const result = await apiClient.sessions.getSessions();
+            const feedbackData: FeedbackData[] = []
+            // console.log(result.data!.listSessions)
+            const listSessions = result.data?.listSessions || [];
+
+            listSessions.forEach((session) => {
+                if (!session?.feedback) return;
+
+                const feedbackList = Array.isArray(session.feedback) ? session.feedback : [session.feedback];
+
+                feedbackList.forEach((feedback) => {
+                    feedbackData.push({
+                    feedback: feedback.feedback ?? 'N/A',
+                    date: feedback.date ?? 'N/A',
+                    message: feedback.message ?? 'N/A',
+                    response: feedback.response ?? 'N/A',
+                    });
+                });
+            });
+            console.log(feedbackData)
+            setData(feedbackData);
+            setIsLoading(false)
         } catch (e) {
-          console.log(e);
-          setIsLoading(false)
+            console.log(e);
+            setIsLoading(false)
         }
       }, [appContext]);
     
