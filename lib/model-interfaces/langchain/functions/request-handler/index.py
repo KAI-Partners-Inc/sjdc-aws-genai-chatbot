@@ -260,22 +260,23 @@ def callKendraQueryAPI(query):
     payload = {
         "user_query": query
     }
-    KENDRA_QUERY_LAMBDA_NAME = 'C4O-custom-response-notavailable'
+    kendra = boto3.client("kendra", region_name="us-east-1")
+   
+    KENDRA_INDEX_ID = "7776cf50-6941-4b6a-baf5-56670ce39896"
     try:
         # Invoke the Lambda function
-        response = lambda_client.invoke(
-            FunctionName=KENDRA_QUERY_LAMBDA_NAME,
-            InvocationType='RequestResponse',  # Synchronous execution
-            Payload=json.dumps(payload)
-        )
-
-        # Read the response payload
-        response_payload = json.loads(response['Payload'].read().decode('utf-8'))
-        
-        return response_payload.get("answer", "No answer found.")  # Extract the answer field
-
+        response = kendra.query(IndexId=KENDRA_INDEX_ID, QueryText=user_query)
+        print("KENDRA OUTPUT")
+        print(response)
+        doc_titles = []
+        for item in response["ResultItems"]:
+            if item["Type"]=="Document":
+                if item["DocumentTitle"]["text"] not in doc_titles:
+                    doc_titles.append(item["DocumentTitle"]["text"])
+        return doc_titles
     except Exception as e:
-        return f"Error: {str(e)}"
+        print( f"Error: {str(e)}")
+        return []
 
 ### 2
 def handle_run(record):
@@ -335,51 +336,52 @@ def handle_run(record):
                     "data": response,
                 }
             )
-        elif model_id == "C4O_Model_Custom":
-            output = callKendraQueryAPI(prompt)
-            metadata = {
-                    "modelId": model_id,
-                    "modelKwargs": data.get("modelKwargs", {}),
-                    "mode": mode,
-                    "citations": [],
-                    "sessionId": session_id,
-                    "userId": user_id,
-                    "documents": [],
-                    "prompts": [],
-                }
-            try:
-                db_chat_history = DynamoDBChatMessageHistory(
-                table_name=os.environ["SESSIONS_TABLE_NAME"],
-                session_id=session_id,
-                user_id=user_id,
-                )
-                db_chat_history.add_message(HumanMessage(content=prompt))
-                db_chat_history.add_message(AIMessage(content=output))
-                db_chat_history.add_metadata(metadata)
-            except Exception as e:
-                logger.error("ERROR: db add meta data")
-                logger.error(e)
-                pass
-            response = {
-                    "sessionId": session_id,
-                    "type": "text",
-                    "content": output,
-                    "metadata": metadata
-                }
-            logger.info(response)
-            send_to_client(
-                {
-                    "type": "text",
-                    "action": ChatbotAction.FINAL_RESPONSE.value,
-                    "timestamp": str(int(round(datetime.now().timestamp()))),
-                    "userId": user_id,
-                    "data": response,
-                }
-            )
+        # elif model_id == "C4O_Model_Custom":
+        #     output = callKendraQueryAPI(prompt)
+        #     metadata = {
+        #             "modelId": model_id,
+        #             "modelKwargs": data.get("modelKwargs", {}),
+        #             "mode": mode,
+        #             "citations": [],
+        #             "sessionId": session_id,
+        #             "userId": user_id,
+        #             "documents": [],
+        #             "prompts": [],
+        #         }
+        #     try:
+        #         db_chat_history = DynamoDBChatMessageHistory(
+        #         table_name=os.environ["SESSIONS_TABLE_NAME"],
+        #         session_id=session_id,
+        #         user_id=user_id,
+        #         )
+        #         db_chat_history.add_message(HumanMessage(content=prompt))
+        #         db_chat_history.add_message(AIMessage(content=output))
+        #         db_chat_history.add_metadata(metadata)
+        #     except Exception as e:
+        #         logger.error("ERROR: db add meta data")
+        #         logger.error(e)
+        #         pass
+        #     response = {
+        #             "sessionId": session_id,
+        #             "type": "text",
+        #             "content": output,
+        #             "metadata": metadata
+        #         }
+        #     logger.info(response)
+        #     send_to_client(
+        #         {
+        #             "type": "text",
+        #             "action": ChatbotAction.FINAL_RESPONSE.value,
+        #             "timestamp": str(int(round(datetime.now().timestamp()))),
+        #             "userId": user_id,
+        #             "data": response,
+        #         }
+        #     )
         elif model_id == "C4O_Model":
             retrieve_generate_response = retrieveAndGenerateC4O(prompt, None, "anthropic.claude-3-sonnet-20240229-v1:0")
             output = retrieve_generate_response["output"]["text"]
-            citations = retrieve_generate_response["citations"]
+            citations = callKendraQueryAPI(prompt)
+            # citations = retrieve_generate_response["citations"]
             logger.info(output)
             metadata = {
                     "modelId": model_id,
@@ -393,39 +395,9 @@ def handle_run(record):
                 }
             output += "\n\nCitations\n\n"
             citations_string = ''
-            titles = []
-            citations_indexes = []
-            # for citation in citations:
-            #     generated_response = citation.get('generatedResponsePart', {})
-            #     text_response = generated_response.get('textResponsePart', {})
-            #     span = text_response.get('span', {})
-                
-            #     index_start = span.get('start')
-            #     index_end = span.get('end')
-            #     cit_nums=''
-            #     for ref in citation.get("retrievedReferences", []):
-            #         md = ref.get("metadata", {})
-            #         title = md.get("x-amz-bedrock-kb-title", "Unknown Title")
-            #         uri = md.get("x-amz-bedrock-kb-source-uri", "Unknown URI")
-            #         if title not in titles:
-            #             titles.append(title)
-            #             ref_num = len(titles)
-            #             cit_nums += f'[[{ref_num}]]({uri})'
-            #             citations_string += f"{ref_num}. {title} {uri}\n"
-            #         else:
-            #             ref_num = titles.index(title)
-            #             ref_num+=1
-            #             temp_cit_num = f'[[{ref_num}]]({uri})'
-            #             if temp_cit_num not in cit_nums:
-            #                 cit_nums+=temp_cit_num
-            #             else:
-            #                 pass
-            #     citations_indexes.append((index_start,index_end, cit_nums))
-            # citations_indexes = sorted(citations_indexes, key=lambda x: x[1], reverse=True)
-            # # Insert strings into the output
-            # for start_index, end_index, string in citations_indexes:
-            #     output = output[:end_index + 1] + "**" + string + "**" + output[end_index + 1:]
-            # output+= citations_string
+            i=0
+            for citation in citations:
+                output+= str(i) + " " + citation + "\n"
             try:
                 db_chat_history = DynamoDBChatMessageHistory(
                 table_name=os.environ["SESSIONS_TABLE_NAME"],
