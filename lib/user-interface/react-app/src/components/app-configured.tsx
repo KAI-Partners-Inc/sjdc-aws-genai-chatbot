@@ -61,7 +61,7 @@ export default function AppConfigured() {
           params.append('grant_type', 'authorization_code');
           params.append('code', authCode);
           params.append('client_id', client_id);
-          params.append('redirect_uri', 'https://sage-ai.kaipartners.com/')
+          params.append('redirect_uri', 'https://d37nmi88xkdn9a.cloudfront.net/')
           // If the code is present, exchange it for tokens
           try {
             const response = await fetch(tokenEndpoint, {
@@ -178,7 +178,7 @@ export default function AppConfigured() {
     );
   }
 
-  const signInUrl = `https://kaip-chatbot.auth.us-east-1.amazoncognito.com/login?client_id=${config?.aws_user_pools_web_client_id}&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=${encodeURIComponent("https://sage-ai.kaipartners.com/")}`;
+  const signInUrl = `https://kaip-chatbot.auth.us-east-1.amazoncognito.com/login?client_id=${config?.aws_user_pools_web_client_id}&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+phone+profile&redirect_uri=${encodeURIComponent("https://d37nmi88xkdn9a.cloudfront.net/")}`;
 
   return (
     <AppContext.Provider value={config}>
