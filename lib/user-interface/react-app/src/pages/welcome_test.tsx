@@ -153,7 +153,7 @@ const WelcomePage = () => {
     
         const iframe = document.createElement('iframe');
         iframe.setAttribute('title', 'Chat Window');
-        iframe.setAttribute('src', 'https://d37nmi88xkdn9a.cloudfront.net/embedded');
+        iframe.setAttribute('src', 'https://sage-ai.kaipartners.com/embedded');
         iframe.setAttribute('allow', 'fullscreen');
         iframe.setAttribute('name', 'chat');
         iframe.setAttribute('style', `

@@ -257,23 +257,16 @@ def retrieveAndGenerateC4O(input, sessionId=None, model_id = "anthropic.claude-3
         )  
 
 def callKendraQueryAPI(query):
-    payload = {
-        "user_query": query
-    }
     kendra = boto3.client("kendra", region_name="us-east-1")
    
     KENDRA_INDEX_ID = "7776cf50-6941-4b6a-baf5-56670ce39896"
     try:
         # Invoke the Lambda function
-        response = kendra.query(IndexId=KENDRA_INDEX_ID, QueryText=user_query)
+        response = kendra.query(IndexId=KENDRA_INDEX_ID, QueryText=query)
         print("KENDRA OUTPUT")
         print(response)
-        doc_titles = []
-        for item in response["ResultItems"]:
-            if item["Type"]=="Document":
-                if item["DocumentTitle"]["text"] not in doc_titles:
-                    doc_titles.append(item["DocumentTitle"]["text"])
-        return doc_titles
+        unique_titles = list({item['DocumentTitle']['Text'] for item in response['ResultItems']})
+        return unique_titles
     except Exception as e:
         print( f"Error: {str(e)}")
         return []
@@ -397,7 +390,8 @@ def handle_run(record):
             citations_string = ''
             i=0
             for citation in citations:
-                output+= str(i) + " " + citation + "\n"
+                output+=  f"{str(i)}. {citation}\n"
+                i+=1
             try:
                 db_chat_history = DynamoDBChatMessageHistory(
                 table_name=os.environ["SESSIONS_TABLE_NAME"],
